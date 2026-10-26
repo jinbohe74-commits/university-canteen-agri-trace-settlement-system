@@ -1,0 +1,63 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: canteen-trace
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/canteen_trace?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: root
+    password: "168168"
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: always
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 业务参数（可用 sys_config 覆盖）
+canteen:
+  jwt:
+    secret: "canteen-trace-direct-supply-trace-settlement-2026-secret-key"
+    expire-minutes: 120          # 普通登录有效期
+    remember-days: 7             # 记住我有效期
+  upload:
+    dir: ./uploads
+    allow-ext: jpg,jpeg,png,pdf,webp
+    max-size-mb: 5
+  batch:
+    qr-dir: ./uploads/qrcode
+
+logging:
+  level:
+    root: INFO
+    com.canteen: INFO
+    com.canteen.mapper: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"

@@ -1,0 +1,245 @@
+[
+  {
+    "role": "admin",
+    "route": "admin/dashboard",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/farmers",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/canteens",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/products",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/users",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/orders",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/settlements",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/warnings",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/trace",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/config",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "admin",
+    "route": "admin/logs",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "farmer24",
+    "route": "farmer/workbench",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "farmer24",
+    "route": "farmer/sources",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "farmer24",
+    "route": "farmer/orders",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "farmer24",
+    "route": "farmer/settlement",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "farmer24",
+    "route": "farmer/credit",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "farmer24",
+    "route": "farmer/messages",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "purchaser01",
+    "route": "purchaser/demands",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "purchaser01",
+    "route": "purchaser/sources",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "purchaser01",
+    "route": "purchaser/match",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "purchaser01",
+    "route": "purchaser/orders",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "purchaser01",
+    "route": "purchaser/inbound",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "purchaser01",
+    "route": "purchaser/evaluation",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "inspector01",
+    "route": "inspector/tasks",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "inspector01",
+    "route": "inspector/quality",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "inspector01",
+    "route": "inspector/delivery",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  },
+  {
+    "role": "inspector01",
+    "route": "inspector/exception",
+    "ok": true,
+    "hasKw": true,
+    "hasTitle": 1,
+    "placeholder": false,
+    "errors": []
+  }
+]

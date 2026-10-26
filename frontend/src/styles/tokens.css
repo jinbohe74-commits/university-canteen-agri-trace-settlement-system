@@ -1,0 +1,65 @@
+:root {
+  /* 主色：绿色农业风 */
+  --c-primary: #16a34a;
+  --c-primary-dark: #15803d;
+  --c-primary-light: #22c55e;
+  --c-primary-soft: #e8f7ee;
+  --c-primary-softer: #f2fbf5;
+
+  /* 侧边栏深墨绿渐变 */
+  --c-sidebar-1: #0e2b20;
+  --c-sidebar-2: #174934;
+  --c-sidebar-text: rgba(233, 245, 238, 0.72);
+  --c-sidebar-text-active: #ffffff;
+
+  /* 中性色 */
+  --c-bg: #eef2f1;
+  --c-card: #ffffff;
+  --c-border: #e8eeec;
+  --c-border-strong: #dbe5e1;
+  --c-text: #111827;
+  --c-text-2: #374151;
+  --c-muted: #6b7280;
+  --c-muted-2: #9ca3af;
+  --c-th: #f7faf9;
+
+  /* 语义色 */
+  --c-blue: #3b82f6;
+  --c-orange: #f59e0b;
+  --c-red: #ef4444;
+  --c-purple: #8b5cf6;
+  --c-teal: #0d9488;
+  --c-cyan: #06b6d4;
+
+  /* 尺寸 */
+  --sidebar-w: 232px;
+  --header-h: 60px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 2px 10px rgba(16, 42, 32, 0.05);
+  --shadow-pop: 0 12px 32px rgba(16, 42, 32, 0.12);
+  --font: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Helvetica Neue",
+    Helvetica, Arial, sans-serif;
+  --font-num: "DIN Alternate", "Helvetica Neue", "PingFang SC", sans-serif;
+
+  /* Element Plus 主题变量覆盖 */
+  --el-color-primary: #16a34a;
+  --el-color-primary-light-3: #4bbf78;
+  --el-color-primary-light-5: #7fd1a0;
+  --el-color-primary-light-7: #b2e3c6;
+  --el-color-primary-light-8: #cbeed9;
+  --el-color-primary-light-9: #e8f7ee;
+  --el-color-primary-dark-2: #15803d;
+  --el-color-success: #16a34a;
+  --el-color-warning: #f59e0b;
+  --el-color-danger: #ef4444;
+  --el-color-info: #6b7280;
+  --el-border-radius-base: 8px;
+  --el-font-family: var(--font);
+  --el-text-color-primary: #111827;
+  --el-text-color-regular: #374151;
+  --el-border-color: #e8eeec;
+  --el-border-color-light: #eef3f1;
+  --el-fill-color-blank: #ffffff;
+  --el-bg-color: #ffffff;
+}
