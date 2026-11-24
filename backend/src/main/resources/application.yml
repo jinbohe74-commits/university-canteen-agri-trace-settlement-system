@@ -34,7 +34,7 @@ mybatis-plus:
     banner: false
     db-config:
       id-type: auto
-      # 修复 P2：数据库 25 张表均无 deleted 列，不再配置全局逻辑删除，避免配置与表结构脱节
+      # 修复 P2：数据库各表均无 deleted 列，不再配置全局逻辑删除，避免配置与表结构脱节
 
 # 业务参数（可用 sys_config 覆盖）
 canteen:
