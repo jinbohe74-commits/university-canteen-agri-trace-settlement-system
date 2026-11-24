@@ -1,7 +1,7 @@
 # 面向高校食堂的农产品直供溯源与结算管理系统
 
 > 管理信息系统课程实验项目 · 高保真原型实现
-> 四角色（系统管理员 / 农户·合作社 / 食堂采购员 / 质检配送员）× 九大子系统 × 25 张数据表
+> 四角色（系统管理员 / 农户·合作社 / 食堂采购员 / 质检配送员）× 九大子系统 × 33 张数据表
 
 ---
 
@@ -11,8 +11,10 @@
 | --- | --- |
 | 后端 | Spring Boot 3.2.5、MyBatis-Plus 3.5.7、JWT（jjwt 0.12）、BCrypt、ZXing（二维码）、SHA-256 |
 | 前端 | Vue 3.4、Vite 5、Element Plus 2.8、ECharts 5、Pinia、Vue Router 4、Axios |
-| 数据库 | MySQL 8/9（库名 `canteen_trace`，utf8mb4，25 张表） |
+| 数据库 | MySQL 8/9（库名 `canteen_trace`，utf8mb4，33 张表） |
 | 运行环境 | JDK 17、Node 18+、Maven 3.9 |
+
+> 数据规模口径：`db/01_schema.sql` 建 26 张基础表，`db/03`–`db/10` 增量脚本新增采购订单 / 报价 / 库存 / 质检标准 / 配送温度 / 通知等 7 张，当前合计 **33 张表**；`11_source_cleanup.sql` 生成的 `supply_source_bak_*` 为临时备份表，不计入。
 
 ## 二、目录结构
 
@@ -23,9 +25,9 @@
 │  └─ src/main/java/com/canteen/
 │     ├─ common/                # Result / 分页 / JWT / 拦截器 / 异常 / 单号生成
 │     ├─ config/                # MyBatis-Plus、Web（跨域、拦截器、静态资源）
-│     ├─ entity/ mapper/        # 25 张表的实体与 Mapper
+│     ├─ entity/ mapper/        # 33 张表的实体与 Mapper
 │     ├─ dto/ vo/               # 请求体与视图对象
-│     ├─ service/               # 19 个业务服务（状态机、匹配、结算、溯源、看板…）
+│     ├─ service/               # 30 个服务类（状态机、匹配、结算、溯源、看板…）
 │     └─ controller/            # 认证、管理员、农户、采购员、质检员、公共、文件
 ├─ frontend/                    # 前端（Vue3）
 │  └─ src/
@@ -33,10 +35,11 @@
 │     ├─ components/            # StatCard、SectionCard、StatusTag、BaseChart、OrderDetailDrawer、TracePanel…
 │     ├─ layout/                # 侧边导航 + 顶栏布局
 │     ├─ router/ store/ styles/ utils/
-│     └─ views/                 # 23+ 页面（admin / farmer / purchaser / inspector / login）
+│     └─ views/                 # 30 个页面（admin / farmer / purchaser / inspector / login）
 ├─ db/
-│  ├─ 01_schema.sql             # 25 张表 DDL（主外键、唯一约束、索引、乐观锁字段）
-│  └─ 02_data.sql               # 初始化数据（326 订单、32 农户、220 农产品、12486 条日志…）
+│  ├─ 01_schema.sql             # 26 张基础表 DDL（主外键、唯一约束、索引、乐观锁字段）
+│  ├─ 02_data.sql               # 初始化数据（326 订单、32 农户、220 农产品、12486 条日志…）
+│  └─ 03~12_*.sql               # 增量脚本：新增 7 张表及字段、权限、日志调整
 ├─ tools/gen_data.py            # 初始化数据生成脚本（可重跑）
 └─ docs/                        # 说明文档
 ```
@@ -146,7 +149,7 @@ npm run dev          # http://127.0.0.1:5173
 
 完整接口见 `docs/接口文档.md`。
 
-## 七、页面清单（对齐原型 23 屏）
+## 七、页面清单（当前 30 个页面）
 
 | 角色 | 页面 |
 | --- | --- |
@@ -173,7 +176,7 @@ npm run dev          # http://127.0.0.1:5173
 
 | 文件 | 说明 |
 | --- | --- |
-| `docs/数据库设计说明.md` | 25 张表清单、关键字段与约束、参数表、数据规模 |
+| `docs/数据库设计说明.md` | 基础表清单、关键字段与约束、参数表、数据规模（增量表见 db/03~12） |
 | `docs/接口文档.md` | 全部 RESTful 接口与参数说明 |
 | `docs/测试报告.md` | 接口/流程/页面/布局测试记录与结论 |
 | `docs/screenshots/` | 28 张页面截图（登录页 + 四角色全部页面） |
