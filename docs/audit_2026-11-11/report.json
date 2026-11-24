@@ -1,0 +1,626 @@
+{
+  "generatedAt": "2026-11-11T13:42:06.640Z",
+  "pages": [
+    {
+      "role": "ADMIN",
+      "path": "admin/dashboard",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1125,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/farmers",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "认证农户/合作社 24 较上月 +3 明细 ›",
+        "入驻生产基地 22 累计 明细 ›",
+        "待审核 6 点击筛出待审核 明细 ›",
+        "平均信用分 86.9 较上月 +0.8 明细 ›"
+      ],
+      "bodyLen": 1045,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/canteens",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "合作食堂 4 校区数量 2 明细 ›",
+        "日均供餐（人次） 8,200 4 个食堂合计 明细 ›",
+        "本月采购订单 346 较上月 +26 明细 ›",
+        "履约合格率 100% 本月 明细 ›"
+      ],
+      "bodyLen": 586,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/products",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "在管品类 86 规格 SKU 明细 ›",
+        "在售农产品 214 累计 220 明细 ›",
+        "供货农户 1,701 供货关系数 明细 ›",
+        "价格波动预警 211 超阈值 明细 ›"
+      ],
+      "bodyLen": 854,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/users",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1554,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/orders",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "待接单 21 需农户响应 明细 ›",
+        "配送中 1 在途批次 明细 ›",
+        "待结算 4 待审核 明细 ›",
+        "今日订单 7 金额 ¥ 6,602.00 明细 ›"
+      ],
+      "bodyLen": 1202,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/settlements",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 20,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "待审核结算单 4 金额 ¥ 4,445.00 明细 ›",
+        "本月已结算 13 本月 17 笔 明细 ›",
+        "损耗扣款 ¥ 133.07 本月累计 明细 ›",
+        "实际结算 ¥ 17,777.00 本月 明细 ›"
+      ],
+      "bodyLen": 975,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/warnings",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "证照过期 1 高风险 明细 ›",
+        "质检不合格 1 需跟进 明细 ›",
+        "价格波动 0 超阈值 明细 ›",
+        "订单逾期 10 需催办 明细 ›"
+      ],
+      "bodyLen": 1190,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/trace",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1082,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/config",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 878,
+      "emptyOnly": false
+    },
+    {
+      "role": "ADMIN",
+      "path": "admin/logs",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "今日操作记录 871 较昨日 +8.6% 明细 ›",
+        "今日登录 6 活跃账号 明细 ›",
+        "异常登录 17 含锁定次数 明细 ›",
+        "审计完整率 100% 操作可追溯 明细 ›"
+      ],
+      "bodyLen": 893,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/workbench",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "待接单 2 需 3 小时内响应 明细 ›",
+        "配送中 0 在途批次 明细 ›",
+        "本月收入 ¥ 12,094.90 较上月 +33.8% 已结算入账 明细 ›",
+        "信用分 81 分 等级：一般 明细 ›"
+      ],
+      "bodyLen": 730,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/sources",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "在售货源 4 持续供应 明细 ›",
+        "累计发布 17 货源订单 明细 ›",
+        "本月成交 14 货源订单 明细 ›",
+        "已售罄 13 需补货 明细 ›"
+      ],
+      "bodyLen": 748,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/demands",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "可报价需求 9 处理中 明细 ›",
+        "我的报价 13 累计 明细 ›",
+        "已中标 12 等待签约发货 明细 ›",
+        "待定标 1 已报价未出结果 明细 ›"
+      ],
+      "bodyLen": 769,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/orders",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "待接单 2 等待响应 明细 ›",
+        "配送中 0 进行中 明细 ›",
+        "待结算 0 待食堂结算 明细 ›",
+        "已完成 25 履约良好 明细 ›"
+      ],
+      "bodyLen": 918,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/settlement",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "本月收入 ¥ 12,094.90 已结算入账 明细 ›",
+        "累计收入 ¥ 50,311.28 已结算 41 笔 明细 ›",
+        "待审核结算单 0 笔 等待平台审核 明细 ›"
+      ],
+      "bodyLen": 1207,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/credit",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1436,
+      "emptyOnly": false
+    },
+    {
+      "role": "FARMER",
+      "path": "farmer/messages",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1076,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/demands",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "待比价 6 需要你定标 明细 ›",
+        "已成交 24 累计 明细 ›",
+        "平均报价数 1 每单货源 明细 ›",
+        "已撤回 4 累计 明细 ›"
+      ],
+      "bodyLen": 673,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/sources",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 922,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/match",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 641,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/orders",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "进行中 28 配送 / 待接 明细 ›",
+        "待入库 3 已送达 明细 ›",
+        "待结算 4 待审核 明细 ›",
+        "本月完成 83 合计 83 笔 明细 ›"
+      ],
+      "bodyLen": 952,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/inbound",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1152,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/stock",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        },
+        {
+          "i": 1,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "在库品项 12 食堂库房 明细 ›",
+        "需补货品项 2 撑不到下周 明细 ›",
+        "本周建议采购 2 按消耗测算 明细 ›",
+        "建议采购金额 ¥1,230.06 按最近入库价估算 明细 ›"
+      ],
+      "bodyLen": 965,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/evaluation",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1486,
+      "emptyOnly": false
+    },
+    {
+      "role": "PURCHASER",
+      "path": "purchaser/trace",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1042,
+      "emptyOnly": false
+    },
+    {
+      "role": "INSPECTOR",
+      "path": "inspector/tasks",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [
+        "待质检 1 排队中 明细 ›",
+        "今日已检 7 合格 7 批次 明细 ›",
+        "配送中 1 在途批次 明细 ›",
+        "不合格 4 需复核 明细 ›"
+      ],
+      "bodyLen": 358,
+      "emptyOnly": false
+    },
+    {
+      "role": "INSPECTOR",
+      "path": "inspector/quality",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 833,
+      "emptyOnly": false
+    },
+    {
+      "role": "INSPECTOR",
+      "path": "inspector/delivery",
+      "errs": [],
+      "badApi": [],
+      "tables": [
+        {
+          "i": 0,
+          "overflowX": 0,
+          "canScroll": true,
+          "lastColClipped": false
+        }
+      ],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 772,
+      "emptyOnly": false
+    },
+    {
+      "role": "INSPECTOR",
+      "path": "inspector/exception",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 517,
+      "emptyOnly": false
+    },
+    {
+      "role": "INSPECTOR",
+      "path": "inspector/trace",
+      "errs": [],
+      "badApi": [],
+      "tables": [],
+      "clipped": [],
+      "clippedTotal": 0,
+      "fakeClick": [],
+      "kpis": [],
+      "bodyLen": 1022,
+      "emptyOnly": false
+    }
+  ]
+}

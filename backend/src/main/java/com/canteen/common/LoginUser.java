@@ -17,4 +17,8 @@ public class LoginUser {
     private Long farmerId;
     /** 食堂 ID（采购员角色） */
     private Long canteenId;
+    /** 当前 token 的唯一标识，用于注销时精确吊销 */
+    private String jti;
+    /** 当前 token 过期时间（毫秒） */
+    private Long tokenExpiresAt;
 }

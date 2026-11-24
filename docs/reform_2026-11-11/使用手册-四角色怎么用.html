@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-mode="day">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>农校直供 · 四个角色怎么用（操作手册）</title>
+<style>
+  :root {
+    --ink: #1B2A24; --ink-2: #3A5149; --muted: #6B7F77;
+    --line: #E2EAE6; --surface: #FFFFFF; --surface-2: #F5F8F6;
+    --accent: #15803D; --accent-soft: #E6F4EF; --warn: #B4741B; --warn-soft: #FAF0DF;
+    --danger: #B4443B; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--surface-2); color: var(--ink);
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.75;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 28px 80px; background: var(--surface); }
+  header.doc { border-bottom: 3px solid var(--accent); padding-bottom: 18px; margin-bottom: 8px; }
+  .kicker { font-size: 12px; letter-spacing: .12em; color: var(--accent); font-weight: 700; }
+  h1 { font-size: 30px; margin: 8px 0 6px; letter-spacing: -.01em; }
+  .lede { font-size: 15px; color: var(--ink-2); margin: 0; }
+  h2 {
+    font-size: 21px; margin: 40px 0 12px; padding-left: 12px;
+    border-left: 4px solid var(--accent); line-height: 1.3;
+  }
+  h3 { font-size: 16px; margin: 24px 0 8px; color: var(--ink); }
+  p { margin: 8px 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--surface-2); font-weight: 600; color: var(--ink-2); }
+  td b { color: var(--ink); }
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+  .card { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .card .n { font-size: 12px; color: var(--muted); }
+  .card .t { font-weight: 700; margin-top: 2px; }
+  .card .d { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; line-height: 1.6; }
+  .card.mine { background: var(--accent-soft); border-color: #BFE3D2; }
+
+  figure { margin: 14px 0 6px; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: var(--radius); display: block; }
+  figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+  .note {
+    background: var(--surface-2); border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 14px; margin: 14px 0; font-size: 14px;
+  }
+  .warn { background: var(--warn-soft); border-left-color: var(--warn); }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 10px 0; }
+  .steps li { position: relative; padding: 8px 0 8px 34px; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .steps li::before {
+    counter-increment: s; content: counter(s);
+    position: absolute; left: 0; top: 9px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kv { display: grid; grid-template-columns: 92px 1fr; gap: 6px 12px; font-size: 14px; margin: 10px 0; }
+  .kv span:nth-child(odd) { color: var(--muted); }
+  .tag { display: inline-block; font-size: 12px; border-radius: 999px; padding: 1px 9px; background: var(--accent-soft); color: var(--accent); }
+  .tag.w { background: var(--warn-soft); color: var(--warn); }
+  footer.doc { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 14px; font-size: 12.5px; color: var(--muted); }
+  @media print { body { background: #fff; } .wrap { max-width: none; } figure img { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <div class="kicker">农校直供 · 溯源与结算管理平台</div>
+  <h1>四个角色怎么用</h1>
+  <p class="lede">这份手册按「你是谁 → 你负责哪一段 → 每一步点哪里 → 做完谁接手」写。全部截图和数据都取自系统当前真实运行状态，不是示意图。</p>
+</header>
+
+<h2>一、30 秒看懂：这个系统到底在干什么</h2>
+<p>它管的是一条链：<b>食堂要买菜 → 农户供货 → 质检配送 → 验收入库 → 结算付款</b>。链上每换一棒，单据就自动流转到下一个状态，并通知下一个该干活的人。四个人各管一棒，谁也不能跳步。</p>
+
+<div class="cards">
+  <div class="card"><div class="n">第一棒</div><div class="t">① 农户供货</div><div class="d">农户 / 合作社<br>挂货源、报价、接单发货</div></div>
+  <div class="card"><div class="n">第二棒</div><div class="t">② 采购下单</div><div class="d">食堂采购员<br>提需求、比价、下单</div></div>
+  <div class="card"><div class="n">第三棒</div><div class="t">③ 质检配送</div><div class="d">质检配送员<br>抽检判定、发车、冷链</div></div>
+  <div class="card"><div class="n">第四棒</div><div class="t">④ 入库结算</div><div class="d">采购员验收 → 管理员审核<br>实秤、损耗扣款、付款</div></div>
+</div>
+
+<div class="note">
+  <b>最关键的一件事：</b>你登录后不需要猜自己在哪一环。顶栏面包屑后面有一个 <span class="tag">流程 2/5</span> 的小标，它告诉你「当前这个页面是你五步主线里的第几步」；点它（或点顶栏 <b>怎么用</b>）会打开你的完整业务流程，每一步都写着「你要做什么」和「此刻库里有多少笔待办」。
+</div>
+
+<h2>二、开始使用</h2>
+
+<h3>2.1 登录</h3>
+<p>浏览器打开 <code>http://localhost:5173</code>。演示环境四个账号，密码统一 <code>123456</code>：</p>
+<table>
+  <tr><th>账号</th><th>角色</th><th>姓名</th><th>进来先看哪一页</th></tr>
+  <tr><td><b>admin</b></td><td>系统管理员</td><td>王管理</td><td>数据看板（全局态势 + 待办）</td></tr>
+  <tr><td><b>farmer24</b></td><td>农户 / 合作社</td><td>张大山（绿源蔬菜合作社）</td><td>我的工作台</td></tr>
+  <tr><td><b>purchaser01</b></td><td>食堂采购员</td><td>李建国（第一食堂）</td><td>采购需求</td></tr>
+  <tr><td><b>inspector01</b></td><td>质检配送员</td><td>赵质检</td><td>我的任务</td></tr>
+</table>
+<p class="muted">登录页可以选角色：选了会校验账号身份，选错会被拦下；不选则由系统自动识别。这是为了防止拿农户账号进管理员页面。</p>
+
+<h3>2.2 第一次登录会发生什么</h3>
+<p>每个角色<b>第一次</b>登录时会自动弹出「怎么用」面板（只弹一次，之后从顶栏 <b>怎么用</b> 随时打开）。面板里有四块内容，从上往下读：</p>
+<ul class="steps">
+  <li><b>你负责什么</b>——一句话说清你的岗位在这条链上的位置。</li>
+  <li><b>全链路四棒</b>——高亮的那一格是「你在这」，其余三格写清别人在干什么、跟你交接什么。</li>
+  <li><b>你的 5 步主线</b>——每步都有：要做什么（业务语言）、此刻真实待办笔数、做完谁接手、一键直达按钮。<span class="tag w">卡住下一棒</span> 标红的步骤表示：这一步不做，别人就得等着。</li>
+  <li><b>常见疑问</b>——比如「为什么有些页面我看不到」「为什么别人的单子我看不到」，答案都是系统里真实成立的规则。</li>
+</ul>
+
+<figure>
+  <img src="shots7/PURCHASER-1-怎么用.png" alt="采购员的「怎么用」面板" />
+  <figcaption>采购员登录后的「怎么用」面板：四棒链路 + 五步主线，第 4 步「实秤验收入库」标红表示有 6 笔待验收卡住了结算。</figcaption>
+</figure>
+
+<div class="note warn">
+  <b>三个按钮别再混：</b>顶栏 <b>怎么用</b> = 我该干什么；<b>待办</b> = 现在就有点开就能干的活；<b>通知</b> = 只发给我的、跟我的单据有关的消息（点开直接定位到那张单，不是跳列表页）。
+</div>
+
+<h2>三、角色 A：系统管理员（admin）</h2>
+<p><b>你的职责：</b>让这条链转得合规——审结算、处置预警、盯在途、审农户准入，并看住全平台经营指标。</p>
+
+<table>
+  <tr><th>步骤</th><th>你要做的事</th><th>点哪里</th><th>做完之后谁接手</th></tr>
+  <tr><td>1 <span class="tag w">阻塞</span></td><td>审核结算单：农户的货已入库、结算单已生成，按损耗扣款规则确认实结金额</td><td>结算审核</td><td>农户收款，采购员可评价</td></tr>
+  <tr><td>2 <span class="tag w">阻塞</span></td><td>处置食安预警：证照到期 / 质检不合格 / 价格异动 / 订单逾期</td><td>食安预警</td><td>农户信用分与匹配排名随之变化</td></tr>
+  <tr><td>3</td><td>跟进在途订单：卡在待质检 / 待配送 / 配送中的单子，能催办并看卡在哪一环</td><td>订单监管</td><td>卡点责任人收到定向催办</td></tr>
+  <tr><td>4</td><td>审核农户准入：未认证的农户不能上架货源</td><td>农户/合作社管理</td><td>农户可发布货源、参与报价</td></tr>
+  <tr><td>5</td><td>看经营态势：采购额、损耗率、合格率、供应商排名</td><td>数据看板</td><td>数据来自全平台真实业务表</td></tr>
+</table>
+
+<h3>审核一张结算单的标准动作</h3>
+<ol class="steps">
+  <li>进「结算审核」，表格里每行是一张结算单：应结、损耗扣款、实结三列都摊开了。</li>
+  <li>点 <b>审核</b> 打开单据工作台：上半部分是这单的具体问题（质检结论、损耗率是否超阈值、冷链温度、结算差额），下半部分是六个节点的业务时间线。</li>
+  <li>看完问题再决定：<b>通过审核</b> → 订单转「已结算」并通知农户；<b>驳回重核</b> → 退回让采购员重新核对实收数量。</li>
+</ol>
+<div class="note">损耗扣款不是拍的：系统按「下单量 − 实收量 ÷ 下单量」算损耗率，乘单价扣款。阈值默认 5%，在「系统参数配置」里可改，超阈值会在单据里直接标红。</div>
+
+<h2>四、角色 B：农户 / 合作社（farmer24）</h2>
+<p><b>你的职责：</b>把货供上来——维护货源、响应需求、接单发货；货进食堂后等结算收款。</p>
+
+<figure>
+  <img src="shots7/FARMER-0-首页与流程.png" alt="农户工作台与怎么用面板" />
+  <figcaption>农户登录后的工作台 + 自动弹出的五步主线。第 4 步下方小字：「另有 1 笔已发货，正在等质检员抽检，不用你操作」——这类提示是为了让你知道「现在不用你动」。</figcaption>
+</figure>
+
+<table>
+  <tr><th>步骤</th><th>你要做的事</th><th>点哪里</th><th>做完之后谁接手</th></tr>
+  <tr><td>1</td><td>把今天能供的菜挂上去：品类、可供数量、单价、可供日期；已售罄的补货或下架</td><td>货源管理</td><td>进入采购员「货源大厅」与智能匹配候选池</td></tr>
+  <tr><td>2</td><td>去需求大厅报价：食堂发出的需求都在这，报价后由采购员横向比价</td><td>需求大厅</td><td>中标即生成采购单，你会收到通知</td></tr>
+  <tr><td>3 <span class="tag w">阻塞</span></td><td>确认接单：写清预计发货时间，不接要说明原因</td><td>订单管理 → 待接单</td><td>你发货后 → 质检配送员接手抽检</td></tr>
+  <tr><td>4 <span class="tag w">阻塞</span></td><td>备货发货：按订单数量备货，发货时绑定批次号</td><td>订单管理 → 已接单</td><td>质检员抽检，合格才允许配送</td></tr>
+  <tr><td>5</td><td>查结算与收入：实秤数量、损耗扣款、实结金额，可导出对账单</td><td>结算与收入</td><td>管理员审核后货款到账</td></tr>
+</table>
+
+<div class="note"><b>为什么批次号这么重要：</b>批次号是后面所有溯源、质检报告、结算凭证的关联键。发货时不绑批次，质检员就查不到这批货的档案，整条链会断在这里。</div>
+
+<h2>五、角色 C：食堂采购员（purchaser01）</h2>
+<p><b>你的职责：</b>把菜买回来——提需求、选供应商、验收入库；最后给这一单打分，决定农户下次还能不能被优先匹配。</p>
+
+<table>
+  <tr><th>步骤</th><th>你要做的事</th><th>点哪里</th><th>做完之后谁接手</th></tr>
+  <tr><td>1</td><td>提出采购需求：品类、数量、期望价、到货时间</td><td>采购需求</td><td>系统推给匹配的农户，农户报价</td></tr>
+  <tr><td>2</td><td>选货源 / 智能匹配：按品类价格信用筛，或看五因子推荐</td><td>货源大厅 / 智能匹配</td><td>选定后生成采购单，农户收到通知</td></tr>
+  <tr><td>3</td><td>跟单到货：接单、发货、质检、配送各环节，卡住自动催办</td><td>我的订单</td><td>到货后由你验收</td></tr>
+  <tr><td>4 <span class="tag w">阻塞</span></td><td>实秤验收入库：当场过秤录实收数量，系统按损耗算扣款与结算金额</td><td>入库确认</td><td>生成结算单交管理员审核，库存自动增加</td></tr>
+  <tr><td>5</td><td>评价本次供货：质量、新鲜度、配送、服务打分</td><td>采购评价</td><td>评价进农户信用分，影响下次匹配排名</td></tr>
+</table>
+
+<figure>
+  <img src="shots7/PURCHASER-4-实秤验收入库.png" alt="入库确认页面" />
+  <figcaption>入库确认：首屏自动载入本食堂最近一笔「已送达」订单，录实收数量后系统当场算出损耗率和实结金额，并生成结算单。</figcaption>
+</figure>
+
+<h3>智能匹配是怎么打分的</h3>
+<p>页面右上角直接写着公式：<code>综合得分 = 0.20×品类 + 0.25×价格 + 0.15×数量 + 0.25×信用 + 0.15×距离/历史</code>，权重和 = 1.00。所以信用分低的农户价格再便宜也排不到前面，这是有意的：食安优先于省钱。权重可在「系统参数配置」调整。</p>
+
+<h2>六、角色 D：质检配送员（inspector01）</h2>
+<p><b>你的职责：</b>把关这批货能不能进食堂——抽检判定、发车配送、冷链监控，不合格整批拦下。</p>
+
+<table>
+  <tr><th>步骤</th><th>你要做的事</th><th>点哪里</th><th>做完之后谁接手</th></tr>
+  <tr><td>1 <span class="tag w">阻塞</span></td><td>领质检任务：农户发货后单子进入待质检，这里是今天要检的批次</td><td>我的任务</td><td>取一批进入质检录入</td></tr>
+  <tr><td>2 <span class="tag w">阻塞</span></td><td>录入质检结论：按标准项填实测值，系统自动判定并存证哈希</td><td>质检录入</td><td>合格→配送；不合格→整批驳回 + 食安预警</td></tr>
+  <tr><td>3 <span class="tag w">阻塞</span></td><td>发车配送：安排车辆司机，记录车牌与冷链起点温度</td><td>配送任务</td><td>订单转「配送中」，采购员可看实时轨迹</td></tr>
+  <tr><td>4</td><td>在途跟踪与交付：看温度是否超标、路线是否偏离；到食堂扫码交付</td><td>配送任务</td><td>采购员实秤入库</td></tr>
+  <tr><td>5</td><td>异常上报：温度超标、破损、迟到、现场质量问题，当场登记入预警</td><td>异常上报</td><td>管理员在预警页处置并留痕</td></tr>
+</table>
+
+<figure>
+  <img src="shots7/INSPECTOR-3-发车配送.png" alt="配送任务页面" />
+  <figcaption>配送任务：左侧是当前配送单与实时轨迹，右侧是历史配送记录；发车前必须记录车牌、司机和冷链温度。</figcaption>
+</figure>
+
+<div class="note warn"><b>不合格的后果是连锁的：</b>整批驳回（订单转「已驳回」）→ 自动生成食安预警给管理员 → 农户信用分扣减 → 该农户下次匹配排名下降。所以录入前先核对批次，别把 A 批的检测值填到 B 批上。</div>
+
+<h2>七、一条订单的一生（真实样本 DD202610230322）</h2>
+<p>这是库里一张真实订单：昌江食用菌基地 → 第三食堂，芹菜 180 kg，¥468.00。四个角色接力用了 8 小时，中途还真出了一次损耗超标。</p>
+
+<div class="kv">
+  <span>订单号</span><span><b>DD202610230322</b> · 批次 PC20261023F0006322</span>
+  <span>当前状态</span><span>已结算</span>
+  <span>订购量</span><span>180 kg，订单金额 ¥468.00</span>
+  <span>最终结算</span><span>实收 165.6 kg，损耗 14.4 kg（8.00%，超 5% 阈值），扣款 ¥37.44，<b>实结 ¥430.56</b></span>
+</div>
+
+<table>
+  <tr><th>时间</th><th>发生了什么</th><th>谁做的</th></tr>
+  <tr><td>10-23 11:59</td><td>订单创建：下单 180 kg · ¥468.00</td><td>采购员（由需求定标或直接下单）</td></tr>
+  <tr><td>10-23 15:59</td><td>到货质检：抽检 2 kg，结论合格</td><td>质检配送员</td></tr>
+  <tr><td>10-23 16:59</td><td>发车配送：赣H·D2867 / 钱师傅，车厢 6.0℃</td><td>质检配送员</td></tr>
+  <tr><td>10-23 17:59</td><td>扫码交付：配送单 PS20261023404</td><td>质检配送员</td></tr>
+  <tr><td>10-23 18:59</td><td>验收入库：实收 165.6 kg，损耗 14.4 kg</td><td>采购员（实秤）</td></tr>
+  <tr><td>10-23 19:59</td><td>生成结算单 JS20261023388：应结 ¥468.00 − 扣款 ¥37.44 = 实结 ¥430.56</td><td>系统生成 → 管理员审核</td></tr>
+</table>
+
+<p>这张单在系统里点开的原话是这样的（不是编的，来自单据工作台）：</p>
+<div class="note">
+  ✓ 质检合格 · 抽检 2 kg，各项指标符合标准<br>
+  <span style="color:var(--danger)">! 损耗率超预警线 · 下单 180 kg，实收 165.6 kg，损耗 14.4 kg（8.00%），阈值 5.0%</span><br>
+  ✓ 冷链温度达标 · 车厢 6.0℃，在 2~8℃ 区间内<br>
+  ✓ 结算单已结算 · 应结 ¥468.00，损耗扣款 ¥37.44，实结 ¥430.56
+</div>
+
+<h2>八、订单状态字典（看懂状态列，就看懂了流程）</h2>
+<table>
+  <tr><th>状态码</th><th>显示</th><th>此刻该谁动</th><th>动了之后变成</th></tr>
+  <tr><td>10</td><td>待接单</td><td>农户</td><td>20 已接单</td></tr>
+  <tr><td>20</td><td>已接单</td><td>农户（发货、绑批次）</td><td>30 待质检</td></tr>
+  <tr><td>30</td><td>待质检</td><td>质检配送员</td><td>40 质检合格待配送 / 41 不合格已驳回</td></tr>
+  <tr><td>40</td><td>质检合格待配送</td><td>质检配送员（发车）</td><td>50 配送中</td></tr>
+  <tr><td>50</td><td>配送中</td><td>质检配送员（扫码交付）</td><td>60 已送达待验收</td></tr>
+  <tr><td>60</td><td>已送达待验收</td><td>采购员（实秤入库）</td><td>70 已入库</td></tr>
+  <tr><td>70 / 80</td><td>已入库 / 待结算</td><td>管理员（审核结算）</td><td>90 已结算</td></tr>
+  <tr><td>90 / 100</td><td>已结算 / 已完成</td><td>采购员（评价）；100 为归档态</td><td>—</td></tr>
+  <tr><td>99</td><td>已取消</td><td>—</td><td>—</td></tr>
+</table>
+<p class="muted">状态列是这个系统的「红绿灯」：你只需要找自己该负责的那一两个状态，其余状态的单子既不该你动，也动不了（按钮会按角色裁剪）。</p>
+
+<h2>九、常见疑问</h2>
+<table>
+  <tr><th>问题</th><th>答案</th></tr>
+  <tr><td>为什么有些页面我看不到？</td><td>左侧菜单由角色决定：农户 7 页、采购员 8 页、质检员 5 页、管理员 11 页。看不到 = 这块不归你负责，不是权限出错。</td></tr>
+  <tr><td>为什么有些单子我看不到？</td><td>数据也按角色隔离：农户只看自己的订单，采购员只看本食堂，管理员看全平台。越权访问会被后端拦成 403，不是前端藏起来。</td></tr>
+  <tr><td>点通知 / 待办之后会怎样？</td><td>直接打开这张单的「具体问题 + 业务时间线 + 你能做的动作」，不用再去列表里翻找。</td></tr>
+  <tr><td>按钮是灰的 / 点不动？</td><td>两种原因：① 这张单当前状态不该你动；② 不满足前置条件（如没绑批次不能发车）。灰按钮旁边一般写着原因。</td></tr>
+  <tr><td>损耗扣款怎么算的？</td><td>损耗率 = (下单量 − 实收量) ÷ 下单量；扣款 = 损耗量 × 单价。阈值默认 5%，可在系统参数配置里改。</td></tr>
+  <tr><td>数据是实时的吗？</td><td>通知与动态用 SSE 推送，断线自动退回 15 秒轮询；表格数据在进入页面时拉取，跨角色操作会触发刷新。</td></tr>
+  <tr><td>导出在哪？</td><td>各列表页右上角有「导出」；数据看板的报表是多工作表的 Excel（概览、订单、品类、供应商各一页），不再挤在一个标签页里。</td></tr>
+  <tr><td>KPI 数字和明细对不上？</td><td>点 KPI 卡片会打开「指标分析」而不是复制页面表格：上面是口径说明（比如「今日已检」= 今天 inspect_time 的记录），下面是构成分析和明细，最多 50 行并标注真实条数。</td></tr>
+</table>
+
+<h2>十、这份系统的边界（如实说明）</h2>
+<ul>
+  <li><b>单据工作台只展示真实单据。</b>查不到对应单据时会明确提示「无法定位」，不会编造一张单来凑数。</li>
+  <li><b>KPI 明细最多 50 行</b>，超出会标注真实总条数并提供「查看完整列表」。</li>
+  <li><b>证照类待办目前只能「标记已处置 + 去预警页」</b>，系统没有证照补传接口，不要期待这里能直接上传新证。</li>
+  <li><b>演示数据里有一批历史订单</b>（约 300 张）是完整链路数据，用于报表和看板；如果要做干净的演示，应重置数据库而不是逐张删单——删单会破坏库存与结算的一致性。</li>
+</ul>
+
+<footer class="doc">
+  农校直供 · 溯源与结算管理平台 ｜ 本手册对应 2026-11-11 第七轮整改：新增「怎么用」角色主线引导、顶栏流程定位、订单页按状态直达。<br>
+  截图来源：<code>docs/reform_2026-11-11/shots7/</code>（均由真实登录、真实数据现场截取）。
+</footer>
+
+</div>
+</body>
+</html>

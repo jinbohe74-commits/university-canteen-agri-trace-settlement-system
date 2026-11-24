@@ -72,11 +72,13 @@ import { farmerApi } from '@/api'
 import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtDate } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const loading = ref(false)
 const list = ref([])
 const cat = ref('all')
-const readAll = ref(false)
+// 已读状态持久化，刷新页面后不会「又变回未读」
+const readAll = ref(localStorage.getItem('ct_msg_read_all') === '1')
 
 const CATS = [
   { key: 'all', label: '全部', icon: 'Bell' },
@@ -151,7 +153,7 @@ const esc = (v) =>
 
 const openMsg = (m) => {
   ElMessageBox.alert(
-    `<div style="line-height:1.9;font-size:13px">
+    `<div style="line-height:1.9;font-size: var(--fs-base)">
       <div style="font-weight:600;margin-bottom:4px">${esc(m.title)}</div>
       <div><b>消息类型：</b>${esc(m.type || '—')}</div>
       <div><b>风险等级：</b>${esc(m.level || '—')}</div>
@@ -165,7 +167,8 @@ const openMsg = (m) => {
 
 const markAllRead = () => {
   readAll.value = true
-  ElMessage.success('全部消息已标记为已读')
+  localStorage.setItem('ct_msg_read_all', '1')
+  ElMessage.success('全部消息已标记为已读（刷新后保持）')
 }
 
 const load = async () => {
@@ -178,6 +181,7 @@ const load = async () => {
   }
 }
 
+useAutoRefresh(load)
 onMounted(load)
 </script>
 
@@ -213,7 +217,7 @@ onMounted(load)
   border: 1px solid transparent;
   background: transparent;
   color: var(--c-muted);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-family: inherit;
   cursor: pointer;
   transition: all 0.18s;
@@ -221,18 +225,18 @@ onMounted(load)
 
 .msg-tab:hover {
   background: #f4faf7;
-  color: #15803d;
+  color: var(--accent);
 }
 
 .msg-tab.active {
-  background: #e8f7ee;
+  background: var(--accent-soft);
   border-color: #d2efdf;
-  color: #15803d;
+  color: var(--accent);
   font-weight: 600;
 }
 
 .msg-tab .el-icon {
-  font-size: 14px;
+  font-size: var(--fs-base);
 }
 
 .msg-tab em {
@@ -241,8 +245,8 @@ onMounted(load)
   padding: 0 4px;
   border-radius: 9px;
   background: #f0f4f2;
-  color: #6b7280;
-  font-size: 10.5px;
+  color: var(--muted);
+  font-size: var(--fs-2xs);
   font-style: normal;
   line-height: 17px;
   text-align: center;
@@ -250,19 +254,19 @@ onMounted(load)
 
 .msg-tab.active em {
   background: #fff;
-  color: #15803d;
+  color: var(--accent);
 }
 
 .msg-unread {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .msg-unread b {
-  color: #b45309;
+  color: var(--warn);
   font-family: var(--font-num);
-  font-size: 13.5px;
+  font-size: var(--fs-base);
 }
 
 /* ---------------- 消息列表 ---------------- */
@@ -305,7 +309,7 @@ onMounted(load)
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #16a34a;
+  background: var(--accent);
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
 
@@ -316,32 +320,32 @@ onMounted(load)
   border-radius: 11px;
   display: grid;
   place-items: center;
-  font-size: 18px;
+  font-size: var(--fs-lg);
 }
 
 .tone-blue {
   color: #1d4ed8;
-  background: #e8efff;
+  background: var(--info-soft);
 }
 
 .tone-green {
-  color: #15803d;
-  background: #e8f7ee;
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .tone-red {
-  color: #b91c1c;
-  background: #fdeaea;
+  color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .tone-orange {
-  color: #b45309;
-  background: #fdf2e2;
+  color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .tone-teal {
-  color: #0f766e;
-  background: #e6f6f4;
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .msg-main {
@@ -353,9 +357,9 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
   line-height: 1.5;
 }
 
@@ -365,15 +369,15 @@ onMounted(load)
   height: 17px;
   border-radius: 5px;
   background: #f3f6f5;
-  color: #6b7280;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: var(--fs-2xs);
   font-weight: 400;
   line-height: 17px;
 }
 
 .msg-content {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   line-height: 1.6;
 }
@@ -388,7 +392,7 @@ onMounted(load)
 }
 
 .msg-time {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   font-family: var(--font-num);
 }

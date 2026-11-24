@@ -171,6 +171,7 @@ import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import StarRate from '@/components/StarRate.vue'
 import { fmtDate, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const loading = ref(false)
 const data = ref({})
@@ -238,6 +239,7 @@ const load = async () => {
   }
 }
 
+useAutoRefresh(load)
 onMounted(load)
 </script>
 
@@ -251,7 +253,7 @@ onMounted(load)
   border-radius: 8px;
   background: #fff;
   border: 1px solid var(--c-border);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-text-2);
 }
 
@@ -287,15 +289,15 @@ onMounted(load)
 
 .ring-score {
   font-family: var(--font-num);
-  font-size: 34px;
+  font-size: var(--fs-display);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
   letter-spacing: -0.5px;
 }
 
 .ring-label {
   margin-top: 3px;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
@@ -313,7 +315,7 @@ onMounted(load)
 }
 
 .dims-title {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   margin-bottom: 10px;
 }
@@ -331,18 +333,18 @@ onMounted(load)
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 5px;
-  font-size: 12.5px;
-  color: #374151;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
 }
 
 .dim-top b {
   font-family: var(--font-num);
-  font-size: 13.5px;
-  color: #15803d;
+  font-size: var(--fs-base);
+  color: var(--accent);
 }
 
 .dim-top b small {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   font-weight: 400;
   color: var(--c-muted-2);
 }
@@ -368,21 +370,21 @@ onMounted(load)
   display: grid;
   place-items: center;
   color: #fff;
-  font-size: 17px;
+  font-size: var(--fs-lg);
   font-weight: 700;
-  background: linear-gradient(135deg, #34d399, #15803d);
+  background: linear-gradient(135deg, #34d399, var(--accent));
   box-shadow: 0 4px 10px rgba(21, 128, 61, 0.18);
 }
 
 .p-name {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .p-type {
   margin-top: 3px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
@@ -395,7 +397,7 @@ onMounted(load)
   align-items: center;
   justify-content: space-between;
   min-height: 30px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   border-bottom: 1px dashed #f1f5f3;
 }
 
@@ -408,12 +410,12 @@ onMounted(load)
 }
 
 .p-v {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 500;
 }
 
 .p-v.good {
-  color: #15803d;
+  color: var(--accent);
   font-weight: 700;
   font-family: var(--font-num);
 }
@@ -424,39 +426,39 @@ onMounted(load)
 }
 
 .reason {
-  font-size: 12.5px;
-  color: #1b2a24;
+  font-size: var(--fs-sm);
+  color: var(--ink);
   line-height: 1.5;
 }
 
 .reason-sub {
   margin-top: 2px;
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--c-muted-2);
 }
 
 .score-num {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .score-num.after {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .delta {
   font-family: var(--font-num);
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 700;
 }
 
 .delta-up {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .delta-down {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 /* ---------------- 评价 ---------------- */
@@ -492,9 +494,9 @@ onMounted(load)
 
 .eval-content {
   margin-top: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   line-height: 1.7;
-  color: #374151;
+  color: var(--ink-2);
 }
 
 .eval-foot {
@@ -502,7 +504,7 @@ onMounted(load)
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 8px;
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--c-muted-2);
 }
 

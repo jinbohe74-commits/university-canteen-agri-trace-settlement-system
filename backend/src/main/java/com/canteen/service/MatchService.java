@@ -31,21 +31,28 @@ public class MatchService {
 
     public Map<String, Object> match(Long demandId) {
         PurchaseDemand d = demandService.getById(demandId);
+        // 修复 P1-8：需求数量为 0/空时提前返回业务错误，避免 divide 抛 ArithmeticException 变成 500
+        if (d.getQuantity() == null || d.getQuantity().signum() <= 0) {
+            throw new com.canteen.common.BizException(400, "需求数量必须大于 0，无法进行智能匹配");
+        }
         Product product = productMapper.selectById(d.getProductId());
         if (product == null) {
             throw new com.canteen.common.BizException(404, "需求关联的农产品不存在");
         }
-        Map<String, BigDecimal> w = configService.matchWeights();
+        // 修复 P1-7：即便 sys_config 被写入了非法权重，计算前也强制归一化
+        Map<String, BigDecimal> w = ConfigService.normalizeWeights(configService.matchWeights());
         int topN = configService.getInt("match_top_n", 5);
+        if (topN <= 0 || topN > 20) {
+            topN = 5;
+        }
 
         // 同类目有效货源
         List<SupplySource> sources = sourceMapper.selectList(new LambdaQueryWrapper<SupplySource>()
                 .eq(SupplySource::getStatus, "正常")
                 .gt(SupplySource::getQuantity, 0)
-                .inSql(SupplySource::getProductId,
-                        "SELECT id FROM product WHERE category_id = " + product.getCategoryId()
-                                + " OR category_id IN (SELECT id FROM product_category WHERE parent_id = "
-                                + product.getCategoryId() + ")"));
+                .apply("(product_id IN (SELECT id FROM product WHERE category_id = {0} " +
+                        "OR category_id IN (SELECT id FROM product_category WHERE parent_id = {0})))",
+                        product.getCategoryId()));
         List<Farmer> farmers = farmerMapper.selectList(null);
         Map<Long, Farmer> farmerMap = new HashMap<>();
         for (Farmer f : farmers) {
@@ -113,6 +120,8 @@ public class MatchService {
                     + w.get("quantity").doubleValue() * quantityScore
                     + w.get("credit").doubleValue() * creditScore
                     + w.get("distance").doubleValue() * distanceScore;
+            // 修复 P1-7：得分严格限制在 0~100
+            total = Math.max(0, Math.min(100, total));
 
             v.setCategoryScore(money(categoryScore));
             v.setPriceScore(money(priceScore));
@@ -135,7 +144,8 @@ public class MatchService {
         res.put("demand", demandService.toVO(d));
         res.put("product", product);
         res.put("weights", w);
-        res.put("weightSum", w.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
+        res.put("weightSum", w.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP));
         res.put("results", top);
         res.put("validCount", list.size());
         res.put("formula", "综合得分 = W1×品类 + W2×价格 + W3×数量 + W4×信用 + W5×距离/历史");

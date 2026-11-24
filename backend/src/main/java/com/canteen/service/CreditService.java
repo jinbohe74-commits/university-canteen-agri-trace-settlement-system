@@ -1,5 +1,6 @@
 package com.canteen.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.canteen.entity.CreditScore;
 import com.canteen.entity.Farmer;
 import com.canteen.mapper.CreditScoreMapper;
@@ -21,9 +22,24 @@ public class CreditService {
     private final FarmerMapper farmerMapper;
     private final CreditScoreMapper creditMapper;
     private final ConfigService configService;
+    private final LogService logService;
 
+    /**
+     * 修复：change 为 null 时安全返回；同一订单 + 同一分值 + 同一原因只允许记一次，
+     * 避免重复扣分（入库/质检回调被重放时不再叠加）。
+     */
     @Transactional
     public void change(Long farmerId, Long orderId, BigDecimal change, String reason) {
+        if (farmerId == null || change == null) {
+            return;
+        }
+        if (orderId != null && creditMapper.selectCount(new LambdaQueryWrapper<CreditScore>()
+                .eq(CreditScore::getFarmerId, farmerId)
+                .eq(CreditScore::getOrderId, orderId)
+                .eq(CreditScore::getChangeScore, change)
+                .eq(CreditScore::getReason, reason)) > 0) {
+            return;
+        }
         Farmer f = farmerMapper.selectById(farmerId);
         if (f == null) {
             return;
@@ -50,6 +66,18 @@ public class CreditService {
         upd.setId(farmerId);
         upd.setCreditScore(after);
         farmerMapper.updateById(upd);
+
+        // 审计闭环：信用分是农户的"经营资格"，改动必须能追到人。
+        // 原来只写 credit_score 表、不写操作日志，导致管理员在「操作日志」里
+        // 用农户姓名搜不到任何一条扣分记录，等于查不出是谁动的。
+        logService.record("信用评价",
+                String.format("调整农户「%s」信用分 %s → %s（%+.1f 分）；原因：%s%s",
+                        f.getName(), strip(before), strip(after), change.doubleValue(), reason,
+                        orderId == null ? "" : "；关联订单 " + orderId));
+    }
+
+    private static String strip(BigDecimal v) {
+        return v == null ? "—" : v.stripTrailingZeros().toPlainString();
     }
 
     public void rewardNormal(Long farmerId, Long orderId) {

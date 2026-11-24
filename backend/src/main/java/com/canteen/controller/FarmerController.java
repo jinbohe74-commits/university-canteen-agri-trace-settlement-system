@@ -34,6 +34,30 @@ public class FarmerController {
     private final FarmerMapper farmerMapper;
     private final OrdersMapper orderMapper;
     private final SettlementMapper settlementMapper;
+    private final QuoteService quoteService;
+
+    /** 需求大厅：农户能看到本食堂仍在处理中、未过截止时间的采购需求并报价 */
+    @GetMapping("/demand-hall")
+    public Result<Map<String, Object>> demandHall(@RequestParam(defaultValue = "1") int page,
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam(required = false) String keyword) {
+        Map<String, Object> res = new LinkedHashMap<>();
+        res.put("page", quoteService.demandHall(page, size, keyword));
+        res.put("myQuotes", quoteService.myQuotes());
+        return Result.success(res);
+    }
+
+    @GetMapping("/quotes")
+    public Result<List<Map<String, Object>>> myQuotes() {
+        return Result.success(quoteService.myQuotes());
+    }
+
+    @PostMapping("/quotes")
+    public Result<com.canteen.entity.DemandQuote> submitQuote(
+            @jakarta.validation.Valid @RequestBody com.canteen.dto.QuoteDTO dto) {
+        com.canteen.entity.DemandQuote q = quoteService.submit(dto);
+        return Result.success("报价已提交，等待采购员比价定标", q);
+    }
 
     @GetMapping("/workbench")
     public Result<Map<String, Object>> workbench() {
@@ -148,7 +172,11 @@ public class FarmerController {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("farmer", f);
         m.put("records", creditMapper.selectList(new LambdaQueryWrapper<CreditScore>()
-                .eq(CreditScore::getFarmerId, fid).orderByDesc(CreditScore::getId).last("LIMIT 30")));
+                .eq(CreditScore::getFarmerId, fid)
+                // 按发生时间倒序：按 id 排会与 create_time 不一致，用户看到的是乱序账本
+                .orderByDesc(CreditScore::getCreateTime)
+                .orderByDesc(CreditScore::getId)
+                .last("LIMIT 30")));
         List<Evaluation> evals = evaluationMapper.selectList(new LambdaQueryWrapper<Evaluation>()
                 .eq(Evaluation::getFarmerId, fid).orderByDesc(Evaluation::getId).last("LIMIT 10"));
         m.put("evaluations", evals);

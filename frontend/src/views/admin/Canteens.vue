@@ -216,6 +216,8 @@ import { ElMessage } from 'element-plus'
 import { adminApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
 import { fmtDay, fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTableDom, stamped } from '@/utils/export'
 
 const CAMPUSES = ['主校区', '东校区']
 
@@ -298,7 +300,8 @@ const onPageChange = (page) => {
 }
 
 const exportRoster = () => {
-  ElMessage.success(`已导出《食堂名册》，共 ${total.value} 条记录`)
+  const n = exportTableDom(stamped('食堂名册'))
+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')
 }
 
 const openCreate = () => {
@@ -353,23 +356,25 @@ const goOrders = (row) => {
   ElMessage.success(`正在查看「${row.name}」的采购记录`)
 }
 
+useAutoRefresh(load)
 onMounted(load)
 </script>
 
 <style scoped>
 .table-card {
-  overflow: hidden;
+  /* 不裁切表格：固定列阴影与横向滚动条必须可见（L-040） */
+  overflow: visible;
 }
 
 .cell-main {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
   line-height: 1.35;
 }
 
 .cell-sub {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 2px;
 }
@@ -385,8 +390,8 @@ onMounted(load)
   gap: 12px;
   padding: 13px 15px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f0fdf4, #e8f7ee);
-  border: 1px solid #d6f0e0;
+  background: linear-gradient(135deg, var(--surface-2), var(--accent-soft));
+  border: 1px solid var(--accent-soft);
   margin-bottom: 14px;
 }
 
@@ -396,10 +401,10 @@ onMounted(load)
   border-radius: 12px;
   display: grid;
   place-items: center;
-  font-size: 17px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #34d399, #15803d);
+  background: linear-gradient(135deg, #34d399, var(--accent));
   flex-shrink: 0;
 }
 
@@ -407,14 +412,14 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .archive-sub {
-  font-size: 11.5px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
   margin-top: 3px;
 }
 
@@ -424,22 +429,22 @@ onMounted(load)
 }
 
 .am-label {
-  font-size: 11px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
 
 .am-value {
   font-family: var(--font-num);
-  font-size: 21px;
+  font-size: var(--fs-xl);
   font-weight: 700;
-  color: #15803d;
+  color: var(--accent);
   line-height: 1.25;
 }
 
 .am-value small {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 500;
-  color: #4b7a60;
+  color: var(--muted);
   margin-left: 2px;
 }
 

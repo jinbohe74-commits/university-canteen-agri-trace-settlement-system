@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.time.format.DateTimeFormatter;
@@ -102,6 +103,33 @@ public class TraceService {
     }
 
     /**
+     * 把数据库里存的文件路径转换为内联 base64 data URL。
+     * 仍从 qrDir 读取真实文件（保留存证文件），但展示不再依赖免鉴权的静态资源接口。
+     */
+    private String inlineQr(String stored) {
+        if (stored == null || stored.isBlank()) {
+            return null;
+        }
+        if (stored.startsWith("data:")) {
+            return stored;
+        }
+        try {
+            File root = new File(qrDir).getCanonicalFile();
+            String name = stored.substring(stored.lastIndexOf('/') + 1);
+            File f = new File(root, name).getCanonicalFile();
+            if (!f.toPath().startsWith(root.toPath()) || !f.isFile()) {
+                log.warn("二维码文件不存在或不合法: {}", stored);
+                return null;
+            }
+            byte[] bytes = Files.readAllBytes(f.toPath());
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
+        } catch (Exception e) {
+            log.warn("二维码内联失败 {}: {}", stored, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * 质检通过后生成溯源记录（哈希 + 二维码 + 链路）
      */
     @Transactional
@@ -172,7 +200,9 @@ public class TraceService {
         v.setBatchNo(t.getBatchNo());
         v.setHash(t.getHash());
         v.setChainHash(t.getHash());
-        v.setQrCode(t.getQrCode());
+        // 修复：文件接口已纳入鉴权，<img src="/api/files/..."> 无法携带 Bearer token。
+        // 改为把二维码内联为 data URL，既不需要开放免鉴权静态资源，也不改动存量数据。
+        v.setQrCode(inlineQr(t.getQrCode()));
         if (product != null) {
             v.setProductName(product.getName());
             v.setProductNo(product.getProductNo());

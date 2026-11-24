@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.canteen.common.BizException;
 import com.canteen.common.PageResult;
+import com.canteen.common.SqlLike;
 import com.canteen.common.UserContext;
 import com.canteen.entity.*;
 import com.canteen.mapper.*;
@@ -20,6 +21,9 @@ import java.util.*;
 
 /**
  * 货源：农户维护、采购员货源大厅
+ *
+ * <p>修复 P2：所有关键词/筛选值改为参数绑定，剥离 LIKE 通配符；
+ * 修复 P1-5：新增与编辑共用价格/数量校验。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -29,21 +33,33 @@ public class SourceService {
     private final ProductMapper productMapper;
     private final ProductCategoryMapper categoryMapper;
     private final FarmerMapper farmerMapper;
-    private final CanteenMapper canteenMapper;
     private final LogService logService;
+
+    private void applyKeyword(LambdaQueryWrapper<SupplySource> qw, String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return;
+        }
+        String like = SqlLike.contains(keyword);
+        if (like == null) {
+            qw.apply("1 = 0");
+        } else {
+            qw.apply("product_id IN (SELECT id FROM product WHERE name LIKE {0})", like);
+        }
+    }
 
     /** 农户自己的货源 */
     public PageResult<SourceVO> myPage(int page, int size, String keyword, String status) {
         LambdaQueryWrapper<SupplySource> qw = new LambdaQueryWrapper<SupplySource>()
                 .eq(SupplySource::getFarmerId, UserContext.farmerId());
-        if (StringUtils.hasText(keyword)) {
-            qw.inSql(SupplySource::getProductId,
-                    "SELECT id FROM product WHERE name LIKE '%" + keyword.replace("'", "") + "%'");
-        }
+        applyKeyword(qw, keyword);
         if (StringUtils.hasText(status)) {
             qw.eq(SupplySource::getStatus, status);
+            qw.orderByDesc(SupplySource::getId);
+        } else {
+            /* 不筛状态时，在售的排前面：以前统一按 id 倒序，历史售罄批次（同一品项
+               反复发布、每次都被订空）会把在售货源压到第二页，看着像一堆重复死数据。 */
+            qw.last("ORDER BY FIELD(status, '正常', '已售罄', '下架', '已撤回'), id DESC");
         }
-        qw.orderByDesc(SupplySource::getId);
         IPage<SupplySource> p = sourceMapper.selectPage(new Page<>(page, size), qw);
         return PageResult.of(p, this::toVO);
     }
@@ -53,25 +69,21 @@ public class SourceService {
                                      BigDecimal priceMax, BigDecimal creditMin, String sort) {
         LambdaQueryWrapper<SupplySource> qw = new LambdaQueryWrapper<SupplySource>()
                 .eq(SupplySource::getStatus, "正常").gt(SupplySource::getQuantity, 0);
-        if (StringUtils.hasText(keyword)) {
-            qw.inSql(SupplySource::getProductId,
-                    "SELECT id FROM product WHERE name LIKE '%" + keyword.replace("'", "") + "%'");
-        }
+        applyKeyword(qw, keyword);
         if (StringUtils.hasText(category) && !"全部".equals(category)) {
             ProductCategory big = categoryMapper.selectOne(new LambdaQueryWrapper<ProductCategory>()
                     .eq(ProductCategory::getCategoryName, category).eq(ProductCategory::getParentId, 0).last("LIMIT 1"));
             if (big != null) {
-                qw.inSql(SupplySource::getProductId,
-                        "SELECT id FROM product WHERE category_id IN (SELECT id FROM product_category WHERE parent_id="
-                                + big.getId() + " OR id=" + big.getId() + ")");
+                qw.apply("product_id IN (SELECT id FROM product WHERE category_id IN " +
+                                "(SELECT id FROM product_category WHERE parent_id = {0} OR id = {0}))",
+                        big.getId());
             }
         }
         if (priceMax != null) {
             qw.le(SupplySource::getPrice, priceMax);
         }
         if (creditMin != null) {
-            qw.inSql(SupplySource::getFarmerId,
-                    "SELECT id FROM farmer WHERE credit_score >= " + creditMin);
+            qw.apply("farmer_id IN (SELECT id FROM farmer WHERE credit_score >= {0})", creditMin);
         }
         if ("price".equals(sort)) {
             qw.orderByAsc(SupplySource::getPrice);
@@ -112,11 +124,15 @@ public class SourceService {
     @Transactional
     public SupplySource save(SupplySource s) {
         Long farmerId = UserContext.farmerId();
-        if (s.getQuantity() != null && s.getQuantity().signum() < 0) {
-            throw new BizException("可供数量不能为负数");
+        // 修复 P1-5：编辑分支同样强制校验，且拒绝 null（原来 null 可绕过校验）
+        if (s.getQuantity() == null || s.getQuantity().signum() < 0) {
+            throw new BizException(400, "可供数量不能为空或负数");
         }
-        if (s.getPrice() != null && s.getPrice().signum() <= 0) {
-            throw new BizException("报价必须大于 0");
+        if (s.getPrice() == null || s.getPrice().signum() <= 0) {
+            throw new BizException(400, "报价必须大于 0");
+        }
+        if (s.getProductId() == null) {
+            throw new BizException(400, "请选择商品");
         }
         if (s.getId() == null) {
             s.setFarmerId(farmerId);

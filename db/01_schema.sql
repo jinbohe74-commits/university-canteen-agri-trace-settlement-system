@@ -543,3 +543,23 @@ CREATE TABLE operation_log (
     KEY idx_create_time (create_time),
     KEY idx_operator (operator)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '操作日志表';
+
+-- ---------------------------------------------------------------------
+-- 26. 跨角色实时事件表（应用启动时也会以 CREATE TABLE IF NOT EXISTS 幂等补齐）
+--     AOP 统一记录所有写操作；SSE 主动推送 + 轮询兜底共用这份事实源
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS sys_event (
+    id             BIGINT       NOT NULL AUTO_INCREMENT COMMENT '事件主键（轮询游标）',
+    event_type     VARCHAR(40)  NOT NULL COMMENT 'DATA_CHANGED / ACCOUNT_DISABLED',
+    module         VARCHAR(50)  NOT NULL COMMENT '功能模块',
+    content        VARCHAR(300) NOT NULL COMMENT '事件描述',
+    operator_id    BIGINT       DEFAULT NULL COMMENT '操作人ID',
+    operator_name  VARCHAR(60)  DEFAULT NULL COMMENT '操作人姓名',
+    operator_role  VARCHAR(30)  DEFAULT NULL COMMENT '操作人角色',
+    target_roles   VARCHAR(120) DEFAULT NULL COMMENT '可见角色（逗号分隔，空=全员）',
+    target_user_id BIGINT       DEFAULT NULL COMMENT '定向接收人（账号停用等）',
+    ref_path       VARCHAR(160) DEFAULT NULL COMMENT '来源接口',
+    create_time    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_create_time (create_time)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '跨角色实时事件表';

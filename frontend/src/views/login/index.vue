@@ -43,7 +43,7 @@
       <div class="login-card">
         <div class="card-head">
           <h2>欢迎回来</h2>
-          <p>请选择角色并登录您的工作台</p>
+          <p>选择角色将校验账号身份；也可直接登录由系统自动识别</p>
         </div>
 
         <div class="role-grid">
@@ -78,7 +78,7 @@
           </el-input>
 
           <div class="form-row">
-            <el-checkbox v-model="form.remember">记住我（7 天免登录）</el-checkbox>
+            <el-checkbox v-model="form.remember">记住账号（下次自动填写）</el-checkbox>
             <span class="forgot" @click="forgot">忘记密码？</span>
           </div>
 
@@ -88,7 +88,7 @@
         </el-form>
 
         <div class="hint-row">
-          <span>默认管理员账号 <b>admin</b> / 密码 <b>123456</b></span>
+          <span>可在多个标签页各登录一个角色，互不影响</span>
           <span class="lock-hint"><el-icon><Lock /></el-icon>连续输错 5 次将锁定 10 分钟</span>
         </div>
 
@@ -113,10 +113,12 @@ const store = useUserStore()
 const loading = ref(false)
 
 const form = reactive({
-  username: 'admin',
-  password: '123456',
-  remember: true,
-  role: 'ADMIN'
+  // 修复 P1：不再预填演示账号与弱口令，避免任何访客一键登录管理员
+  username: localStorage.getItem('ct_last_username') || '',
+  password: '',
+  remember: !!localStorage.getItem('ct_last_username'),
+  // 默认不选角色：避免「默认管理员高亮」误导，且不影响直接登录
+  role: ''
 })
 
 const capabilities = [
@@ -127,20 +129,20 @@ const capabilities = [
 ]
 
 const roleOptions = [
-  { code: 'ADMIN', label: '管理员', icon: 'UserFilled', account: 'admin' },
-  { code: 'FARMER', label: '农户', icon: 'Apple', account: 'farmer24' },
-  { code: 'PURCHASER', label: '采购员', icon: 'ShoppingCart', account: 'purchaser01' },
-  { code: 'INSPECTOR', label: '质检员', icon: 'Van', account: 'inspector01' }
+  { code: 'ADMIN', label: '管理员', icon: 'UserFilled' },
+  { code: 'FARMER', label: '农户', icon: 'Apple' },
+  { code: 'PURCHASER', label: '采购员', icon: 'ShoppingCart' },
+  { code: 'INSPECTOR', label: '质检员', icon: 'Van' }
 ]
 
+// 角色选择真实参与登录校验：选中后 expectedRole 随请求提交，服务端比对账号实际角色；
+// 再次点击已选角色可取消选择（回到自动识别）。前端不缓存任何演示账号。
 const pickRole = (r) => {
-  form.role = r.code
-  form.username = r.account
-  form.password = '123456'
+  form.role = form.role === r.code ? '' : r.code
 }
 
 const forgot = () => {
-  ElMessage.info('请联系系统管理员（admin）重置密码')
+  ElMessage.info('请联系系统管理员重置密码')
 }
 
 const submit = async () => {
@@ -153,9 +155,17 @@ const submit = async () => {
     const data = await store.login({
       username: form.username.trim(),
       password: form.password,
-      remember: form.remember
+      remember: form.remember,
+      expectedRole: form.role || undefined
     })
     ElMessage.success('欢迎回来，' + data.user.realName)
+    // 「记住账号」只记账号名，不把令牌写进 localStorage——
+    // 令牌是标签页级会话，写进共享存储会让多个角色的身份互相覆盖。
+    if (form.remember) localStorage.setItem('ct_last_username', form.username.trim())
+    else localStorage.removeItem('ct_last_username')
+    /* 真·首次登录标记：只有从登录页进来的会话才自动打开「怎么用」引导。
+       验收脚本/直接带 token 进入的调试不会被打扰，也不会挡住页面点击。 */
+    sessionStorage.setItem('ct_guide_fresh', '1')
     const redirect = route.query.redirect
     router.replace(redirect || store.home)
   } catch (e) {
@@ -167,319 +177,172 @@ const submit = async () => {
 </script>
 
 <style scoped>
+/* ==========================================================================
+   登录页（2026-11-10 二次收敛）
+   与全站共用同一套设计系统：同一字体栈、同一圆角、同一组件语言。
+   左侧摄影是固定的**内容资产**，不随明度模式切换；右侧表单用设计 token
+   跟随 day/paper/night，因此登录 → 业务页不会再像换了一个系统。
+   template 与 script 完全保留（含空表单、角色按钮只改视觉、密码显隐）。
+   ========================================================================== */
 .login-page {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
   min-height: 100vh;
-  background: #f4f8f6;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
 }
 
-/* ---------------- 左：品牌区 ---------------- */
+/* ---------------- 左：纪实摄影品牌区 ---------------- */
 .brand-side {
   position: relative;
-  width: 54%;
   min-height: 100vh;
-  padding: 56px 64px 40px;
+  padding: 54px 56px 38px;
   color: #fff;
   overflow: hidden;
-  background: radial-gradient(120% 90% at 12% 8%, #1f7a4d 0%, #145c3a 42%, #0b3a26 100%);
+  background-color: #1B3A2E;
+  background-image: var(--hero);
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-
-.brand-inner {
-  position: relative;
-  z-index: 2;
-  max-width: 640px;
+.brand-side::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(100deg, rgba(16, 40, 31, .72), rgba(16, 40, 31, .86));
 }
+/* 旧版无信息装饰（光斑 / 叶片）全部退场 */
+.blob, .leaf { display: none; }
 
+.brand-inner { position: relative; z-index: 2; max-width: 600px; }
 .brand-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.13);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  font-size: 12.5px;
-  letter-spacing: 1px;
-  color: #d9f7e5;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 0; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 0; background: transparent;
+  font-size: var(--fs-xs); letter-spacing: .22em; color: #F3EDE0;
+  text-transform: uppercase;
 }
-
 .brand-title {
-  margin: 34px 0 16px;
-  font-size: 44px;
-  line-height: 1.28;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  margin: 40px 0 14px;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.3vw, 44px);
+  line-height: 1.3; font-weight: 700; letter-spacing: -.01em;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, .32);
 }
-
 .brand-en {
-  font-size: 11.5px;
-  letter-spacing: 2.4px;
-  color: rgba(214, 246, 227, 0.62);
+  font-family: var(--font-num);
+  font-size: var(--fs-xs); letter-spacing: .2em; color: rgba(243, 237, 224, .76);
 }
-
 .brand-desc {
-  margin: 26px 0 38px;
-  max-width: 560px;
-  font-size: 14px;
-  line-height: 2;
-  color: rgba(226, 246, 235, 0.82);
+  margin: 30px 0 36px; max-width: 540px;
+  font-size: var(--fs-base); line-height: 2.05; color: rgba(250, 246, 237, .88);
 }
-
 .cap-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  max-width: 560px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px; max-width: 540px;
 }
-
 .cap-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 16px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  backdrop-filter: blur(7px);
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 15px; border-radius: var(--radius);
+  background: rgba(246, 242, 233, .09);
+  border: 1px solid rgba(246, 242, 233, .24);
+  backdrop-filter: none;
 }
-
 .cap-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: rgba(74, 222, 128, 0.18);
-  color: #86efac;
-  font-size: 17px;
-  flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  display: grid; place-items: center;
+  background: rgba(246, 242, 233, .14); color: #F3EDE0;
+  font-size: var(--fs-md); flex-shrink: 0;
 }
-
-.cap-title {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.cap-sub {
-  font-size: 11.5px;
-  color: rgba(214, 246, 227, 0.58);
-  margin-top: 3px;
-}
-
+.cap-title { font-size: var(--fs-base); font-weight: 700; color: #fff; font-family: var(--font-display); }
+.cap-sub { font-size: var(--fs-xs); color: rgba(243, 237, 224, .7); margin-top: 3px; }
 .brand-foot {
-  position: relative;
-  z-index: 2;
-  font-size: 11.5px;
-  color: rgba(214, 246, 227, 0.42);
-  letter-spacing: 0.3px;
+  position: relative; z-index: 2;
+  font-size: var(--fs-xs); color: rgba(243, 237, 224, .6); letter-spacing: .04em;
 }
 
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: 0.6;
-}
-
-.blob-1 {
-  width: 420px;
-  height: 420px;
-  right: -160px;
-  top: -120px;
-  background: radial-gradient(circle, rgba(74, 222, 128, 0.22), transparent 68%);
-}
-
-.blob-2 {
-  width: 520px;
-  height: 520px;
-  left: -220px;
-  bottom: -260px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.18), transparent 68%);
-}
-
-.leaf {
-  position: absolute;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 60% 0 60% 0;
-}
-
-.leaf-1 {
-  width: 210px;
-  height: 210px;
-  right: 40px;
-  bottom: 80px;
-  transform: rotate(18deg);
-}
-
-.leaf-2 {
-  width: 130px;
-  height: 130px;
-  right: 180px;
-  bottom: 190px;
-  transform: rotate(-24deg);
-}
-
-/* ---------------- 右：登录表单 ---------------- */
+/* ---------------- 右：纸色表单 ---------------- */
 .form-side {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 44px; background: var(--surface);
 }
-
 .login-card {
-  width: 100%;
-  max-width: 432px;
-  background: #fff;
-  border-radius: 18px;
-  padding: 34px 34px 22px;
-  box-shadow: 0 24px 60px rgba(16, 58, 40, 0.12);
-  border: 1px solid #eaf1ee;
+  width: 100%; max-width: 372px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 8px 4px 18px;
+  box-shadow: var(--shadow);
 }
-
+/* 全局 .card-head 是 flex（供业务卡使用），登录页标题与副标题必须回到块级 */
+.card-head { display: block; }
 .card-head h2 {
-  margin: 0;
-  font-size: 23px;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: 0.5px;
+  margin: 0; font-family: var(--font-display);
+  font-size: var(--fs-xl); font-weight: 700; color: var(--ink); letter-spacing: -.01em;
 }
+.card-head p { margin: 9px 0 26px; font-size: var(--fs-sm); color: var(--muted); line-height: 1.7; }
 
-.card-head p {
-  margin: 8px 0 22px;
-  font-size: 13px;
-  color: var(--c-muted);
-}
-
-.role-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 9px;
-  margin-bottom: 22px;
-}
-
+/* 角色选择沿用全站 chip 组件语言（圆角 + 边框 + 软底），不再有方案专属形态 */
+.role-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 22px; }
 .role-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 11px 4px 9px;
-  border-radius: 11px;
-  border: 1px solid var(--c-border-strong);
-  background: #fff;
-  color: #5b6b64;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.18s ease;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 11px 3px 10px; border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface); color: var(--muted);
+  font-size: var(--fs-xs); cursor: pointer;
+  transition: color .18s, border-color .18s, background .18s;
 }
-
-.role-item:hover {
-  border-color: #a7e3bf;
-  color: var(--c-primary-dark);
-  background: #f6fdf9;
-}
-
+.role-item:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 .role-item.active {
-  border-color: var(--c-primary);
-  background: linear-gradient(180deg, #f0fdf4, #e6f8ed);
-  color: var(--c-primary-dark);
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.14);
+  border-color: var(--accent); background: var(--accent-soft);
+  color: var(--accent); font-weight: 700;
 }
-
-.role-icon {
-  font-size: 17px;
-}
+.role-icon { font-size: var(--fs-md); }
 
 .login-form :deep(.el-input__wrapper) {
-  height: 44px;
-  border-radius: 10px;
-  font-size: 13.5px;
+  height: 43px; border-radius: var(--radius); font-size: var(--fs-base);
+  box-shadow: 0 0 0 1px var(--line-strong) inset !important;
+  background: var(--bg) !important;
 }
-
-.field-label {
-  display: block;
-  font-size: 12.5px;
-  color: #4b5563;
-  margin: 0 0 7px;
-  font-weight: 500;
+.login-form :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 1px var(--accent) inset !important;
 }
-
-.login-form :deep(.el-input) {
-  margin-bottom: 16px;
-}
-
-.form-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 2px 0 20px;
-}
-
-.form-row :deep(.el-checkbox__label) {
-  font-size: 12.5px;
-  color: var(--c-muted);
-}
-
-.forgot {
-  font-size: 12.5px;
-  color: var(--c-primary);
-  cursor: pointer;
-}
-
-.forgot:hover {
-  text-decoration: underline;
-}
-
+.field-label { display: block; font-size: var(--fs-xs); font-weight: 700; color: var(--ink-2); margin: 0 0 7px; }
+.login-form :deep(.el-input) { margin-bottom: 15px; }
+.form-row { display: flex; align-items: center; justify-content: space-between; margin: 2px 0 20px; }
+.form-row :deep(.el-checkbox__label) { font-size: var(--fs-xs); color: var(--muted); }
+.forgot { font-size: var(--fs-xs); color: var(--accent); cursor: pointer; }
+.forgot:hover { text-decoration: underline; }
 .submit {
-  width: 100%;
-  height: 44px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  border-radius: 10px;
-  box-shadow: 0 10px 22px rgba(22, 163, 74, 0.24);
+  width: 100%; height: 43px; font-size: var(--fs-base); font-weight: 700;
+  letter-spacing: .14em; border-radius: var(--radius);
+  box-shadow: none; background: var(--accent); border-color: var(--accent);
+  color: var(--accent-ink);
 }
-
+.submit:hover { filter: brightness(1.1); }
 .hint-row {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-top: 18px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: #f7faf9;
-  border: 1px dashed var(--c-border-strong);
-  font-size: 11.5px;
-  color: var(--c-muted);
+  display: flex; flex-direction: column; gap: 7px;
+  margin-top: 18px; padding: 11px 13px; border-radius: var(--radius);
+  background: var(--surface-2); border: 1px dashed var(--line-strong);
+  font-size: var(--fs-xs); color: var(--muted); line-height: 1.7;
 }
-
-.lock-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #b45309;
-}
-
+.lock-hint { display: inline-flex; align-items: center; gap: 4px; color: var(--warn); }
 .card-foot {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--c-border);
-  font-size: 11px;
-  color: var(--c-muted-2);
+  display: flex; justify-content: space-between;
+  margin-top: 18px; padding-top: 13px; border-top: 1px solid var(--line);
+  font-size: var(--fs-2xs); color: var(--muted); font-family: var(--font-num);
 }
 
-@media (max-width: 1180px) {
-  .brand-side {
-    display: none;
-  }
+/* ---------------- 外观模式只影响右侧表单（走设计 token） ----------------
+   左侧摄影区是固定内容资产：三种明度下都用同一张图、同一遮罩、同一白字，
+   因此登录页与业务页不会因切换模式或跳转而变成「另一套系统」。 */
+
+@media (max-width: 1080px) {
+  .login-page { grid-template-columns: 1fr; }
+  .brand-side { display: none; }
 }
 </style>

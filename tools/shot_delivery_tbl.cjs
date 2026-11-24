@@ -1,0 +1,16 @@
+const path=require('path');const BASE='http://127.0.0.1:5173',API='http://127.0.0.1:8080'
+const G=path.join(process.env.APPDATA,'npm','node_modules');module.paths.push(G)
+const {chromium}=require(path.join(G,'playwright'));const sleep=ms=>new Promise(r=>setTimeout(r,ms))
+;(async()=>{const b=await chromium.launch({channel:'msedge'})
+const res=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'inspector01',password:'123456',expectedRole:'INSPECTOR'})})
+const d=(await res.json()).data
+const c=await b.newContext({viewport:{width:1440,height:900}})
+await c.addInitScript(([t,u,rn,mn])=>{sessionStorage.setItem('ct_token',t);sessionStorage.setItem('ct_user',u);sessionStorage.setItem('ct_role_name',rn);sessionStorage.setItem('ct_menus',mn)},[d.token,JSON.stringify(d.user),d.roleName||'',JSON.stringify(d.menus||[])])
+const p=await c.newPage()
+await p.goto(BASE+'/inspector/delivery',{waitUntil:'domcontentloaded'});await sleep(2800)
+const el=p.locator('.el-table').first()
+await el.scrollIntoViewIfNeeded();await sleep(700)
+console.log('表格行数',await p.locator('.el-table__body tbody tr').count())
+console.log('行内操作',JSON.stringify(await p.locator('.el-table__body tbody tr').first().locator('.link,.link-strong,.muted').allInnerTexts()))
+await p.screenshot({path:'docs/roleplay_2026-11-10/after/2b-配送表-行内操作.png'})
+await b.close()})()

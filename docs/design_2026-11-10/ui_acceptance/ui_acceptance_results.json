@@ -1,0 +1,221 @@
+{
+  "summary": {
+    "total": 32,
+    "pass": 28,
+    "failed": 0,
+    "infos": 2,
+    "ratios": {
+      "a": 12.06,
+      "b": 17.85,
+      "c": 15
+    },
+    "consoleErrors": 0,
+    "badResponses": 0,
+    "shots": [
+      {
+        "label": "A 田埂 · 登录页（摄影主视觉 + 衬线 + 零渐变）",
+        "file": "docs\\design_2026-11-10\\ui_acceptance\\A-登录.png"
+      },
+      {
+        "label": "B 枢纽 · 订单监管（70px 窄栏 + 即时筛选 + 高密度表格）",
+        "file": "docs\\design_2026-11-10\\ui_acceptance\\B-订单.png"
+      },
+      {
+        "label": "手动锁定 A 田埂 · 表格页换肤一致性",
+        "file": "docs\\design_2026-11-10\\ui_acceptance\\A-表格锁定.png"
+      },
+      {
+        "label": "手动锁定 C 夜航 · 表格页换肤一致性",
+        "file": "docs\\design_2026-11-10\\ui_acceptance\\C-表格锁定.png"
+      },
+      {
+        "label": "C 夜航 · 管理员驾驶舱（横向导航 + 明度分层 + 数据高亮）",
+        "file": "docs\\design_2026-11-10\\ui_acceptance\\C-驾驶舱.png"
+      },
+      {
+        "label": "A 田埂 · 批次溯源（纸质纪实 + 可展开时间线）",
+        "file": "docs\\design_2026-11-10\\ui_acceptance\\A-溯源.png"
+      }
+    ]
+  },
+  "results": [
+    {
+      "name": "登录页自动分配 A 田埂",
+      "ok": true,
+      "scheme": "a"
+    },
+    {
+      "name": "登录页摄影主视觉已加载",
+      "ok": true
+    },
+    {
+      "name": "登录表单不预填任何凭据",
+      "ok": true
+    },
+    {
+      "name": "自动分配：管理员驾驶舱 → C 夜航",
+      "ok": true,
+      "expected": "c",
+      "got": "c"
+    },
+    {
+      "name": "自动分配：表格密集页 → B 枢纽",
+      "ok": true,
+      "expected": "b",
+      "got": "b"
+    },
+    {
+      "name": "自动分配：溯源查询页 → A 田埂",
+      "ok": true,
+      "expected": "a",
+      "got": "a"
+    },
+    {
+      "name": "跨角色路由访问被鉴权拦截",
+      "ok": null,
+      "info": true,
+      "url": "http://127.0.0.1:5173/admin/dashboard",
+      "scheme": "c"
+    },
+    {
+      "name": "方案 A 正文/面板对比度 ≥ 4.5:1",
+      "ok": true,
+      "ratio": 12.06,
+      "ink": "#20372A",
+      "surface": "#FBF8F1"
+    },
+    {
+      "name": "方案 B 正文/面板对比度 ≥ 4.5:1",
+      "ok": true,
+      "ratio": 17.85,
+      "ink": "#0F172A",
+      "surface": "#FFFFFF"
+    },
+    {
+      "name": "方案 C 正文/面板对比度 ≥ 4.5:1",
+      "ok": true,
+      "ratio": 15,
+      "ink": "#E9F2F9",
+      "surface": "#101D2D"
+    },
+    {
+      "name": "三套方案对比度自检值互不重复（防滞后一轮）",
+      "ok": true,
+      "ratios": {
+        "a": 12.06,
+        "b": 17.85,
+        "c": 15
+      }
+    },
+    {
+      "name": "⌘K / Ctrl+K 打开命令面板",
+      "ok": true,
+      "cmdVisible": 1
+    },
+    {
+      "name": "命令面板输入实时过滤",
+      "ok": true,
+      "filtered": 1
+    },
+    {
+      "name": "命令面板回车直达目标页",
+      "ok": true,
+      "url": "http://127.0.0.1:5173/admin/settlements"
+    },
+    {
+      "name": "表格页注入即时筛选（并入原筛选条，不新增重复工具条）",
+      "ok": true,
+      "hasSearch": 1,
+      "standaloneLivebars": 0
+    },
+    {
+      "name": "即时搜索：输入 → 行数归零，清空 → 恢复",
+      "ok": true,
+      "before": 10,
+      "zero": 0,
+      "restored": 10
+    },
+    {
+      "name": "页面原有状态 chips 时不再生成第二套",
+      "ok": true,
+      "nativeChips": 6,
+      "injectedChips": 0
+    },
+    {
+      "name": "状态 chip 筛选生效",
+      "ok": true,
+      "sel": ".tabs-row .tab-btn, .chips .chip, .tab-btn",
+      "onCount": 1,
+      "beforeChip": 10,
+      "afterChip": 6
+    },
+    {
+      "name": "表头点击排序（DOM 层）",
+      "ok": true,
+      "sorted": "asc"
+    },
+    {
+      "name": "行 hover 快捷操作已注入",
+      "ok": true,
+      "rowOps": 6
+    },
+    {
+      "name": "复制单号后出现 toast",
+      "ok": true
+    },
+    {
+      "name": "批量浮动条（该页无多选列，跳过）",
+      "ok": null,
+      "info": true,
+      "boxes": 0
+    },
+    {
+      "name": "勾选后批量浮动条出现且计数正确",
+      "ok": true,
+      "selBoxes": 10,
+      "barOn": 1,
+      "cnt": "1"
+    },
+    {
+      "name": "驾驶舱自动分配 C",
+      "ok": true,
+      "scheme": "c"
+    },
+    {
+      "name": "C 方案隐藏侧栏并显示横向导航",
+      "ok": true
+    },
+    {
+      "name": "统计数字完成滚动且非空",
+      "ok": true
+    },
+    {
+      "name": "深色下 ECharts 已渲染",
+      "ok": true
+    },
+    {
+      "name": "溯源页自动分配 A",
+      "ok": true,
+      "scheme": "a"
+    },
+    {
+      "name": "溯源时间线节点可展开",
+      "ok": true,
+      "titles": 3
+    },
+    {
+      "name": "弱动效开关写入 html.reduce-motion",
+      "ok": true
+    },
+    {
+      "name": "全程 0 控制台错误",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "全程 0 本地 4xx 响应",
+      "ok": true,
+      "badResponses": []
+    }
+  ]
+}

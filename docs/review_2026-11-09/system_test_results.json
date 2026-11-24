@@ -1,0 +1,271 @@
+{
+  "summary": {
+    "total": 37,
+    "pass": 22,
+    "fail": 0,
+    "defect": 14,
+    "fixed": 0,
+    "info": 1
+  },
+  "cases": [
+    {
+      "group": "A 可用性",
+      "name": "健康检查返回 UP",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200",
+      "expected": "HTTP 200 / code 200 / status UP"
+    },
+    {
+      "group": "A 可用性",
+      "name": "admin 登录成功",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "farmer24 登录成功",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "purchaser01 登录成功",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "inspector01 登录成功",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "不存在的账号被拒绝",
+      "status": "PASS",
+      "observed": "code=401",
+      "expected": "非 200"
+    },
+    {
+      "group": "A 可用性",
+      "name": "未登录返回 HTTP 200 + 业务码 401（网关无法识别）",
+      "status": "DEFECT",
+      "observed": "HTTP 200, code=401",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "B 越权",
+      "name": "farmer24 可读管理员接口（无服务端角色鉴权）",
+      "status": "DEFECT",
+      "observed": "4/4 个接口返回 200: ['/api/admin/dashboard', '/api/admin/users', '/api/admin/config', '/api/admin/settlements']",
+      "expected": "全部 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "purchaser01 可读管理员接口（无服务端角色鉴权）",
+      "status": "DEFECT",
+      "observed": "4/4 个接口返回 200: ['/api/admin/dashboard', '/api/admin/users', '/api/admin/config', '/api/admin/settlements']",
+      "expected": "全部 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "inspector01 可读管理员接口（无服务端角色鉴权）",
+      "status": "DEFECT",
+      "observed": "4/4 个接口返回 200: ['/api/admin/dashboard', '/api/admin/users', '/api/admin/config', '/api/admin/settlements']",
+      "expected": "全部 403"
+    },
+    {
+      "group": "C 文件",
+      "name": "无 token 上传文件成功",
+      "status": "DEFECT",
+      "observed": "code=200",
+      "expected": "401"
+    },
+    {
+      "group": "C 文件",
+      "name": "上传文件可免鉴权公开读取",
+      "status": "DEFECT",
+      "observed": "HTTP 200, 12 bytes",
+      "expected": "401"
+    },
+    {
+      "group": "C 文件",
+      "name": "type 参数路径穿越写到 uploads 目录之外",
+      "status": "DEFECT",
+      "observed": "code=200, 逃逸目录存在=True",
+      "expected": "type 应做白名单校验"
+    },
+    {
+      "group": "D 认证",
+      "name": "用配置里明文 secret 伪造管理员 token 成功",
+      "status": "DEFECT",
+      "observed": "HTTP 200, code=200",
+      "expected": "拒绝"
+    },
+    {
+      "group": "E 认证",
+      "name": "注销后旧 token 仍然有效（无黑名单）",
+      "status": "DEFECT",
+      "observed": "code=200",
+      "expected": "401"
+    },
+    {
+      "group": "F 校验",
+      "name": "空质检请求返回 404/500 而非 400（DTO 无 @Valid，null 直接查库）",
+      "status": "DEFECT",
+      "observed": "code=404, message='订单不存在'",
+      "expected": "400 参数校验错误"
+    },
+    {
+      "group": "F 校验",
+      "name": "空格分隔日期格式被拒且回显 Jackson 异常全文（信息泄露）",
+      "status": "DEFECT",
+      "observed": "code=500, message='系统繁忙，请稍后重试：JSON parse error: Cannot deserialize value of type `java.time.LocalDateTime` from String \"2026-12-3'",
+      "expected": "400 + 固定文案"
+    },
+    {
+      "group": "F 校验",
+      "name": "非法分页参数返回 500 而非 400",
+      "status": "DEFECT",
+      "observed": "code=500",
+      "expected": "400"
+    },
+    {
+      "group": "G 查询",
+      "name": "keyword=% 绕过筛选命中全表（原生 SQL 拼接）",
+      "status": "DEFECT",
+      "observed": "wild=330, 不存在关键词=0",
+      "expected": "% 应按字面量转义"
+    },
+    {
+      "group": "H 闭环",
+      "name": "存在已完成且带批次号的订单",
+      "status": "PASS",
+      "observed": "扫描 50 条",
+      "expected": "至少 1 条"
+    },
+    {
+      "group": "H 闭环",
+      "name": "订单详情可查询",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + data"
+    },
+    {
+      "group": "H 闭环",
+      "name": "批次溯源返回批次号与 64 位存证哈希",
+      "status": "PASS",
+      "observed": "code=200, 含批次号=True, 含64位hash=True",
+      "expected": "code 200 + 批次号 + SHA-256"
+    },
+    {
+      "group": "H 闭环",
+      "name": "订单状态字典完整（12 个状态）",
+      "status": "PASS",
+      "observed": "12 个",
+      "expected": ">= 12"
+    },
+    {
+      "group": "H 闭环",
+      "name": "farmer24 主页面接口返回业务数据",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + 非空 data"
+    },
+    {
+      "group": "H 闭环",
+      "name": "purchaser01 主页面接口返回业务数据",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + 非空 data"
+    },
+    {
+      "group": "H 闭环",
+      "name": "inspector01 主页面接口返回业务数据",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + 非空 data"
+    },
+    {
+      "group": "I 写路径",
+      "name": "发布采购需求成功",
+      "status": "PASS",
+      "observed": "code=200, demandNo=X20261109130",
+      "expected": "code 200 + demandNo"
+    },
+    {
+      "group": "I 写路径",
+      "name": "新需求可按 id 查询",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200"
+    },
+    {
+      "group": "I 写路径",
+      "name": "智能匹配返回不超过 Top5 的结果",
+      "status": "PASS",
+      "observed": "code=200, results=5",
+      "expected": "code 200 + <=5"
+    },
+    {
+      "group": "I 写路径",
+      "name": "负数需求数量被拒绝",
+      "status": "PASS",
+      "observed": "code=500",
+      "expected": "非 200"
+    },
+    {
+      "group": "L 数据",
+      "name": "全量结算单满足金额公式",
+      "status": "PASS",
+      "observed": "不一致 0 条",
+      "expected": "0 条"
+    },
+    {
+      "group": "L 数据",
+      "name": "订单号唯一",
+      "status": "PASS",
+      "observed": "重复 0 组",
+      "expected": "0 组"
+    },
+    {
+      "group": "L 数据",
+      "name": "数据库 25 张表",
+      "status": "PASS",
+      "observed": "25 张",
+      "expected": "25"
+    },
+    {
+      "group": "L 数据",
+      "name": "全局配置 logic-delete-field=deleted 但表中无该列",
+      "status": "DEFECT",
+      "observed": "含 deleted 列的字段数=0",
+      "expected": "配置与表结构一致"
+    },
+    {
+      "group": "L 数据",
+      "name": "演示库订单总量（观察项）",
+      "status": "INFO",
+      "observed": "330 条",
+      "expected": "README 记录 326 条"
+    },
+    {
+      "group": "C 文件",
+      "name": "上传探针文件已清理（不留垃圾文件）",
+      "status": "PASS",
+      "observed": "残留 0 个",
+      "expected": "0 个"
+    },
+    {
+      "group": "I 写路径",
+      "name": "测试需求已精确清理（可重复执行）",
+      "status": "PASS",
+      "observed": "残留 0 条",
+      "expected": "0 条"
+    }
+  ]
+}

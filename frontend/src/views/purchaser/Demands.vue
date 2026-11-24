@@ -3,109 +3,130 @@
     <div class="page-head">
       <div>
         <h2 class="page-title">采购需求管理</h2>
-        <p class="page-sub">发布采购需求，系统自动推送农户并启动五因子智能匹配</p>
+        <p class="page-sub">发布需求 → 农户报价 → 比价定标；列表默认只看待比价的需求</p>
       </div>
       <div class="page-actions">
         <el-button plain @click="exportDemands"><el-icon><Download /></el-icon>导出需求</el-button>
+        <el-button type="primary" @click="publishVisible = true"><el-icon><Plus /></el-icon>发布需求</el-button>
       </div>
     </div>
 
     <!-- 统计卡 -->
     <div class="stat-grid">
-      <StatCard label="匹配中" :value="fmtNum(stats.matching || 0)" foot="需求单" icon="Search" color="orange" />
+      <StatCard label="待比价" :value="fmtNum(stats.matching || 0)" foot="需要你定标" icon="Search" color="orange" />
       <StatCard label="已成交" :value="fmtNum(stats.dealt || 0)" foot="累计" icon="CircleCheck" color="green" />
       <StatCard label="平均报价数" :value="fmtNum(stats.avgQuotes || 0)" foot="每单货源" icon="Shop" color="blue" />
       <StatCard label="已撤回" :value="fmtNum(stats.withdrawn || 0)" foot="累计" icon="RefreshLeft" color="purple" />
     </div>
 
-    <div class="demand-layout">
-      <!-- 需求列表 -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">需求列表</div>
-          <div class="card-extra">共 {{ total }} 条需求 · 五因子匹配</div>
-        </div>
-
-        <div class="filter-bar">
-          <el-input
-            v-model="keyword"
-            placeholder="需求编号 / 产品"
-            clearable
-            style="width: 190px"
-            @keyup.enter="search"
-          >
-            <template #prefix><el-icon><Search /></el-icon></template>
-          </el-input>
-          <el-select v-model="status" placeholder="全部状态" style="width: 128px">
-            <el-option label="全部状态" value="ALL" />
-            <el-option label="处理中" value="处理中" />
-            <el-option label="已成交" value="已成交" />
-            <el-option label="已撤回" value="已撤回" />
-            <el-option label="已完成" value="已完成" />
-          </el-select>
-          <el-button type="primary" @click="search"><el-icon><Search /></el-icon>查询</el-button>
-          <div class="filter-spacer"></div>
-          <span class="muted small">需求发布后自动推送同品类认证农户</span>
-        </div>
-
-        <el-tabs v-model="status" class="status-tabs">
-          <el-tab-pane label="全部" name="ALL" />
-          <el-tab-pane label="匹配中" name="处理中" />
-          <el-tab-pane label="已成交" name="已成交" />
-          <el-tab-pane label="已撤回" name="已撤回" />
-        </el-tabs>
-
-        <div class="table-wrap" v-loading="loading">
-          <el-table :data="rows" size="default" style="width: 100%">
-            <el-table-column label="需求编号" min-width="128">
-              <template #default="{ row }"><span class="mono">{{ row.demandNo }}</span></template>
-            </el-table-column>
-            <el-table-column label="产品" min-width="82">
-              <template #default="{ row }"><span class="bold">{{ row.productName || '—' }}</span></template>
-            </el-table-column>
-            <el-table-column prop="categoryName" label="品类" width="74" />
-            <el-table-column label="数量" width="92" align="right">
-              <template #default="{ row }">{{ fmtNum(row.quantity) }} {{ row.unit }}</template>
-            </el-table-column>
-            <el-table-column label="期望价" width="88" align="right">
-              <template #default="{ row }"><span class="money">¥{{ fmtMoney(row.expectedPrice) }}</span></template>
-            </el-table-column>
-            <el-table-column label="期望交货" width="96">
-              <template #default="{ row }">{{ fmtMD(row.deadline) }}</template>
-            </el-table-column>
-            <el-table-column label="状态" width="88">
-              <template #default="{ row }"><StatusTag type="demand" :value="row.status" /></template>
-            </el-table-column>
-            <el-table-column label="报价数" width="70" align="center">
-              <template #default="{ row }"><span class="mono">{{ row.quoteCount || 0 }}</span></template>
-            </el-table-column>
-            <el-table-column label="操作" width="96" fixed="right">
-              <template #default="{ row }">
-                <span v-if="row.status === '处理中'" class="link" @click="goMatch(row)">匹配结果</span>
-                <span v-else-if="row.orderId" class="link" @click="router.push('/purchaser/orders')">订单</span>
-                <span v-else class="link" @click="openDetail(row)">详情</span>
-              </template>
-            </el-table-column>
-            <template #empty><div class="empty">暂无采购需求</div></template>
-          </el-table>
-        </div>
-
-        <div class="pager">
-          <span>共 {{ total }} 条 · 第 {{ page }} / {{ pages }} 页</span>
-          <el-pagination
-            v-model:current-page="page"
-            :page-size="size"
-            :total="total"
-            layout="prev, pager, next"
-            background
-            @current-change="load"
-          />
-        </div>
+    <!-- 需求列表：主视图，发布表单收进抽屉，避免两栏抢版面 -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">需求列表</div>
+        <div class="card-extra">共 {{ total }} 条 · 五因子匹配</div>
       </div>
 
-      <!-- 发布表单 -->
-      <SectionCard title="发布采购需求">
-        <el-form label-position="top" class="demand-form">
+      <div class="filter-bar">
+        <el-input
+          v-model="keyword"
+          placeholder="需求编号 / 产品"
+          clearable
+          style="width: 210px"
+          @keyup.enter="search"
+        >
+          <template #prefix><el-icon><Search /></el-icon></template>
+        </el-input>
+        <el-button type="primary" @click="search"><el-icon><Search /></el-icon>查询</el-button>
+        <div class="filter-spacer"></div>
+        <span class="muted small">需求发布后自动推送同品类认证农户</span>
+      </div>
+
+      <!-- 从待办点「去比价」会带 focus=需求编号过来，这里明说定位到了哪一条 -->
+      <div v-if="focusNo" class="focus-bar">
+        <el-icon><Aim /></el-icon>
+        <span class="grow">
+          正在定位待办需求 <b class="mono">{{ focusNo }}</b>
+          <template v-if="focusHit">，已打开比价面板</template>
+          <template v-else>，当前列表里没找到这条</template>
+        </span>
+        <el-button link type="primary" @click="clearFocus">查看全部需求</el-button>
+      </div>
+
+      <el-tabs v-model="status" class="status-tabs">
+        <el-tab-pane label="待比价" name="处理中" />
+        <el-tab-pane label="已成交" name="已成交" />
+        <el-tab-pane label="已完成" name="已完成" />
+        <el-tab-pane label="已撤回" name="已撤回" />
+        <el-tab-pane label="全部" name="ALL" />
+      </el-tabs>
+
+      <div class="table-wrap" v-loading="loading">
+        <el-table :data="rows" size="default" style="width: 100%" :row-class-name="rowClass">
+          <el-table-column label="需求编号" min-width="146">
+            <template #default="{ row }">
+              <span class="mono">{{ row.demandNo }}</span>
+              <span class="cell-sub">{{ fmtDate(row.createTime).slice(5, 16) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="产品 / 品类" min-width="132">
+            <template #default="{ row }">
+              <span class="bold">{{ row.productName || '—' }}</span>
+              <span class="cell-sub">{{ row.categoryName || '—' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="数量" width="94" align="right">
+            <template #default="{ row }">{{ fmtNum(row.quantity) }} {{ row.unit }}</template>
+          </el-table-column>
+          <el-table-column label="期望单价" width="94" align="right">
+            <template #default="{ row }"><span class="money">¥{{ fmtMoney(row.expectedPrice) }}</span></template>
+          </el-table-column>
+          <el-table-column label="交货截止" width="118">
+            <template #default="{ row }">
+              <span class="mono">{{ fmtMD(row.deadline) }}</span>
+              <span v-if="row.status === '处理中'" class="cell-sub" :class="deadlineLevel(row.deadline)">
+                {{ untilText(row.deadline) }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="报价" width="86" align="center">
+            <template #default="{ row }">
+              <span v-if="row.quoteCount > 0" class="quote-n mono">{{ row.quoteCount }} 家</span>
+              <span v-else-if="row.status === '处理中'" class="tag tag-red">等报价</span>
+              <span v-else class="muted">—</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="92" align="center">
+            <template #default="{ row }"><StatusTag type="demand" :value="row.status" /></template>
+          </el-table-column>
+          <el-table-column label="操作" width="112" align="center" fixed="right">
+            <template #default="{ row }">
+              <el-button
+                v-if="row.status === '处理中'"
+                type="primary" size="small" @click="openDetail(row)"
+              >比价定标</el-button>
+              <el-button v-else size="small" plain @click="openDetail(row)">查看</el-button>
+            </template>
+          </el-table-column>
+          <template #empty><div class="empty">当前分类下没有需求</div></template>
+        </el-table>
+      </div>
+
+      <div class="pager">
+        <span>共 {{ total }} 条 · 第 {{ page }} / {{ pages }} 页</span>
+        <el-pagination
+          v-model:current-page="page"
+          :page-size="size"
+          :total="total"
+          layout="prev, pager, next"
+          background
+          @current-change="load"
+        />
+      </div>
+    </div>
+
+    <!-- 发布表单收进抽屉：日常主任务是看需求、比价定标，发布是低频动作 -->
+    <el-drawer v-model="publishVisible" title="发布采购需求" size="440px" append-to-body>
+      <el-form label-position="top" class="demand-form">
           <el-form-item label="采购产品">
             <el-select
               v-model="form.productId"
@@ -194,11 +215,10 @@
           </el-button>
           <p class="form-hint">发布后系统自动推送至同品类认证农户，并按「品类 / 价格 / 数量 / 信用 / 距离」五因子计算匹配得分。</p>
         </el-form>
-      </SectionCard>
-    </div>
+    </el-drawer>
 
     <!-- 需求详情 -->
-    <el-dialog v-model="detailVisible" title="需求详情" width="600px">
+    <el-dialog v-model="detailVisible" title="需求详情" width="780px">
       <el-descriptions v-if="detailRow" :column="2" border size="small">
         <el-descriptions-item label="需求编号">
           <span class="mono">{{ detailRow.demandNo }}</span>
@@ -227,6 +247,61 @@
           {{ detailRow.qualityReq || '—' }}
         </el-descriptions-item>
       </el-descriptions>
+
+      <!-- 报价比价：农户报价后在这里横向对比并定标 -->
+      <div v-if="detailRow" class="cmp">
+        <div class="cmp-head">
+          <span class="cmp-title">报价比价</span>
+          <span v-if="quotes.length" class="muted small">{{ quotes.length }} 家报价 · 按单价从低到高</span>
+          <span v-else class="muted small">还没有农户报价，等待需求大厅推送</span>
+        </div>
+        <el-table v-if="quotes.length" :data="quotes" size="small">
+          <el-table-column label="农户" min-width="146">
+            <template #default="{ row }">
+              <span class="bold">{{ row.farmerName }}</span>
+              <span class="tag tag-gray">{{ row.farmerType }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="报价单价" width="112" align="right">
+            <template #default="{ row }">
+              <span class="money">¥{{ fmtMoney(row.price) }}</span>
+              <span v-if="row.lowestPrice" class="tag tag-green">最低</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="信用分" width="94" align="center">
+            <template #default="{ row }">
+              {{ fmtNum(row.creditScore, 0) }}
+              <span v-if="row.bestCredit" class="tag tag-blue">最高</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="承诺送达" width="86" align="center">
+            <template #default="{ row }">{{ row.deliveryDays }} 天</template>
+          </el-table-column>
+          <el-table-column label="可供数量" width="94" align="right">
+            <template #default="{ row }">{{ fmtNum(row.quantity) }}{{ detailRow.unit }}</template>
+          </el-table-column>
+          <el-table-column label="状态" width="78" align="center">
+            <template #default="{ row }">
+              <span class="tag" :class="quoteTag(row.status)">{{ row.status }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="84" align="center" fixed="right">
+            <template #default="{ row }">
+              <span
+                v-if="row.status === '待选' && detailRow.status === '处理中'"
+                class="link-strong"
+                @click="award(row)"
+              >
+                定标
+              </span>
+              <span v-else class="muted small">—</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div v-if="quotes.length" class="cmp-tip">
+          定标后自动生成采购单并通知中标农户，其余报价置为落选，需求随即变为「已成交」。
+        </div>
+      </div>
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
       </template>
@@ -236,30 +311,40 @@
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useRoute } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { commonApi, purchaserApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
-import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTableDom, stamped } from '@/utils/export'
 
-const router = useRouter()
+const route = useRoute()
 
 const loading = ref(false)
 const publishing = ref(false)
+const publishVisible = ref(false)
 const rows = ref([])
 const total = ref(0)
 const pages = ref(1)
 const page = ref(1)
 const size = ref(10)
 const keyword = ref('')
-const status = ref('ALL')
+/* 默认只看「待比价」：这一屏就是"我要干的活"；
+   全部/已成交是历史，翻得到但不占第一眼（原来看全部，满屏同类历史单） */
+const status = ref('处理中')
 const stats = ref({})
 const products = ref([])
 
+/* 待办带过来的需求编号：定位到的那一条要高亮，并直接打开比价面板 */
+const focusNo = ref('')
+const focusHit = ref(false)
+
 const detailVisible = ref(false)
 const detailRow = ref(null)
+const quotes = ref([])
+const awarding = ref(null)
 
 const DEFAULT_REQ = '要求新鲜、无黄叶、农残检测合格；需提供批次溯源二维码。'
 
@@ -276,6 +361,26 @@ const form = reactive({
 const fmtMD = (v) => (v ? fmtDate(v).slice(5, 16) : '—')
 
 const disabledPast = (d) => d.getTime() < Date.now() - 86400000
+
+/* 截止时间语义：待比价的需求只关心"还剩多久"，不是"哪天下的" */
+const untilText = (deadline) => {
+  if (!deadline) return ''
+  const min = Math.round((new Date(deadline).getTime() - Date.now()) / 60000)
+  if (min < 0) return '已过截止 ' + Math.ceil(-min / 1440) + ' 天'
+  if (min < 60) return '剩 ' + Math.max(1, min) + ' 分钟'
+  const h = Math.round(min / 60)
+  if (h < 24) return '剩 ' + h + ' 小时'
+  return '剩 ' + Math.round(h / 24) + ' 天'
+}
+const deadlineLevel = (deadline) => {
+  if (!deadline) return ''
+  const min = Math.round((new Date(deadline).getTime() - Date.now()) / 60000)
+  if (min < 0) return 'dl-danger'
+  if (min < 24 * 60) return 'dl-warn'
+  return ''
+}
+
+const rowClass = ({ row }) => (row.demandNo === focusNo.value ? 'row-focus' : '')
 
 const load = async () => {
   loading.value = true
@@ -345,7 +450,9 @@ const publish = async () => {
     form.expectedPrice = null
     form.deadline = ''
     form.qualityReq = DEFAULT_REQ
+    publishVisible.value = false
     page.value = 1
+    status.value = '处理中'
     await load()
   } catch (e) {
     /* 错误提示由请求拦截器统一处理 */
@@ -354,31 +461,140 @@ const publish = async () => {
   }
 }
 
-const goMatch = (row) => {
-  router.push('/purchaser/match?demandId=' + row.id)
-}
-
 const openDetail = (row) => {
   detailRow.value = row
   detailVisible.value = true
+  loadQuotes(row.id)
+}
+
+/* ---- 待办深链：/purchaser/demands?focus=X2026... ---- */
+async function applyFocus() {
+  const focus = String(route.query.focus || '').trim()
+  if (!focus) return
+  focusNo.value = focus
+  keyword.value = focus
+  status.value = 'ALL'   // 待办里的需求可能已经成交，不能被默认筛选挡住
+  page.value = 1
+  await load()
+  const hit = (rows.value || []).find((r) => r.demandNo === focus)
+  focusHit.value = !!hit
+  if (hit) openDetail(hit)
+}
+
+const clearFocus = () => {
+  focusNo.value = ''
+  focusHit.value = false
+  keyword.value = ''
+  status.value = '处理中'
+  page.value = 1
+  load()
+}
+
+/** 比价表：每次打开详情都重新拉，避免看到别处定标后的过期状态 */
+const loadQuotes = async (demandId) => {
+  quotes.value = []
+  try {
+    const res = await purchaserApi.demandQuotes(demandId)
+    quotes.value = res.data?.quotes || []
+  } catch (e) {
+    /* 错误提示由请求拦截器统一处理 */
+  }
+}
+
+const quoteTag = (s) => {
+  if (s === '中标') return 'tag-green'
+  if (s === '落选') return 'tag-gray'
+  return 'tag-orange'
+}
+
+const award = async (q) => {
+  try {
+    await ElMessageBox.confirm(
+      `将「${q.farmerName}」定为中标供应商：单价 ¥${fmtMoney(q.price)}，可供 ${fmtNum(q.quantity)}，` +
+        `承诺 ${q.deliveryDays} 天送达。定标后立即生成采购单，其余报价置为落选。`,
+      '确认定标',
+      { type: 'warning', confirmButtonText: '确认定标', cancelButtonText: '再想想' }
+    )
+  } catch (e) {
+    return
+  }
+  awarding.value = q.id
+  try {
+    const res = await purchaserApi.awardQuote(detailRow.value.id, q.id)
+    /* 定标后留在需求页：用户可能还有第二条要比价，
+       一杆子把人弹到订单页，等于让他重新找回来（L-043 同类问题） */
+    ElMessage.success((res.message || '已定标并生成采购单') + '，可在「我的订单」查看')
+    detailVisible.value = false
+    await load()
+  } catch (e) {
+    /* 错误提示由请求拦截器统一处理 */
+  } finally {
+    awarding.value = null
+  }
 }
 
 const exportDemands = () => {
-  ElMessage.success(`已导出 ${total.value} 条采购需求（含期望价、状态与报价数）`)
+  const n = exportTableDom(stamped('采购需求'))
+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')
 }
 
-onMounted(() => {
+useAutoRefresh(load)
+onMounted(async () => {
   loadProducts()
-  load()
+  await load()
+  applyFocus()
 })
+watch(() => route.query.focus, () => { applyFocus() })
 </script>
 
 <style scoped>
-.demand-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
+/* 定位条：从待办带 focus 过来时，明说定位到了哪一条 */
+.focus-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 12px 0;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: var(--accent-soft);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+}
+
+.focus-bar b {
+  color: var(--accent);
+}
+
+.cell-sub {
+  display: block;
+  font-size: var(--fs-2xs);
+  color: var(--c-muted-2);
+  margin-top: 1px;
+}
+
+.cell-sub.dl-warn {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.cell-sub.dl-danger {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.quote-n {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* 定位到的那一行要能一眼认出来，不能只是"跳过来了" */
+:deep(.el-table__row.row-focus) {
+  background: var(--accent-soft);
+}
+
+:deep(.el-table__row.row-focus td) {
+  background: var(--accent-soft);
 }
 
 .status-tabs {
@@ -403,7 +619,7 @@ onMounted(() => {
 }
 
 .demand-form :deep(.el-form-item__label) {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   padding-bottom: 4px;
 }
@@ -423,8 +639,37 @@ onMounted(() => {
 
 .form-hint {
   margin: 10px 0 0;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   line-height: 1.7;
   color: var(--c-muted-2);
+}
+
+/* 报价比价：紧跟在需求信息下方，避免用户看完需求还要再点一次才知道有没有人报价 */
+.cmp {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--c-border);
+}
+
+.cmp-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.cmp-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.cmp-tip {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--info-soft);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
 }
 </style>

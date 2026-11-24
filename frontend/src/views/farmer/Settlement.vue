@@ -185,14 +185,18 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { farmerApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
 import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTableDom, stamped } from '@/utils/export'
 
 const loading = ref(false)
+const route = useRoute()
 const rows = ref([])
 const income = ref({})
 const monthIncome = ref(0)
@@ -260,10 +264,21 @@ const openDetail = (row) => {
 }
 
 const exportBill = () => {
-  ElMessage.success(`对账单已导出：${pageInfo.value.total} 条结算记录`)
+  const n = exportTableDom(stamped('农户对账单'))
+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')
 }
 
-onMounted(load)
+useAutoRefresh(load)
+/* 单据工作台「查看我的对账单」带 ?focus=<订单号>：定位到那一笔并打开明细 */
+onMounted(async () => {
+  await load()
+  const no = String(route.query.focus || '').trim()
+  if (!no) return
+  const hit = (rows.value || []).find(
+    (r) => String(r.orderNo || '') === no || String(r.settlementNo || '') === no
+  )
+  if (hit) openDetail(hit)
+})
 </script>
 
 <style scoped>
@@ -275,7 +290,7 @@ onMounted(load)
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -286,7 +301,7 @@ onMounted(load)
 }
 
 .pay {
-  color: #15803d;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -313,36 +328,36 @@ onMounted(load)
 }
 
 .dlg-no {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #111827;
+  color: var(--ink);
 }
 
 .dlg-product {
   margin: 14px 0 12px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f7faf9;
+  background: var(--surface-2);
   border: 1px solid var(--c-border);
 }
 
 .dp-name {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .dp-meta {
   margin-top: 4px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
 .amount-box {
   padding: 14px 16px;
   border-radius: 11px;
-  background: linear-gradient(135deg, #f0fdf4, #e9f8ef);
-  border: 1px solid #d6f0e0;
+  background: linear-gradient(135deg, var(--surface-2), #e9f8ef);
+  border: 1px solid var(--accent-soft);
 }
 
 .amt-row {
@@ -350,18 +365,18 @@ onMounted(load)
   align-items: center;
   justify-content: space-between;
   padding: 5px 0;
-  font-size: 13px;
+  font-size: var(--fs-base);
   color: #3f5d4f;
 }
 
 .amt-row b {
   font-family: var(--font-num);
-  font-size: 14px;
-  color: #1b2a24;
+  font-size: var(--fs-base);
+  color: var(--ink);
 }
 
 .amt-row.minus b {
-  color: #b45309;
+  color: var(--warn);
 }
 
 .amt-divider {
@@ -371,15 +386,15 @@ onMounted(load)
 }
 
 .amt-row.total {
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .amt-row.total b {
-  font-size: 22px;
+  font-size: var(--fs-xl);
   font-weight: 700;
-  color: #15803d;
+  color: var(--accent);
   letter-spacing: -0.3px;
 }
 
@@ -390,9 +405,9 @@ onMounted(load)
   margin: 12px 0 14px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: #fffbeb;
+  background: var(--warn-soft);
   border: 1px solid #fdecc8;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   line-height: 1.7;
   color: #92620d;
 }

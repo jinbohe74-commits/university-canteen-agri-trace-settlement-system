@@ -7,6 +7,7 @@ import com.canteen.entity.Orders;
 import com.canteen.entity.PurchaseDemand;
 import com.canteen.entity.SupplySource;
 import com.canteen.service.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,9 @@ public class PurchaserController {
     private final SourceService sourceService;
     private final MatchService matchService;
     private final OrderService orderService;
+    private final PurchaseOrderService purchaseOrderService;
+    private final QuoteService quoteService;
+    private final StockService stockService;
     private final InboundService inboundService;
     private final EvaluationService evaluationService;
     private final TraceService traceService;
@@ -113,8 +117,91 @@ public class PurchaserController {
         BigDecimal quantity = new BigDecimal(String.valueOf(body.get("quantity")));
         LocalDateTime expected = body.get("expectedDelivery") == null ? null
                 : LocalDateTime.parse(String.valueOf(body.get("expectedDelivery")));
-        Orders o = orderService.create(demandId, sourceId, quantity, expected);
+        // 单笔下单也走采购单：保证每张订单都有采购单归属，「按采购单」视图不会漏单
+        com.canteen.dto.PurchaseOrderDTO dto = new com.canteen.dto.PurchaseOrderDTO();
+        dto.setDemandId(demandId);
+        dto.setExpectedDelivery(expected);
+        com.canteen.dto.PurchaseOrderDTO.Item item = new com.canteen.dto.PurchaseOrderDTO.Item();
+        item.setSourceId(sourceId);
+        item.setQuantity(quantity);
+        dto.setItems(List.of(item));
+        com.canteen.entity.PurchaseOrder po = purchaseOrderService.create(dto);
+        Orders o = orderService.firstOfPo(po.getId());
         return Result.success("下单成功，已通知农户接单", o);
+    }
+
+    // ---------------------------------------------------------------- 采购单（一次下单多品项）
+    @GetMapping("/purchase-orders")
+    public Result<Map<String, Object>> purchaseOrders(@RequestParam(defaultValue = "1") int page,
+                                                      @RequestParam(defaultValue = "10") int size,
+                                                      @RequestParam(required = false) String status,
+                                                      @RequestParam(required = false) String keyword) {
+        Map<String, Object> res = new LinkedHashMap<>();
+        res.put("page", purchaseOrderService.page(page, size, status, keyword));
+        res.put("stats", purchaseOrderService.stats());
+        return Result.success(res);
+    }
+
+    @GetMapping("/purchase-orders/{id}")
+    public Result<Map<String, Object>> purchaseOrderDetail(@PathVariable Long id) {
+        return Result.success(purchaseOrderService.detail(id));
+    }
+
+    // ---------------------------------------------------------------- 库存 / 领用 / 采购建议
+    @GetMapping("/stock")
+    public Result<Map<String, Object>> stock() {
+        return Result.success(stockService.overview());
+    }
+
+    @PostMapping("/stock/out")
+    public Result<Void> stockOut(@Valid @RequestBody com.canteen.dto.StockOutDTO dto) {
+        stockService.out(dto);
+        return Result.success("出库成功，库存已扣减", null);
+    }
+
+    @GetMapping("/stock/suggestions")
+    public Result<Map<String, Object>> suggestions() {
+        return Result.success(stockService.suggestions());
+    }
+
+    @PostMapping("/stock/demands")
+    public Result<List<com.canteen.entity.PurchaseDemand>> createDemandsFromSuggestion(
+            @RequestBody Map<String, Object> body) {
+        Object raw = body.get("productIds");
+        List<Long> ids = new java.util.ArrayList<>();
+        if (raw instanceof List<?> list) {
+            for (Object o : list) {
+                ids.add(Long.valueOf(String.valueOf(o)));
+            }
+        }
+        List<com.canteen.entity.PurchaseDemand> created = stockService.generateDemands(ids);
+        return Result.success("已生成 " + created.size() + " 条采购需求，等待农户报价", created);
+    }
+
+    @PutMapping("/stock/safety")
+    public Result<Void> setSafety(@RequestParam Long productId,
+                                  @RequestParam java.math.BigDecimal safetyQty) {
+        stockService.setSafety(productId, safetyQty);
+        return Result.success("安全库存已更新", null);
+    }
+
+    // ---------------------------------------------------------------- 需求报价 / 定标
+    @GetMapping("/demands/{id}/quotes")
+    public Result<Map<String, Object>> demandQuotes(@PathVariable Long id) {
+        return Result.success(quoteService.compare(id));
+    }
+
+    @PostMapping("/demands/{id}/award/{quoteId}")
+    public Result<com.canteen.entity.PurchaseOrder> award(@PathVariable Long id, @PathVariable Long quoteId) {
+        com.canteen.entity.PurchaseOrder po = quoteService.award(id, quoteId);
+        return Result.success("已定标并生成采购单 " + po.getPoNo(), po);
+    }
+
+    @PostMapping("/purchase-orders")
+    public Result<com.canteen.entity.PurchaseOrder> createPurchaseOrder(
+            @Valid @RequestBody com.canteen.dto.PurchaseOrderDTO dto) {
+        com.canteen.entity.PurchaseOrder po = purchaseOrderService.create(dto);
+        return Result.success("已生成采购单 " + po.getPoNo() + "，共 " + po.getItemCount() + " 个品项，已通知农户接单", po);
     }
 
     // ---------------------------------------------------------------- 入库确认
@@ -124,8 +211,14 @@ public class PurchaserController {
     }
 
     @PostMapping("/inbound")
-    public Result<Map<String, Object>> inbound(@RequestBody InboundDTO dto) {
+    public Result<Map<String, Object>> inbound(@Valid @RequestBody InboundDTO dto) {
         return Result.success("入库成功，已自动生成结算单", inboundService.confirm(dto));
+    }
+
+    /** 待入库清单：本食堂全部「已送达」订单，供入库页左侧列表逐笔处理 */
+    @GetMapping("/inbound/pending")
+    public Result<Map<String, Object>> inboundPending(@RequestParam(defaultValue = "50") int limit) {
+        return Result.success(inboundService.pending(limit));
     }
 
     @GetMapping("/inbound/recent")
@@ -146,7 +239,7 @@ public class PurchaserController {
     }
 
     @PostMapping("/evaluations")
-    public Result<Void> submitEvaluation(@RequestBody EvaluationDTO dto) {
+    public Result<Void> submitEvaluation(@Valid @RequestBody EvaluationDTO dto) {
         evaluationService.submit(dto);
         return Result.success("评价已提交，结果已纳入农户信用", null);
     }

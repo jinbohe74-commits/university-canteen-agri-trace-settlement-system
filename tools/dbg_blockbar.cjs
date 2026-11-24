@@ -1,0 +1,17 @@
+const path=require('path');const BASE='http://127.0.0.1:5173';const API='http://127.0.0.1:8080'
+const G=path.join(process.env.APPDATA,'npm','node_modules');module.paths.push(G)
+const {chromium}=require(path.join(G,'playwright'))
+const sleep=ms=>new Promise(r=>setTimeout(r,ms))
+;(async()=>{const b=await chromium.launch({channel:'msedge'})
+const res=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'purchaser01',password:'123456',expectedRole:'PURCHASER'})})
+const d=(await res.json()).data
+const ctx=await b.newContext({viewport:{width:1440,height:900}})
+await ctx.addInitScript(([t,u,rn,mn])=>{sessionStorage.setItem('ct_token',t);sessionStorage.setItem('ct_user',u);sessionStorage.setItem('ct_role_name',rn);sessionStorage.setItem('ct_menus',mn)},[d.token,JSON.stringify(d.user),d.roleName||'',JSON.stringify(d.menus||[])])
+const p=await ctx.newPage()
+await p.goto(BASE+'/purchaser/inbound?orderNo=DD202611100330',{waitUntil:'domcontentloaded'});await sleep(2600)
+const bar=await p.locator('.block-bar').first().innerText().catch(()=>'')
+console.log('原因条:',bar?bar.replace(/\s+/g,' ').slice(0,160):'未出现')
+const dis=await p.locator('.el-input-number input').first().isDisabled().catch(()=>null)
+console.log('实收输入禁用:',dis)
+await p.screenshot({path:'docs/roleplay_2026-11-10/shots4/4-inbound-blocked.png'})
+await b.close()})()

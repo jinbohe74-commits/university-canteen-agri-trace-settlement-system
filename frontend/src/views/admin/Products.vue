@@ -40,10 +40,7 @@
         >
           <template #prefix><el-icon><Search /></el-icon></template>
         </el-input>
-        <el-select v-model="query.category" placeholder="产品大类" clearable style="width: 140px" @change="search">
-          <el-option label="全部大类" value="" />
-          <el-option v-for="c in BIG_CATEGORIES" :key="c" :label="c" :value="c" />
-        </el-select>
+        <!-- 产品大类由下方带数量的分段控件承担，这里不再放重复的下拉 -->
         <el-select v-model="query.status" placeholder="销售状态" clearable style="width: 132px" @change="search">
           <el-option label="全部状态" value="" />
           <el-option label="在售" value="在售" />
@@ -255,6 +252,8 @@ import { adminApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
 import BaseChart from '@/components/BaseChart.vue'
 import { fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { downloadCsv, stamped } from '@/utils/export'
 
 const BIG_CATEGORIES = ['叶菜类', '根茎类', '茄果类', '瓜果类', '菌菇类', '有机菜']
 const STORAGE = ['冷链配送', '冷链保鲜', '常温通风']
@@ -368,7 +367,13 @@ const onPageChange = (page) => {
 }
 
 const importTemplate = () => {
-  ElMessage.success('已下载《农产品导入模板》，请按品类、单位与参考价填写后上传')
+  const n = downloadCsv(stamped('农产品导入模板'),
+    ['品名', '品类', '单位', '参考价(元)', '产地', '规格', '状态'],
+    [
+      ['大白菜（示例，导入前请删除）', '叶菜类', 'kg', '2.50', '本地基地', '散装', '正常'],
+      ['西红柿（示例，导入前请删除）', '茄果类', 'kg', '5.80', '本地基地', '箱装', '正常']
+    ])
+  ElMessage.success(`导入模板已下载（${n} 行示例，请替换后上传）`)
 }
 
 const openCreate = () => {
@@ -526,6 +531,7 @@ const priceOption = computed(() => {
   }
 })
 
+useAutoRefresh(load)
 onMounted(() => {
   load()
   loadCategories()
@@ -534,7 +540,8 @@ onMounted(() => {
 
 <style scoped>
 .table-card {
-  overflow: hidden;
+  /* 不裁切表格：固定列阴影与横向滚动条必须可见（L-040） */
+  overflow: visible;
 }
 
 .tab-bar {
@@ -555,7 +562,7 @@ onMounted(() => {
   border-radius: 15px;
   background: #f4f7f5;
   color: var(--c-text-2);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   cursor: pointer;
   transition: all 0.16s ease;
 }
@@ -574,7 +581,7 @@ onMounted(() => {
 
 .tab-num {
   font-family: var(--font-num);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -583,14 +590,14 @@ onMounted(() => {
 }
 
 .cell-main {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
   line-height: 1.35;
 }
 
 .cell-sub {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 2px;
 }
@@ -614,29 +621,29 @@ onMounted(() => {
 .pm-item {
   padding: 10px 12px;
   border-radius: 10px;
-  background: #f7fbf9;
+  background: var(--surface-2);
   border: 1px solid var(--c-border);
 }
 
 .pm-label {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
 .pm-value {
   font-family: var(--font-num);
-  font-size: 18px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin-top: 4px;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .pm-value.warn {
-  color: #b45309;
+  color: var(--warn);
 }
 
 .pm-value.primary {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .pm-meta {
@@ -645,7 +652,7 @@ onMounted(() => {
 }
 
 .pm-text {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   line-height: 1.55;
   margin-top: 5px;
@@ -659,16 +666,16 @@ onMounted(() => {
 }
 
 .chart-title {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .inline-legend {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
@@ -696,7 +703,7 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   margin-top: 10px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 

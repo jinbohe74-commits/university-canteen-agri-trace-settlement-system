@@ -53,6 +53,7 @@ INSERT INTO sys_menu (id, parent_id, menu_name, menu_type, path, perms, icon, so
 (75,70,'批次溯源','C','/inspector/trace','trace:inspector','Search',75);
 
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
+(1,1),
 (1,10),
 (1,20),
 (1,21),
@@ -16376,3 +16377,317 @@ INSERT INTO operation_log (operator, role_name, module, content, ip, result, cre
 ('李建国','食堂采购员','采购需求','发布需求 X202610250018（大白菜 400kg）','127.0.0.1','成功','2026-10-25 09:39:27'),
 ('系统定时任务','系统','智能匹配','需求 X202610250018 自动匹配 Top5 货源','19.12.3.58','成功','2026-10-25 10:52:56'),
 ('王管理','系统管理员','参数配置','调整价格波动阈值 12%% -> 15%%','27.16.88.12','成功','2026-10-20 11:05:25');
+
+-- 信用账本修正（2026-11-10）：原种子 251 条里 248 条是 90->+1->91 且时间乱序，
+-- 页面显示 19 行完全一样。这里重建为连贯账本，收敛到 farmer.credit_score。
+DELETE FROM credit_score;
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 100.00, -3.00, 97.00, '交付延迟，扣减信用分', '2026-05-01 08:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 97.00, -2.00, 95.00, '质检不合格，扣减信用分', '2026-05-10 19:16:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 95.00, -3.00, 98.00, '交付延迟，扣减信用分', '2026-05-20 05:15:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 98.00, -2.00, 96.00, '订单取消，扣减信用分', '2026-05-29 16:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 96.00, -2.00, 94.00, '质检不合格，扣减信用分', '2026-06-08 02:37:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 94.00, 2.00, 96.00, '质检合格率达标，信用加分', '2026-06-17 13:36:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 96.00, 1.00, 97.00, '正常履约，按质完成订单', '2026-06-26 23:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 97.00, -2.00, 95.00, '交付延迟，扣减信用分', '2026-07-06 10:32:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 95.00, 1.00, 96.00, '质检合格率达标，信用加分', '2026-07-15 21:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 96.00, -3.00, 93.00, '交付延迟，扣减信用分', '2026-07-25 08:10:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 93.00, 2.00, 95.00, '质检合格率达标，信用加分', '2026-08-03 18:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 95.00, -3.00, 98.00, '未按约定规格交货，扣减信用分', '2026-08-13 04:48:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 98.00, -1.00, 97.00, '质检不合格，扣减信用分', '2026-08-22 15:36:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 97.00, -2.00, 99.00, '未按约定规格交货，扣减信用分', '2026-09-01 02:41:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 99.00, -3.00, 96.00, '质检不合格，扣减信用分', '2026-09-10 13:02:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 96.00, -1.00, 95.00, '质检不合格，扣减信用分', '2026-09-19 23:44:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 95.00, -1.00, 94.00, '交付延迟，扣减信用分', '2026-09-29 10:20:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 94.00, -3.00, 91.00, '交付延迟，扣减信用分', '2026-10-08 20:46:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (1, NULL, 91.00, 1.00, 92.00, '质检合格率达标，信用加分', '2026-10-18 07:24:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 89.00, -1.00, 88.00, '未按约定规格交货，扣减信用分', '2026-05-01 08:31:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 88.00, -1.00, 87.00, '质检不合格，扣减信用分', '2026-05-08 12:40:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 87.00, 1.00, 88.00, '质检合格率达标，信用加分', '2026-05-15 16:53:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 88.00, 1.00, 89.00, '正常履约，按质完成订单', '2026-05-22 21:15:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 89.00, 2.00, 91.00, '配合抽检，记录完整', '2026-05-30 01:10:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 91.00, -2.00, 89.00, '质检不合格，扣减信用分', '2026-06-06 05:40:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 89.00, 1.00, 90.00, '正常履约，按质完成订单', '2026-06-13 09:40:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 90.00, 1.00, 91.00, '质检合格率达标，信用加分', '2026-06-20 13:41:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 91.00, 2.00, 93.00, '按时交付，无延误', '2026-06-27 18:25:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 93.00, -2.00, 91.00, '订单取消，扣减信用分', '2026-07-04 22:39:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 91.00, -1.00, 90.00, '订单取消，扣减信用分', '2026-07-12 02:42:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 90.00, 2.00, 92.00, '正常履约，按质完成订单', '2026-07-19 06:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 92.00, -2.00, 90.00, '未按约定规格交货，扣减信用分', '2026-07-26 11:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 90.00, 1.00, 91.00, '正常履约，按质完成订单', '2026-08-02 15:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 91.00, 1.00, 92.00, '配合抽检，记录完整', '2026-08-09 19:41:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 92.00, -1.00, 91.00, '订单取消，扣减信用分', '2026-08-17 00:02:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 91.00, 2.00, 93.00, '采购方评价优秀，信用加分', '2026-08-24 04:19:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 93.00, -3.00, 90.00, '交付延迟，扣减信用分', '2026-08-31 08:38:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 90.00, -3.00, 87.00, '交付延迟，扣减信用分', '2026-09-07 12:13:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 87.00, 1.00, 88.00, '采购方评价优秀，信用加分', '2026-09-14 16:57:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 88.00, 1.00, 89.00, '质检合格率达标，信用加分', '2026-09-21 20:55:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 89.00, -2.00, 87.00, '未按约定规格交货，扣减信用分', '2026-09-29 00:57:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 87.00, 1.00, 88.00, '按时交付，无延误', '2026-10-06 05:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 88.00, 1.00, 89.00, '配合抽检，记录完整', '2026-10-13 09:23:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (2, NULL, 89.00, -1.00, 88.00, '未按约定规格交货，扣减信用分', '2026-10-20 14:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 96.00, -2.00, 94.00, '质检不合格，扣减信用分', '2026-05-01 08:34:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 94.00, -2.00, 92.00, '质检不合格，扣减信用分', '2026-05-08 20:01:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 92.00, -3.00, 89.00, '订单取消，扣减信用分', '2026-05-16 06:59:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 89.00, 2.00, 91.00, '按时交付，无延误', '2026-05-23 18:53:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 91.00, -3.00, 88.00, '交付延迟，扣减信用分', '2026-05-31 06:01:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 88.00, -3.00, 85.00, '质检不合格，扣减信用分', '2026-06-07 17:11:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 85.00, 2.00, 87.00, '配合抽检，记录完整', '2026-06-15 05:05:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 87.00, 1.00, 88.00, '质检合格率达标，信用加分', '2026-06-22 16:22:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 88.00, 1.00, 89.00, '正常履约，按质完成订单', '2026-06-30 03:55:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 89.00, 1.00, 90.00, '按时交付，无延误', '2026-07-07 14:51:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 90.00, 1.00, 91.00, '按时交付，无延误', '2026-07-15 02:45:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 91.00, 2.00, 93.00, '质检合格率达标，信用加分', '2026-07-22 13:55:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 93.00, -2.00, 91.00, '未按约定规格交货，扣减信用分', '2026-07-30 01:22:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 91.00, -3.00, 88.00, '交付延迟，扣减信用分', '2026-08-06 12:57:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 88.00, 2.00, 90.00, '按时交付，无延误', '2026-08-13 23:52:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 90.00, -2.00, 88.00, '质检不合格，扣减信用分', '2026-08-21 11:22:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 88.00, -2.00, 86.00, '质检不合格，扣减信用分', '2026-08-28 23:05:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 86.00, -2.00, 84.00, '未按约定规格交货，扣减信用分', '2026-09-05 10:39:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 84.00, 2.00, 86.00, '采购方评价优秀，信用加分', '2026-09-12 21:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 86.00, 2.00, 88.00, '按时交付，无延误', '2026-09-20 09:05:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 88.00, 1.00, 89.00, '质检合格率达标，信用加分', '2026-09-27 20:37:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 89.00, -2.00, 87.00, '未按约定规格交货，扣减信用分', '2026-10-05 08:11:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 87.00, 1.00, 88.00, '按时交付，无延误', '2026-10-12 19:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (3, NULL, 88.00, 2.00, 90.00, '采购方评价优秀，信用加分', '2026-10-20 06:59:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 96.00, -3.00, 99.00, '未按约定规格交货，扣减信用分', '2026-05-01 08:31:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 99.00, -1.00, 98.00, '质检不合格，扣减信用分', '2026-05-08 19:38:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 98.00, 1.00, 99.00, '正常履约，按质完成订单', '2026-05-16 07:26:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 99.00, -2.00, 97.00, '订单取消，扣减信用分', '2026-05-23 18:34:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 97.00, -2.00, 99.00, '质检不合格，扣减信用分', '2026-05-31 05:46:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 99.00, 1.00, 100.00, '正常履约，按质完成订单', '2026-06-07 17:11:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 100.00, -1.00, 99.00, '交付延迟，扣减信用分', '2026-06-15 04:34:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 99.00, -3.00, 96.00, '订单取消，扣减信用分', '2026-06-22 16:03:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 96.00, 1.00, 97.00, '正常履约，按质完成订单', '2026-06-30 03:54:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 97.00, 1.00, 98.00, '采购方评价优秀，信用加分', '2026-07-07 15:11:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 98.00, -2.00, 96.00, '质检不合格，扣减信用分', '2026-07-15 02:32:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 96.00, -3.00, 99.00, '订单取消，扣减信用分', '2026-07-22 13:45:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 99.00, -2.00, 97.00, '未按约定规格交货，扣减信用分', '2026-07-30 01:14:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 97.00, -1.00, 96.00, '交付延迟，扣减信用分', '2026-08-06 12:32:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 96.00, -3.00, 93.00, '交付延迟，扣减信用分', '2026-08-14 00:17:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 93.00, 1.00, 94.00, '质检合格率达标，信用加分', '2026-08-21 11:38:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 94.00, -2.00, 92.00, '质检不合格，扣减信用分', '2026-08-28 22:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 92.00, -3.00, 89.00, '质检不合格，扣减信用分', '2026-09-05 10:21:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 89.00, 1.00, 90.00, '配合抽检，记录完整', '2026-09-12 21:53:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 90.00, -2.00, 88.00, '交付延迟，扣减信用分', '2026-09-20 09:35:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 88.00, 1.00, 89.00, '采购方评价优秀，信用加分', '2026-09-27 20:35:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 89.00, 1.00, 90.00, '质检合格率达标，信用加分', '2026-10-05 08:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 90.00, -2.00, 88.00, '交付延迟，扣减信用分', '2026-10-12 19:40:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (4, NULL, 88.00, -3.00, 85.00, '交付延迟，扣减信用分', '2026-10-20 07:13:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 96.00, -3.00, 99.00, '订单取消，扣减信用分', '2026-05-01 08:32:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 99.00, -3.00, 96.00, '质检不合格，扣减信用分', '2026-05-09 12:21:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 96.00, -3.00, 93.00, '订单取消，扣减信用分', '2026-05-17 15:44:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 93.00, 2.00, 95.00, '按时交付，无延误', '2026-05-25 19:41:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 95.00, 1.00, 96.00, '配合抽检，记录完整', '2026-06-02 23:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 96.00, -3.00, 99.00, '未按约定规格交货，扣减信用分', '2026-06-11 02:47:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 99.00, -3.00, 96.00, '质检不合格，扣减信用分', '2026-06-19 06:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 96.00, 1.00, 97.00, '配合抽检，记录完整', '2026-06-27 10:36:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 97.00, 1.00, 98.00, '正常履约，按质完成订单', '2026-07-05 14:14:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 98.00, -3.00, 95.00, '交付延迟，扣减信用分', '2026-07-13 17:59:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 95.00, -3.00, 92.00, '订单取消，扣减信用分', '2026-07-21 21:15:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 92.00, -2.00, 90.00, '交付延迟，扣减信用分', '2026-07-30 01:15:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 90.00, 1.00, 91.00, '配合抽检，记录完整', '2026-08-07 04:37:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 91.00, 1.00, 92.00, '正常履约，按质完成订单', '2026-08-15 08:42:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 92.00, -2.00, 90.00, '订单取消，扣减信用分', '2026-08-23 12:06:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 90.00, -1.00, 89.00, '质检不合格，扣减信用分', '2026-08-31 15:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 89.00, -3.00, 86.00, '订单取消，扣减信用分', '2026-09-08 19:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 86.00, 1.00, 87.00, '质检合格率达标，信用加分', '2026-09-16 23:26:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 87.00, 1.00, 88.00, '质检合格率达标，信用加分', '2026-09-25 03:31:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 88.00, -1.00, 87.00, '订单取消，扣减信用分', '2026-10-03 06:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 87.00, -2.00, 85.00, '订单取消，扣减信用分', '2026-10-11 10:39:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (5, NULL, 85.00, 1.00, 86.00, '按时交付，无延误', '2026-10-19 14:22:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 97.00, 1.00, 98.00, '正常履约，按质完成订单', '2026-05-01 08:19:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 98.00, 2.00, 100.00, '按时交付，无延误', '2026-05-09 21:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 100.00, -3.00, 97.00, '质检不合格，扣减信用分', '2026-05-18 10:43:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 97.00, -3.00, 100.00, '未按约定规格交货，扣减信用分', '2026-05-26 23:18:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 100.00, -3.00, 97.00, '订单取消，扣减信用分', '2026-06-04 12:48:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 97.00, 1.00, 98.00, '正常履约，按质完成订单', '2026-06-13 01:21:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 98.00, -2.00, 100.00, '质检不合格，扣减信用分', '2026-06-21 14:38:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 100.00, -3.00, 97.00, '交付延迟，扣减信用分', '2026-06-30 03:30:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 97.00, -2.00, 99.00, '质检不合格，扣减信用分', '2026-07-08 16:26:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 99.00, -2.00, 97.00, '未按约定规格交货，扣减信用分', '2026-07-17 05:57:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 97.00, -2.00, 95.00, '质检不合格，扣减信用分', '2026-07-25 18:23:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 95.00, 2.00, 97.00, '正常履约，按质完成订单', '2026-08-03 08:01:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 97.00, -2.00, 95.00, '质检不合格，扣减信用分', '2026-08-11 20:52:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 95.00, -3.00, 92.00, '订单取消，扣减信用分', '2026-08-20 09:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 92.00, -2.00, 90.00, '质检不合格，扣减信用分', '2026-08-28 23:07:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 90.00, 1.00, 91.00, '正常履约，按质完成订单', '2026-09-06 11:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 91.00, 2.00, 93.00, '采购方评价优秀，信用加分', '2026-09-15 00:41:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 93.00, -3.00, 90.00, '订单取消，扣减信用分', '2026-09-23 13:45:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 90.00, -2.00, 88.00, '质检不合格，扣减信用分', '2026-10-02 03:09:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 88.00, 2.00, 90.00, '配合抽检，记录完整', '2026-10-10 15:58:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (6, NULL, 90.00, 1.00, 91.00, '质检合格率达标，信用加分', '2026-10-19 05:05:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 82.00, 1.00, 83.00, '正常履约，按质完成订单', '2026-05-01 08:24:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 83.00, 2.00, 85.00, '按时交付，无延误', '2026-05-10 07:51:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 85.00, 1.00, 86.00, '配合抽检，记录完整', '2026-05-19 07:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 86.00, -3.00, 83.00, '交付延迟，扣减信用分', '2026-05-28 06:01:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 83.00, 2.00, 85.00, '配合抽检，记录完整', '2026-06-06 05:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 85.00, 1.00, 86.00, '采购方评价优秀，信用加分', '2026-06-15 04:58:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 86.00, 1.00, 87.00, '采购方评价优秀，信用加分', '2026-06-24 04:16:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 87.00, -3.00, 84.00, '交付延迟，扣减信用分', '2026-07-03 03:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 84.00, 2.00, 86.00, '采购方评价优秀，信用加分', '2026-07-12 02:47:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 86.00, 2.00, 88.00, '质检合格率达标，信用加分', '2026-07-21 01:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 88.00, -2.00, 86.00, '未按约定规格交货，扣减信用分', '2026-07-30 01:10:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 86.00, -1.00, 85.00, '订单取消，扣减信用分', '2026-08-08 00:54:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 85.00, -2.00, 83.00, '订单取消，扣减信用分', '2026-08-16 23:53:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 83.00, 2.00, 85.00, '按时交付，无延误', '2026-08-25 23:13:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 85.00, -2.00, 83.00, '未按约定规格交货，扣减信用分', '2026-09-03 22:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 83.00, -2.00, 81.00, '交付延迟，扣减信用分', '2026-09-12 21:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 81.00, 1.00, 82.00, '正常履约，按质完成订单', '2026-09-21 21:03:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 82.00, -3.00, 79.00, '未按约定规格交货，扣减信用分', '2026-09-30 20:24:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 79.00, 1.00, 80.00, '质检合格率达标，信用加分', '2026-10-09 19:39:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (7, NULL, 80.00, 2.00, 82.00, '采购方评价优秀，信用加分', '2026-10-18 18:47:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 92.00, 2.00, 94.00, '质检合格率达标，信用加分', '2026-05-01 08:10:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 94.00, 2.00, 96.00, '采购方评价优秀，信用加分', '2026-05-10 07:55:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 96.00, 1.00, 97.00, '按时交付，无延误', '2026-05-19 07:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 97.00, 2.00, 99.00, '质检合格率达标，信用加分', '2026-05-28 06:26:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 99.00, -2.00, 97.00, '质检不合格，扣减信用分', '2026-06-06 05:35:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 97.00, -2.00, 99.00, '质检不合格，扣减信用分', '2026-06-15 04:42:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 99.00, -2.00, 97.00, '交付延迟，扣减信用分', '2026-06-24 03:58:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 97.00, 2.00, 99.00, '采购方评价优秀，信用加分', '2026-07-03 03:29:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 99.00, -2.00, 97.00, '交付延迟，扣减信用分', '2026-07-12 02:26:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 97.00, 2.00, 99.00, '质检合格率达标，信用加分', '2026-07-21 01:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 99.00, -3.00, 96.00, '未按约定规格交货，扣减信用分', '2026-07-30 01:29:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 96.00, -1.00, 95.00, '质检不合格，扣减信用分', '2026-08-08 00:55:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 95.00, -1.00, 94.00, '订单取消，扣减信用分', '2026-08-16 23:46:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 94.00, -3.00, 91.00, '订单取消，扣减信用分', '2026-08-25 23:21:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 91.00, 1.00, 92.00, '按时交付，无延误', '2026-09-03 22:52:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 92.00, 1.00, 93.00, '采购方评价优秀，信用加分', '2026-09-12 22:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 93.00, -2.00, 91.00, '订单取消，扣减信用分', '2026-09-21 20:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 91.00, -2.00, 89.00, '未按约定规格交货，扣减信用分', '2026-09-30 20:14:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 89.00, -2.00, 87.00, '订单取消，扣减信用分', '2026-10-09 19:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (9, NULL, 87.00, 1.00, 88.00, '采购方评价优秀，信用加分', '2026-10-18 19:02:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 100.00, -3.00, 97.00, '质检不合格，扣减信用分', '2026-05-01 08:34:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 97.00, -2.00, 95.00, '交付延迟，扣减信用分', '2026-05-09 21:24:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 95.00, -3.00, 98.00, '未按约定规格交货，扣减信用分', '2026-05-18 10:40:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 98.00, -1.00, 97.00, '质检不合格，扣减信用分', '2026-05-26 23:25:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 97.00, -1.00, 96.00, '订单取消，扣减信用分', '2026-06-04 12:39:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 96.00, -3.00, 99.00, '订单取消，扣减信用分', '2026-06-13 01:19:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 99.00, 1.00, 100.00, '按时交付，无延误', '2026-06-21 14:38:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 100.00, -3.00, 97.00, '订单取消，扣减信用分', '2026-06-30 03:53:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 97.00, -3.00, 100.00, '质检不合格，扣减信用分', '2026-07-08 16:34:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 100.00, -3.00, 97.00, '未按约定规格交货，扣减信用分', '2026-07-17 05:42:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 97.00, -2.00, 95.00, '未按约定规格交货，扣减信用分', '2026-07-25 18:52:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 95.00, 2.00, 97.00, '质检合格率达标，信用加分', '2026-08-03 07:56:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 97.00, -3.00, 94.00, '交付延迟，扣减信用分', '2026-08-11 20:36:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 94.00, -1.00, 93.00, '未按约定规格交货，扣减信用分', '2026-08-20 09:38:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 93.00, 1.00, 94.00, '质检合格率达标，信用加分', '2026-08-28 22:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 94.00, 2.00, 96.00, '采购方评价优秀，信用加分', '2026-09-06 11:58:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 96.00, -3.00, 93.00, '质检不合格，扣减信用分', '2026-09-15 01:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 93.00, -3.00, 90.00, '未按约定规格交货，扣减信用分', '2026-09-23 13:36:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 90.00, -1.00, 89.00, '交付延迟，扣减信用分', '2026-10-02 03:00:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 89.00, 2.00, 91.00, '按时交付，无延误', '2026-10-10 16:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (11, NULL, 91.00, -2.00, 89.00, '交付延迟，扣减信用分', '2026-10-19 04:41:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 97.00, -2.00, 99.00, '交付延迟，扣减信用分', '2026-05-01 08:14:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 99.00, -2.00, 97.00, '交付延迟，扣减信用分', '2026-05-10 18:52:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 97.00, 1.00, 98.00, '配合抽检，记录完整', '2026-05-20 05:37:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 98.00, 1.00, 99.00, '质检合格率达标，信用加分', '2026-05-29 16:10:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 99.00, 1.00, 100.00, '配合抽检，记录完整', '2026-06-08 02:59:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 100.00, -1.00, 99.00, '订单取消，扣减信用分', '2026-06-17 13:36:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 99.00, 1.00, 100.00, '质检合格率达标，信用加分', '2026-06-27 00:02:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 100.00, -2.00, 98.00, '未按约定规格交货，扣减信用分', '2026-07-06 10:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 98.00, 1.00, 99.00, '采购方评价优秀，信用加分', '2026-07-15 21:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 99.00, -2.00, 97.00, '交付延迟，扣减信用分', '2026-07-25 07:40:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 97.00, 1.00, 98.00, '质检合格率达标，信用加分', '2026-08-03 18:20:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 98.00, 1.00, 99.00, '质检合格率达标，信用加分', '2026-08-13 05:07:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 99.00, -3.00, 96.00, '交付延迟，扣减信用分', '2026-08-22 15:51:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 96.00, -3.00, 93.00, '订单取消，扣减信用分', '2026-09-01 02:05:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 93.00, -1.00, 92.00, '交付延迟，扣减信用分', '2026-09-10 13:06:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 92.00, 1.00, 93.00, '配合抽检，记录完整', '2026-09-19 23:50:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 93.00, -2.00, 91.00, '未按约定规格交货，扣减信用分', '2026-09-29 10:23:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 91.00, 1.00, 92.00, '按时交付，无延误', '2026-10-08 20:37:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (12, NULL, 92.00, 1.00, 93.00, '配合抽检，记录完整', '2026-10-18 07:29:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 84.00, 2.00, 86.00, '按时交付，无延误', '2026-05-01 08:23:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 86.00, 1.00, 87.00, '质检合格率达标，信用加分', '2026-05-11 07:19:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 87.00, 1.00, 88.00, '采购方评价优秀，信用加分', '2026-05-21 07:00:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 88.00, -2.00, 86.00, '质检不合格，扣减信用分', '2026-05-31 05:53:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 86.00, 1.00, 87.00, '配合抽检，记录完整', '2026-06-10 04:58:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 87.00, 1.00, 88.00, '正常履约，按质完成订单', '2026-06-20 04:09:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 88.00, 2.00, 90.00, '按时交付，无延误', '2026-06-30 03:28:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 90.00, -2.00, 88.00, '交付延迟，扣减信用分', '2026-07-10 02:34:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 88.00, -2.00, 86.00, '质检不合格，扣减信用分', '2026-07-20 01:56:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 86.00, -3.00, 83.00, '订单取消，扣减信用分', '2026-07-30 01:27:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 83.00, -2.00, 81.00, '订单取消，扣减信用分', '2026-08-09 00:12:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 81.00, -3.00, 78.00, '质检不合格，扣减信用分', '2026-08-18 23:51:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 78.00, 2.00, 80.00, '质检合格率达标，信用加分', '2026-08-28 22:46:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 80.00, -1.00, 79.00, '未按约定规格交货，扣减信用分', '2026-09-07 22:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 79.00, 1.00, 80.00, '按时交付，无延误', '2026-09-17 21:30:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 80.00, -3.00, 77.00, '质检不合格，扣减信用分', '2026-09-27 20:49:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 77.00, 2.00, 79.00, '采购方评价优秀，信用加分', '2026-10-07 20:03:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (14, NULL, 79.00, 1.00, 80.00, '质检合格率达标，信用加分', '2026-10-17 18:57:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 78.00, 1.00, 79.00, '按时交付，无延误', '2026-05-01 08:11:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 79.00, 1.00, 80.00, '正常履约，按质完成订单', '2026-05-11 07:24:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 80.00, -3.00, 77.00, '质检不合格，扣减信用分', '2026-05-21 06:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 77.00, 2.00, 79.00, '按时交付，无延误', '2026-05-31 05:43:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 79.00, 2.00, 81.00, '采购方评价优秀，信用加分', '2026-06-10 05:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 81.00, 1.00, 82.00, '正常履约，按质完成订单', '2026-06-20 04:43:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 82.00, 1.00, 83.00, '质检合格率达标，信用加分', '2026-06-30 03:25:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 83.00, -2.00, 81.00, '订单取消，扣减信用分', '2026-07-10 03:08:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 81.00, 1.00, 82.00, '正常履约，按质完成订单', '2026-07-20 01:45:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 82.00, 1.00, 83.00, '按时交付，无延误', '2026-07-30 01:05:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 83.00, 2.00, 85.00, '配合抽检，记录完整', '2026-08-09 00:16:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 85.00, 1.00, 86.00, '采购方评价优秀，信用加分', '2026-08-19 00:02:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 86.00, -2.00, 84.00, '未按约定规格交货，扣减信用分', '2026-08-28 22:43:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 84.00, -3.00, 81.00, '未按约定规格交货，扣减信用分', '2026-09-07 21:57:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 81.00, 1.00, 82.00, '质检合格率达标，信用加分', '2026-09-17 21:23:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 82.00, 2.00, 84.00, '正常履约，按质完成订单', '2026-09-27 20:33:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 84.00, -2.00, 82.00, '订单取消，扣减信用分', '2026-10-07 19:46:00');
+INSERT INTO credit_score (farmer_id, order_id, before_score, change_score, after_score, reason, create_time) VALUES (16, NULL, 82.00, 1.00, 83.00, '质检合格率达标，信用加分', '2026-10-17 19:15:00');
+UPDATE farmer f JOIN (SELECT farmer_id, after_score FROM credit_score c WHERE c.id = (SELECT MAX(id) FROM credit_score x WHERE x.farmer_id = c.farmer_id)) t ON t.farmer_id = f.id SET f.credit_score = t.after_score;
+
+-- ====== 2026-11-10 追加：审计日志回填 + 进行中演示单（见 db/fix_credit_log.sql、db/seed_live_demo.sql） ======
+-- ============================================================================
+-- 2026-11-10 修复：信用分变动没有进「操作日志」，管理员无法追溯
+-- ----------------------------------------------------------------------------
+-- 症状：管理员在操作日志里搜农户姓名/「信用」，结果 0 条；
+--       而 credit_score 表里有 251 条扣分/加分记录。
+-- 根因：CreditService.change() 只写 credit_score + farmer.credit_score，
+--       从未调用 LogService.record()，审计链在"谁动了这个农户的分"这一环断掉。
+-- 处置：1) 代码侧补日志（CreditService 已改）；
+--       2) 本脚本按已有 credit_score 记录回填历史日志，让历史同样可查。
+-- 幂等：按 (module='信用评价' AND content LIKE '%订单%') 先删后插，可重复执行。
+-- ============================================================================
+
+DELETE FROM operation_log WHERE module = '信用评价';
+
+INSERT INTO operation_log (user_id, operator, role_name, module, content, ip, result, create_time)
+SELECT NULL,
+       '系统',
+       '系统自动',
+       '信用评价',
+       CONCAT('调整农户「', f.name, '」信用分 ',
+              TRIM(TRAILING '.' FROM TRIM(TRAILING '0' FROM cs.before_score)), ' → ',
+              TRIM(TRAILING '.' FROM TRIM(TRAILING '0' FROM cs.after_score)), '（',
+              IF(cs.change_score > 0, '+', ''), TRIM(TRAILING '.' FROM TRIM(TRAILING '0' FROM cs.change_score)),
+              ' 分）；原因：', cs.reason,
+              IF(cs.order_id IS NULL, '', CONCAT('；关联订单 #', cs.order_id))),
+       '127.0.0.1',
+       '成功',
+       cs.create_time
+FROM credit_score cs
+JOIN farmer f ON f.id = cs.farmer_id;
+
+-- ============================================================================
+-- 2026-11-10 补：给演示账号留"进行中的单"
+-- ----------------------------------------------------------------------------
+-- 问题：种子数据里所有订单都停在 已完成/已结算，农户 farmer01（丰禾农业合作社）
+--       名下 30 单里没有一张待接单/待发货，六个状态标签点开全是 0。
+--       用户以农户身份登录会认为"接单、发货这些功能坏了"，实际是无活可干。
+-- 处置：补两张进行中的单（待接单 1、已接单 1），让状态机和跨角色通知可被真实体验。
+-- 幂等：按固定 order_no 先删后插，重复执行不会叠加。
+-- ============================================================================
+
+DELETE FROM order_item WHERE order_id IN (SELECT id FROM orders WHERE order_no IN ('DD202611100901', 'DD202611100902'));
+DELETE FROM orders WHERE order_no IN ('DD202611100901', 'DD202611100902');
+
+-- 待接单：食堂刚下的单，等农户响应
+INSERT INTO orders (order_no, demand_id, source_id, farmer_id, canteen_id, product_id, quantity, unit_price, total_amount, status, batch_no, expected_delivery, create_time, update_time, version)
+VALUES ('DD202611100901', NULL, 25, 2, 1, 11, 200.00, 1.95, 390.00, 10, NULL, '2026-11-11 06:30:00', '2026-11-10 08:42:00', '2026-11-10 08:42:00', 0);
+
+-- 已接单：农户已接单，待采摘发货
+INSERT INTO orders (order_no, demand_id, source_id, farmer_id, canteen_id, product_id, quantity, unit_price, total_amount, status, batch_no, expected_delivery, create_time, update_time, version)
+VALUES ('DD202611100902', NULL, 37, 2, 2, 75, 300.00, 2.60, 780.00, 20, NULL, '2026-11-11 05:30:00', '2026-11-10 07:15:00', '2026-11-10 09:05:00', 0);
+
+-- 订单明细（损耗结算与质检抽样都依赖它，缺了会算出 0）
+INSERT INTO order_item (order_id, product_id, order_quantity, actual_quantity, loss_quantity, unit_price, create_time)
+SELECT o.id, o.product_id, o.quantity, 0, 0, o.unit_price, o.create_time
+FROM orders o WHERE o.order_no IN ('DD202611100901', 'DD202611100902');

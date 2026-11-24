@@ -1,0 +1,141 @@
+{
+  "summary": {
+    "at": "2026-11-11T11:18:54.995Z",
+    "total": 13,
+    "pass": 13,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "admin 菜单项齐全（11 项）",
+      "ok": true,
+      "detail": {
+        "groups": [
+          "概览",
+          "基础档案",
+          "业务监管",
+          "系统管理"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "name": "admin 无空分组",
+      "ok": true,
+      "detail": {
+        "emptyGroups": []
+      }
+    },
+    {
+      "name": "farmer24 菜单项齐全（6 项）",
+      "ok": true,
+      "detail": {
+        "groups": [
+          "生产经营"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "name": "farmer24 无空分组",
+      "ok": true,
+      "detail": {
+        "emptyGroups": []
+      }
+    },
+    {
+      "name": "purchaser01 菜单项齐全（7 项）",
+      "ok": true,
+      "detail": {
+        "groups": [
+          "采购协同"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "name": "purchaser01 无空分组",
+      "ok": true,
+      "detail": {
+        "emptyGroups": []
+      }
+    },
+    {
+      "name": "inspector01 菜单项齐全（5 项）",
+      "ok": true,
+      "detail": {
+        "groups": [
+          "质检配送"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "name": "inspector01 无空分组",
+      "ok": true,
+      "detail": {
+        "emptyGroups": []
+      }
+    },
+    {
+      "name": "侧栏渲染出「数据看板」",
+      "ok": true,
+      "detail": {
+        "labels": [
+          "概览",
+          "基础档案",
+          "业务监管",
+          "系统管理"
+        ],
+        "items": [
+          "数据看板",
+          "农户/合作社管理",
+          "食堂档案管理",
+          "农产品档案",
+          "用户与权限",
+          "订单监管",
+          "结算审核",
+          "食安预警",
+          "批次溯源",
+          "系统参数配置",
+          "操作日志"
+        ]
+      }
+    },
+    {
+      "name": "侧栏「概览」分组可见",
+      "ok": true,
+      "detail": {
+        "labels": [
+          "概览",
+          "基础档案",
+          "业务监管",
+          "系统管理"
+        ]
+      }
+    },
+    {
+      "name": "数据看板链接指向 /admin/dashboard",
+      "ok": true,
+      "detail": {
+        "href": "/admin/dashboard"
+      }
+    },
+    {
+      "name": "点击后进入数据看板页且内容已渲染",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5173/admin/dashboard",
+        "title": "运营总览"
+      }
+    },
+    {
+      "name": "全程 0 控制台错误",
+      "ok": true,
+      "detail": {
+        "count": 0,
+        "samples": []
+      }
+    }
+  ]
+}

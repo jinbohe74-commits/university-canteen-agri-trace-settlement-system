@@ -15,6 +15,8 @@ public class Orders {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String orderNo;
+    /** 所属采购单：一次提交多个品项时，各履约子单共用同一个采购单 */
+    private Long poId;
     private Long demandId;
     private Long sourceId;
     private Long farmerId;

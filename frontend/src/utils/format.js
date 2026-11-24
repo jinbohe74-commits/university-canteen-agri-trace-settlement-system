@@ -12,6 +12,19 @@ export const fmtNum = (v, digits = 0) => {
   return n.toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 
+/**
+ * 数量类（kg / 批）格式化：整数不补小数位，带小数保留 2 位。
+ * 不能用 fmtNum 的默认 0 位 —— 0.30kg 会被四舍五入成 "0"，损耗 0.5kg 显示成 "0kg"。
+ */
+export const fmtQty = (v) => {
+  if (v === null || v === undefined || v === '') return '—'
+  const n = Number(v)
+  if (Number.isNaN(n)) return v
+  return Number.isInteger(n)
+    ? n.toLocaleString('zh-CN')
+    : n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 export const fmtWan = (v) => {
   const n = Number(v || 0)
   if (n >= 100000000) return (n / 100000000).toFixed(2) + ' 亿'

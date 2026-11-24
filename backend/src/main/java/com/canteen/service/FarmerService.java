@@ -10,6 +10,7 @@ import com.canteen.entity.Farmer;
 import com.canteen.entity.SupplySource;
 import com.canteen.entity.SysUser;
 import com.canteen.mapper.FarmerMapper;
+import com.canteen.mapper.OrdersMapper;
 import com.canteen.mapper.SupplySourceMapper;
 import com.canteen.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class FarmerService {
 
     private final FarmerMapper farmerMapper;
     private final SupplySourceMapper sourceMapper;
+    private final OrdersMapper ordersMapper;
     private final SysUserMapper userMapper;
     private final LogService logService;
 
@@ -164,7 +166,8 @@ public class FarmerService {
                 .eq(SupplySource::getFarmerId, fid).eq(SupplySource::getStatus, "正常"));
         m.put("stock", all.stream().map(SupplySource::getQuantity)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
-        m.put("monthDeals", all.size() * 8);
+        // 本月成交必须能对上库里的订单：以前是 all.size() * 8 估的，纯属编造
+        m.put("monthDeals", ordersMapper.countMonthDeals(fid));
         return m;
     }
 }

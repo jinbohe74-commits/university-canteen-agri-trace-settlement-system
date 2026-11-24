@@ -67,18 +67,6 @@
 
     <!-- 列表 -->
     <div class="card">
-      <div class="tabs-row">
-        <button
-          v-for="t in tabs"
-          :key="t.key"
-          class="tab-btn"
-          :class="{ on: tab === t.key }"
-          @click="switchTab(t.key)"
-        >
-          {{ t.label }}<span class="tab-num">{{ t.count }}</span>
-        </button>
-      </div>
-
       <div class="filter-bar">
         <el-input
           v-model="query.keyword"
@@ -92,9 +80,10 @@
           <el-option label="全部食堂" value="" />
           <el-option v-for="c in canteens" :key="c.id" :label="c.name" :value="c.id" />
         </el-select>
-        <el-select v-model="query.status" placeholder="订单状态" @change="search">
+        <el-select v-model="query.status" placeholder="订单状态" clearable @change="search" style="width: 132px">
           <el-option label="全部状态" value="" />
           <el-option v-for="s in statusDict" :key="s.status" :label="s.name" :value="s.status" />
+          <el-option label="已取消" :value="99" />
         </el-select>
         <el-select v-model="query.days" placeholder="下单时间" @change="search">
           <el-option label="全部时间" value="" />
@@ -156,7 +145,7 @@
               <span class="mono muted">{{ fmtDate(row.createTime) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="150" align="right">
+          <el-table-column label="操作" width="150" align="right" fixed="right">
             <template #default="{ row }">
               <span class="link" @click.stop="openDetail(row)">详情</span>
               <span class="link" @click.stop="openDetail(row)">追踪</span>
@@ -188,6 +177,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useFocusLocator, makeListFocus } from '@/utils/focusLocator'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi, commonApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
@@ -195,6 +185,7 @@ import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import OrderDetailDrawer from '@/components/OrderDetailDrawer.vue'
 import { fmtDate, fmtMoney, fmtNum, fmtWan, today } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 /* 订单状态机节点（与后端 statusDict 一致） */
 const STEPS = [
@@ -232,14 +223,19 @@ const activeIdx = computed(() => {
 
 const countOf = (status) => Number((stats.value.statusCount || {})[String(status)] || 0)
 
+/* 状态分段控件是「按状态看订单」的唯一入口：
+   由后端状态字典驱动，覆盖全部状态，不再与下拉框重复（上一版两处并存，
+   用户不知道该点哪一个，且下拉里还有 5 个状态在标签里根本选不到）。 */
 const tabs = computed(() => {
   const sc = stats.value.statusCount || {}
+  const dict = (statusDict.value || []).map((s) => ({
+    key: String(s.status),
+    label: s.name,
+    count: Number(sc[String(s.status)] || 0)
+  }))
   return [
     { key: 'all', label: '全部', count: Number(stats.value.total || 0) },
-    { key: '10', label: '待接单', count: Number(sc['10'] || 0) },
-    { key: '50', label: '配送中', count: Number(sc['50'] || 0) },
-    { key: '80', label: '待结算', count: Number(sc['80'] || 0) },
-    { key: '100', label: '已完成', count: Number(sc['100'] || 0) },
+    ...dict,
     { key: '99', label: '已取消', count: Number(sc['99'] || 0) }
   ]
 })
@@ -383,6 +379,9 @@ const exportOrders = async () => {
   }
 }
 
+useAutoRefresh(load)
+/* 从通知/待办工作台带 ?focus=<单号> 进来时，自动筛选并打开这一单 */
+useFocusLocator(makeListFocus({ query, load, rows: () => list.records, open: openDetail }))
 onMounted(() => {
   loadCanteens()
   load()
@@ -391,13 +390,13 @@ onMounted(() => {
 
 <style scoped>
 .cur-no {
-  color: #14532d;
+  color: var(--ink);
   font-weight: 700;
 }
 
 .cur-status {
-  color: #15803d;
-  font-size: 12.5px;
+  color: var(--accent);
+  font-size: var(--fs-sm);
   font-weight: 600;
 }
 
@@ -444,45 +443,45 @@ onMounted(() => {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   background: #f4f7f6;
-  color: #9ca3af;
+  color: var(--muted);
   box-shadow: 0 0 0 1px #e2e8e5;
   transition: all 0.2s;
 }
 
 .flow-node.done .flow-dot {
   background: #dcfce7;
-  color: #15803d;
-  box-shadow: 0 0 0 1px #bbe6cb;
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
 }
 
 .flow-node.active .flow-dot {
-  background: linear-gradient(135deg, #34d399, #15803d);
+  background: linear-gradient(135deg, #34d399, var(--accent));
   color: #fff;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
 }
 
 .flow-name {
   margin-top: 7px;
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: var(--fs-sm);
+  color: var(--muted);
   white-space: nowrap;
 }
 
 .flow-node.done .flow-name {
-  color: #374151;
+  color: var(--ink-2);
 }
 
 .flow-node.active .flow-name {
-  color: #15803d;
+  color: var(--accent);
   font-weight: 700;
 }
 
 .flow-cnt {
   margin-top: 2px;
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: #b6c2bd;
   font-family: var(--font-num);
 }
@@ -494,7 +493,7 @@ onMounted(() => {
   margin-top: 14px;
   padding-top: 11px;
   border-top: 1px dashed var(--c-border);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   line-height: 1.7;
 }
@@ -507,11 +506,14 @@ onMounted(() => {
 /* Tabs */
 .tabs-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
   align-items: center;
   padding: 8px 14px 0;
   border-bottom: 1px solid var(--c-border);
 }
+.tabs-row .tab-btn { flex: 0 0 auto; }
 
 .tab-btn {
   display: inline-flex;
@@ -522,57 +524,57 @@ onMounted(() => {
   border-bottom: 2px solid transparent;
   background: transparent;
   font-family: inherit;
-  font-size: 13px;
-  color: #6b7280;
+  font-size: var(--fs-base);
+  color: var(--muted);
   cursor: pointer;
   transition: color 0.16s;
 }
 
 .tab-btn:hover {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .tab-btn.on {
-  color: #15803d;
+  color: var(--accent);
   font-weight: 600;
-  border-bottom-color: #16a34a;
+  border-bottom-color: var(--accent);
 }
 
 .tab-num {
   min-width: 18px;
   padding: 0 6px;
   border-radius: 10px;
-  background: #f1f5f4;
-  color: #64748b;
+  background: var(--surface-2);
+  color: var(--muted);
   font-family: var(--font-num);
-  font-size: 11px;
+  font-size: var(--fs-xs);
   line-height: 16px;
   text-align: center;
 }
 
 .tab-btn.on .tab-num {
-  background: #e8f7ee;
-  color: #15803d;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 /* 单元格 */
 .cell-main {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .cell-sub {
   margin-top: 2px;
-  font-size: 11.5px;
-  color: #9ca3af;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
 
 .link.urge {
-  color: #b45309;
+  color: var(--warn);
 }
 
 .link.urge:hover {
-  color: #92400e;
+  color: var(--warn);
 }
 </style>

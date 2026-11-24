@@ -81,11 +81,16 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { adminApi } from '@/api'
+// 该组件被四个角色的溯源路由共用，必须走公共接口，不能硬编码管理员前缀
+import { commonApi } from '@/api'
 import TracePanel from '@/components/TracePanel.vue'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTextReport, stamped } from '@/utils/export'
 
 const loading = ref(false)
+const route = useRoute()
 const querying = ref(false)
 const batchNo = ref('')
 const recent = ref([])
@@ -104,7 +109,7 @@ const doQuery = async (no) => {
   querying.value = true
   errorMsg.value = ''
   try {
-    const res = await adminApi.trace(bn)
+    const res = await commonApi.trace(bn)
     const d = res.data || {}
     if (d.recent) recent.value = d.recent
     if (d.trace) {
@@ -123,25 +128,64 @@ const doQuery = async (no) => {
 }
 
 const scanQuery = () => {
-  ElMessage.info('已唤起扫码识别，请将批次二维码对准扫码枪或摄像头')
+  // 扫码枪本质是把批次号敲进输入框；这里如实聚焦输入框，不再假称唤起摄像头
   if (searchInput.value && searchInput.value.focus) searchInput.value.focus()
+  ElMessage.info('已聚焦批次号输入框：请用扫码枪扫描，或粘贴二维码中的批次号后回车')
 }
 
 const exportReport = () => {
-  if (!trace.value) {
+  const t = trace.value
+  if (!t) {
     ElMessage.warning('请先查询批次溯源信息')
     return
   }
-  ElMessage.success('溯源报告已生成：' + trace.value.batchNo)
+  const lines = [
+    '批次号：' + (t.batchNo || '—'),
+    '溯源状态：' + (t.complete ? '链路完整' : '待完成入库'),
+    '',
+    '— 批次基础信息 —',
+    `产品：${t.productName || '—'}（${t.categoryName || '—'}）`,
+    `供货农户：${t.farmerName || '—'} · 信用 ${t.creditScore ?? '—'} 分`,
+    `收货食堂：${t.canteenName || '—'}${t.campus ? '（' + t.campus + '）' : ''}`,
+    `下单数量：${t.orderQuantity ?? '—'} ${t.unit || 'kg'} · 实收：${t.receiveQuantity ?? '待入库'}`,
+    `成交单价：¥ ${t.unitPrice ?? '—'} / ${t.unit || 'kg'}`,
+    `关联订单：${t.orderNo || '—'} · 产地：${t.farmerAddress || '—'}`,
+    '',
+    '— 质检结论 —',
+    `结论：${t.qualityResult || '—'} · 质检员：${t.inspector || '—'} · 时间：${t.inspectTime || '—'}`,
+    ...(t.qualityItems || []).map(it => `  · ${it.name || it.item || '项目'}：${it.ok === false ? '不合格' : '合格'}${it.value ? '（' + it.value + '）' : ''}`),
+    '',
+    '— 链路节点 —',
+    ...(t.nodes || []).map((n, i) => `  ${i + 1}. ${n.title || n.name || '节点'} · ${n.time || ''} ${n.desc || ''}`),
+    '',
+    '存证哈希（SHA-256）：' + (t.hash || '—')
+  ]
+  exportTextReport(stamped('溯源报告_' + t.batchNo, 'txt'), '批次溯源报告 · ' + t.batchNo, lines)
+  ElMessage.success('溯源报告已下载：' + t.batchNo)
 }
+
+/* 实时刷新只更新「最近批次」，不覆盖用户正在查看的溯源详情 */
+const loadRecent = async () => {
+  try {
+    const res = await commonApi.trace()
+    recent.value = res.data?.recent || []
+  } catch (e) { /* 拦截器已提示 */ }
+}
+useAutoRefresh(loadRecent)
 
 onMounted(async () => {
   loading.value = true
   try {
-    const res = await adminApi.trace()
+    const res = await commonApi.trace()
     const d = res.data || {}
     recent.value = d.recent || []
-    if (recent.value.length) {
+    // 从单据工作台「查看溯源记录」带 ?focus=<批次号或订单号> 进来时，直接查这一批；
+    // 否则落到最近一批，不让用户面对空白搜索框
+    const focusNo = String(route.query.focus || '').trim()
+    if (focusNo) {
+      batchNo.value = focusNo
+      await doQuery(focusNo)
+    } else if (recent.value.length) {
       await doQuery(recent.value[0].batchNo)
     }
   } catch (e) {
@@ -175,7 +219,7 @@ onMounted(async () => {
 }
 
 .big-input :deep(.el-input__inner) {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   letter-spacing: 0.2px;
 }
@@ -200,7 +244,7 @@ onMounted(async () => {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   padding-top: 5px;
 }
@@ -217,31 +261,31 @@ onMounted(async () => {
   gap: 1px;
   padding: 5px 10px;
   border-radius: 8px;
-  background: #f7faf9;
+  background: var(--surface-2);
   border: 1px solid #eaeff0;
   cursor: pointer;
   transition: all 0.16s;
 }
 
 .chip:hover {
-  border-color: #bbe6cb;
-  background: #f2fbf5;
+  border-color: var(--accent-soft);
+  background: var(--surface-2);
 }
 
 .chip.on {
   border-color: #86efac;
-  background: #e8f7ee;
+  background: var(--accent-soft);
   box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
 }
 
 .chip-no {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
-  color: #15803d;
+  color: var(--accent);
 }
 
 .chip-meta {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--c-muted-2);
 }
 
@@ -258,21 +302,21 @@ onMounted(async () => {
   border-radius: 18px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #e8f7ee, #d6f0e0);
-  color: #15803d;
-  font-size: 26px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--accent-soft));
+  color: var(--accent);
+  font-size: var(--fs-display);
 }
 
 .empty-title {
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .empty-desc {
   max-width: 540px;
   margin: 8px auto 0;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   line-height: 1.8;
 }
@@ -284,9 +328,9 @@ onMounted(async () => {
   margin-top: 14px;
   padding: 6px 12px;
   border-radius: 8px;
-  background: #fdf2e2;
-  color: #b45309;
-  font-size: 12.5px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: var(--fs-sm);
 }
 
 .recent-grid {
@@ -300,41 +344,41 @@ onMounted(async () => {
 .recent-card {
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f8fbfa;
-  border: 1px solid #eef3f1;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2);
   cursor: pointer;
   transition: all 0.16s;
 }
 
 .recent-card:hover {
-  border-color: #bbe6cb;
-  background: #f2fbf5;
+  border-color: var(--accent-soft);
+  background: var(--surface-2);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(16, 42, 32, 0.06);
 }
 
 .rc-no {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 600;
-  color: #15803d;
+  color: var(--accent);
   word-break: break-all;
 }
 
 .rc-main {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 700;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .rc-sub {
   margin-top: 3px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
 .rc-sub.muted {
   color: var(--c-muted-2);
-  font-size: 11px;
+  font-size: var(--fs-xs);
 }
 </style>

@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "total": 16,
+    "pass": 16,
+    "fail": 0
+  },
+  "cases": [
+    {
+      "name": "管理员登录",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '登录成功', 'data': {'token': 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdE1zIjoxNzk0MzA5NDk4MTk0LCJqdGkiOiIwZjQ4MTUxYS0zYzhlLTQ3MTgtODMwNy00N2EzM2ZjNGU4N2EiLCJpYXQiOjE3OTQzMDk0OTgsImV4cCI6MTc5NDMxNjY5OH0.2elkKbxFitBTwdVC_M4Wo7EJ_px1bH5Dn5P6LF24GlCuABmuv95wgJMijhvKi-V4KgAIQHdWRP6d1tGSVDPp_A', 'user': {'id': 1, 'username': 'admin', 'realName': '王管理', 'phone':"
+    },
+    {
+      "name": "农户登录",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '登录成功', 'data': {'token': 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGQVJNRVIiLCJpYXRNcyI6MTc5NDMwOTQ5ODI4NCwianRpIjoiZTg3ODg0NzctMTNmNC00MzEzLThmMjctMzYyZjcxN2ZmNTZhIiwiaWF0IjoxNzk0MzA5NDk4LCJleHAiOjE3OTQzMTY2OTh9.9JjkYDuokDMR4myUsazb5hLmbGl3fkxt976HrUEa3cliSm64V7-oHiKP6QDjdZdjinkKGum1A0__TdULIufhcA', 'user': {'id': 2, 'username': 'farmer24', 'realName': '张大山', 'pho"
+    },
+    {
+      "name": "采购员登录",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '登录成功', 'data': {'token': 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOjEwLCJyb2xlIjoiUFVSQ0hBU0VSIiwiaWF0TXMiOjE3OTQzMDk0OTgzODMsImp0aSI6IjA4YTQ3NzIwLTI5NDAtNDdiZi04OWZkLTY5ZTEyM2FjYTU5MSIsImlhdCI6MTc5NDMwOTQ5OCwiZXhwIjoxNzk0MzE2Njk4fQ.USNpNqLVNB7j2rQO1eELi-xwgRuCbxaAcPUc6DfSWi4orM6YBurK1qH-RwdwSVaw-JMDw8XH6QabQhGr3kUmhw', 'user': {'id': 10, 'username': 'purchaser01', 'realName': '"
+    },
+    {
+      "name": "取得可用商品ID",
+      "ok": true,
+      "detail": "45"
+    },
+    {
+      "name": "农户发布货源成功",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '货源发布成功，已进入智能匹配候选池', 'data': {'id': 93, 'farmerId': 1, 'productId': 45, 'quantity': 88, 'unit': 'kg', 'price': 3.6, 'supplyStart': '2026-11-10', 'supplyEnd': '2026-11-25', 'deliveryMode': None, 'storageReq': None, 'originRemark': None, 'images': None, 'soldQuantity': 0, 'status': '正常', 'createTime': None, 'updateTime': None}}"
+    },
+    {
+      "name": "采购员轮询到农户发布事件",
+      "ok": true,
+      "detail": "['王丰收 更新了供货信息（farmer/sources）', '张大山 更新了供货信息（farmer/sources）']"
+    },
+    {
+      "name": "管理员同样实时可见",
+      "ok": true,
+      "detail": "['李建国 确认了收货入库（purchaser/inbound）', '王丰收 更新了供货信息（farmer/sources）']"
+    },
+    {
+      "name": "采购员货源列表能读到该新货源",
+      "ok": true,
+      "detail": "{'page': {'records': [{'id': 93, 'farmerId': 1, 'productId': 45, 'quantity': 88.0, 'unit': 'kg', 'price': 3.6, 'supplyStart': '2026-11-10', 'supplyEnd': '2026-11-25', 'deliveryMode': '现货·当日发', 'storageReq': '冷链配送', 'originRemark': None, 'images': None, 'soldQuantity': 0.0, 'status': '正常', 'createTime': '2026-11-10T19:18:18', 'updateTime': '2026-11-10T19:18:18', 'productName': '西兰花', 'productNo': '"
+    },
+    {
+      "name": "停用农户账号成功",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '操作成功', 'data': None}"
+    },
+    {
+      "name": "被停用账号的旧 token 立即被拒",
+      "ok": true,
+      "detail": "{'http': 401, 'body': {'code': 401, 'message': '登录凭证已失效，请重新登录', 'data': None}}"
+    },
+    {
+      "name": "被停用账号无法重新登录",
+      "ok": true,
+      "detail": "{'code': 401, 'message': '用户名或密码错误', 'data': None}"
+    },
+    {
+      "name": "恢复农户账号",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '操作成功', 'data': None}"
+    },
+    {
+      "name": "恢复后可正常登录",
+      "ok": true,
+      "detail": "None"
+    },
+    {
+      "name": "被停用账号能取到定向停用事件",
+      "ok": true,
+      "detail": "[{'id': 104, 'eventType': 'ACCOUNT_DISABLED', 'module': '账号安全', 'content': '管理员已停用账号「farmer24」，当前登录已失效', 'operatorId': 1, 'operatorName': '王管理', 'operatorRole': 'ADMIN', 'targetUserId': 2, 'refPath': '/api/admin/users/2/status', 'createTime': '2026-11-10T19:16:48'}]"
+    },
+    {
+      "name": "停用事件不越权泄露给管理员",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "探针货源置为下架（清理）",
+      "ok": true,
+      "detail": "{'code': 200, 'message': '状态已更新为 下架', 'data': None}"
+    }
+  ]
+}

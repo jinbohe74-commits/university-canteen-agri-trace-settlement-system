@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.canteen.common.BizException;
+import com.canteen.common.LoginUser;
 import com.canteen.common.PageResult;
 import com.canteen.common.UserContext;
 import com.canteen.dto.EvaluationDTO;
@@ -132,6 +133,17 @@ public class EvaluationService {
                 .multiply(BigDecimal.valueOf(20)).setScale(0, RoundingMode.HALF_UP);
     }
 
+    /** 修复 P2：评分必须在 0~5，防止负数或超范围分数影响信用计算。 */
+    private void validateScore(EvaluationDTO dto) {
+        List<BigDecimal> scores = Arrays.asList(dto.getOverallScore(), dto.getQualityScore(),
+                dto.getFreshScore(), dto.getDeliveryScore(), dto.getServiceScore(), dto.getPackageScore());
+        for (BigDecimal s : scores) {
+            if (s != null && (s.signum() < 0 || s.compareTo(BigDecimal.valueOf(5)) > 0)) {
+                throw new BizException(400, "评分必须在 0~5 分之间");
+            }
+        }
+    }
+
     @Transactional
     public Evaluation submit(EvaluationDTO dto) {
         Orders o = ordersMapper.selectById(dto.getOrderId());
@@ -141,6 +153,15 @@ public class EvaluationService {
         if (o.getStatus() < 90) {
             throw new BizException("订单尚未结算，暂不能评价");
         }
+        // 修复 P1-3：只能评价本食堂的订单
+        LoginUser lu = UserContext.getOrNull();
+        if (lu != null && "PURCHASER".equals(lu.getRole())) {
+            Long cid = lu.getCanteenId();
+            if (cid == null || !Objects.equals(o.getCanteenId(), cid)) {
+                throw new BizException(403, "只能评价本食堂的订单");
+            }
+        }
+        validateScore(dto);
         if (evaluationMapper.selectCount(new LambdaQueryWrapper<Evaluation>()
                 .eq(Evaluation::getOrderId, o.getId())) > 0) {
             throw new BizException("该订单已评价，请勿重复提交");

@@ -27,6 +27,12 @@ public class Farmer {
     private String certFile;
     private LocalDate certExpire;
     private BigDecimal distanceKm;
+
+    /** 基地经度（配送动态地图用，与 distance_km 自洽） */
+    private BigDecimal lng;
+
+    /** 基地纬度 */
+    private BigDecimal lat;
     private BigDecimal creditScore;
     private String status;
     private Integer dealCount;

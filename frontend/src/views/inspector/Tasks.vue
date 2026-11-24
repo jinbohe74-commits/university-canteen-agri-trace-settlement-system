@@ -31,27 +31,36 @@
       <SectionCard title="今日质检任务" no-pad>
         <template #extra>待质检 {{ stats.pending || 0 }}</template>
         <el-table :data="records" style="width: 100%" header-cell-class-name="th">
-          <el-table-column label="批次号" min-width="188">
+          <el-table-column label="订单号" min-width="136">
+            <template #default="{ row }">
+              <span class="mono">{{ row.orderNo }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="批次号" min-width="120">
             <template #default="{ row }">
               <span v-if="row.batchNo" class="mono">{{ row.batchNo }}</span>
               <span v-else class="muted small">待生成</span>
             </template>
           </el-table-column>
-          <el-table-column label="产品" min-width="100">
+          <el-table-column label="产品" min-width="96">
             <template #default="{ row }">{{ row.productName }}</template>
           </el-table-column>
-          <el-table-column prop="farmerName" label="供货农户" min-width="130" show-overflow-tooltip />
-          <el-table-column label="数量" width="92" align="right">
+          <el-table-column label="供货农户 / 收货食堂" min-width="150" show-overflow-tooltip>
+            <template #default="{ row }">
+              <div class="cell-2l">{{ row.farmerName }}</div>
+              <div class="cell-2l-sub">{{ row.canteenName }}</div>
+            </template>
+          </el-table-column>
+          <el-table-column label="数量" width="88" align="right">
             <template #default="{ row }">{{ fmtNum(row.quantity) }} {{ row.unit }}</template>
           </el-table-column>
-          <el-table-column prop="canteenName" label="收货食堂" min-width="100" />
-          <el-table-column label="状态" width="96" align="center">
+          <el-table-column label="状态" width="88" align="center">
             <template #default="{ row }"><StatusTag type="order" :value="row.status" /></template>
           </el-table-column>
-          <el-table-column label="操作" width="150" align="center">
+          <el-table-column label="操作" width="132" align="center" fixed="right">
             <template #default="{ row }">
               <span class="link" @click="openDetail(row)">详情</span>
-              <span class="link" @click="goQuality(row)">质检录入</span>
+              <span class="link link-strong" @click="goQuality(row)">质检录入</span>
             </template>
           </el-table-column>
           <template #empty>
@@ -85,7 +94,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { inspectorApi } from '@/api'
 import { useUserStore } from '@/store/user'
 import StatCard from '@/components/StatCard.vue'
@@ -94,11 +103,13 @@ import StatusTag from '@/components/StatusTag.vue'
 import BaseChart from '@/components/BaseChart.vue'
 import OrderDetailDrawer from '@/components/OrderDetailDrawer.vue'
 import { fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const router = useRouter()
 const store = useUserStore()
 
 const loading = ref(false)
+const route = useRoute()
 const records = ref([])
 const total = ref(0)
 const page = ref(1)
@@ -173,7 +184,17 @@ const goQuality = (row) => {
   router.push({ path: '/inspector/quality', query: { orderId: row.id } })
 }
 
-onMounted(load)
+useAutoRefresh(load)
+/* 单据工作台「查看我的任务」带 ?focus=<订单号>：定位到那一单并打开详情 */
+onMounted(async () => {
+  await load()
+  const no = String(route.query.focus || '').trim()
+  if (!no) return
+  const hit = (records.value || []).find(
+    (r) => String(r.orderNo || '') === no || String(r.id) === no
+  )
+  if (hit) openDetail(hit)
+})
 </script>
 
 <style scoped>
@@ -188,7 +209,7 @@ onMounted(load)
   margin-bottom: 16px;
   overflow: hidden;
   color: #fff;
-  background: linear-gradient(120deg, #0f766e 0%, #0d9488 52%, #115e59 100%);
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent) 52%, #115e59 100%);
   box-shadow: 0 10px 26px rgba(13, 148, 136, 0.2);
 }
 
@@ -206,21 +227,21 @@ onMounted(load)
   border-radius: 13px;
   display: grid;
   place-items: center;
-  font-size: 19px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.24);
 }
 
 .hero-title {
-  font-size: 18px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   letter-spacing: 0.3px;
 }
 
 .hero-sub {
   margin-top: 6px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: rgba(230, 255, 251, 0.78);
 }
 
@@ -232,14 +253,14 @@ onMounted(load)
 
 .hero-num {
   font-family: var(--font-num);
-  font-size: 30px;
+  font-size: var(--fs-display);
   font-weight: 700;
   line-height: 1;
 }
 
 .hero-num-label {
   margin-top: 6px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: rgba(230, 255, 251, 0.7);
 }
 
@@ -255,15 +276,26 @@ onMounted(load)
 
 .grid-main {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   align-items: start;
 }
 
 .side-col {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
+  align-items: start;
+}
+
+.cell-2l {
+  line-height: 1.5;
+}
+
+.cell-2l-sub {
+  line-height: 1.5;
+  color: var(--muted);
+  font-size: var(--fs-xs);
 }
 
 .hint-bar {
@@ -271,10 +303,10 @@ onMounted(load)
   gap: 8px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: #e6f6f4;
+  background: var(--accent-soft);
   border: 1px solid #cdeee8;
-  color: #0f766e;
-  font-size: 12px;
+  color: var(--accent);
+  font-size: var(--fs-sm);
   line-height: 1.7;
 }
 </style>

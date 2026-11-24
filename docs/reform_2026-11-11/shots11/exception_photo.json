@@ -1,0 +1,42 @@
+[
+  {
+    "n": "上报页不再出现「演示环境」假提示",
+    "ok": true,
+    "d": "ok"
+  },
+  {
+    "n": "选图后出现真实缩略图",
+    "ok": true,
+    "d": "{\"thumbs\":1,\"hasImg\":true}"
+  },
+  {
+    "n": "提交后提示含照片张数",
+    "ok": true,
+    "d": "ok"
+  },
+  {
+    "n": "预警落库且带 photo_urls",
+    "ok": true,
+    "d": "/api/files/exception/382280f199834a339c1f5a7712fadbe9.png"
+  },
+  {
+    "n": "照片可用登录态取回（非 401）",
+    "ok": true,
+    "d": "HTTP 200 · /api/files/exception/382280f199834a339c1f5a7712fadbe9.png"
+  },
+  {
+    "n": "未登录直连被拒绝（受控下载）",
+    "ok": true,
+    "d": "HTTP 401"
+  },
+  {
+    "n": "管理员详情显示现场照片",
+    "ok": true,
+    "d": "{\"photosTitle\":true,\"photoChip\":1,\"dialogs\":1}"
+  },
+  {
+    "n": "页面无 JS 报错",
+    "ok": true,
+    "d": "ok"
+  }
+]

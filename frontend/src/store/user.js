@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia'
 import { authApi } from '@/api'
+import {
+  readSession,
+  writeSession,
+  readJson,
+  writeJson,
+  clearSession
+} from '@/utils/session'
 
 const HOME = {
   ADMIN: '/admin/dashboard',
@@ -10,11 +17,16 @@ const HOME = {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    token: localStorage.getItem('ct_token') || '',
-    user: JSON.parse(localStorage.getItem('ct_user') || 'null'),
-    roleName: localStorage.getItem('ct_role_name') || '',
-    menus: JSON.parse(localStorage.getItem('ct_menus') || '[]'),
-    perms: JSON.parse(localStorage.getItem('ct_perms') || '[]')
+    // 会话存在 sessionStorage：同一浏览器的多个标签页可以各登录一个角色互不干扰
+    token: readSession('ct_token'),
+    user: readJson('ct_user'),
+    roleName: readSession('ct_role_name'),
+    menus: readJson('ct_menus', []),
+    perms: readJson('ct_perms', []),
+    // 新建账号 / 被管理员重置密码后为 true：没改密前业务接口一律 428
+    needChangePwd: readSession('ct_need_pwd') === '1',
+    // 修复 P1-13：刷新后必须向后端复核身份，本地缓存里的 role 只作展示用
+    verified: false
   }),
   getters: {
     role: (s) => s.user?.role || '',
@@ -26,29 +38,58 @@ export const useUserStore = defineStore('user', {
   actions: {
     async login(form) {
       const res = await authApi.login(form)
-      const data = res.data
+      this.applyLoginData(res.data)
+      return res.data
+    },
+    applyLoginData(data) {
       this.token = data.token
       this.user = data.user
       this.roleName = data.roleName
       this.menus = data.menus
       this.perms = data.perms
-      localStorage.setItem('ct_token', data.token)
-      localStorage.setItem('ct_user', JSON.stringify(data.user))
-      localStorage.setItem('ct_role_name', data.roleName)
-      localStorage.setItem('ct_menus', JSON.stringify(data.menus))
-      localStorage.setItem('ct_perms', JSON.stringify(data.perms))
-      return data
+      this.needChangePwd = !!data.needChangePwd
+      this.verified = true
+      writeSession('ct_token', data.token)
+      writeJson('ct_user', data.user)
+      writeSession('ct_role_name', data.roleName)
+      writeJson('ct_menus', data.menus)
+      writeJson('ct_perms', data.perms)
+      writeSession('ct_need_pwd', this.needChangePwd ? '1' : '0')
     },
+    /** 以服务端 /auth/me 的结果为准覆盖本地缓存的角色、菜单与权限 */
     async refresh() {
       const res = await authApi.me()
       this.user = res.data.user
       this.roleName = res.data.roleName
       this.menus = res.data.menus
       this.perms = res.data.perms
-      localStorage.setItem('ct_user', JSON.stringify(this.user))
-      localStorage.setItem('ct_menus', JSON.stringify(this.menus))
-      localStorage.setItem('ct_role_name', this.roleName)
-      localStorage.setItem('ct_perms', JSON.stringify(this.perms))
+      this.needChangePwd = !!res.data.needChangePwd
+      this.verified = true
+      writeJson('ct_user', this.user)
+      writeJson('ct_menus', this.menus)
+      writeSession('ct_role_name', this.roleName)
+      writeJson('ct_perms', this.perms)
+      writeSession('ct_need_pwd', this.needChangePwd ? '1' : '0')
+      return this.user
+    },
+    /**
+     * 自助改密。成功后后端会重新签发 token（其余会话被踢下线），
+     * 这里同步换掉本地凭证，用户不必重新登录。
+     */
+    async changePassword(payload) {
+      const res = await authApi.changePassword(payload)
+      const data = res.data || {}
+      if (data.token) {
+        this.token = data.token
+        writeSession('ct_token', data.token)
+      }
+      if (data.user) {
+        this.user = data.user
+        writeJson('ct_user', data.user)
+      }
+      this.needChangePwd = false
+      writeSession('ct_need_pwd', '0')
+      return data
     },
     async logout() {
       try {
@@ -64,11 +105,9 @@ export const useUserStore = defineStore('user', {
       this.menus = []
       this.perms = []
       this.roleName = ''
-      localStorage.removeItem('ct_token')
-      localStorage.removeItem('ct_user')
-      localStorage.removeItem('ct_menus')
-      localStorage.removeItem('ct_perms')
-      localStorage.removeItem('ct_role_name')
+      this.needChangePwd = false
+      this.verified = false
+      clearSession()
     }
   }
 })

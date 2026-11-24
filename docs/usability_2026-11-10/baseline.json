@@ -1,0 +1,210 @@
+{
+  "summary": {
+    "phase": "baseline",
+    "at": "2026-11-10T07:42:35.335Z",
+    "total": 18,
+    "defects": 10,
+    "passed": 8,
+    "downloads": [
+      "操作日志_2026-11-10.csv"
+    ],
+    "consoleErrors": 0
+  },
+  "results": [
+    {
+      "name": "登录页存在 4 个角色按钮",
+      "ok": true,
+      "roleButtons": 4
+    },
+    {
+      "name": "选中的角色随登录请求提交给后端",
+      "ok": false,
+      "selectedRole": "农户",
+      "loginBody": "{\"username\":\"admin\",\"password\":\"123456\",\"remember\":false}"
+    },
+    {
+      "name": "角色与账号不符时给出明确拒绝/提示",
+      "ok": false,
+      "urlAfterLogin": "/admin/dashboard"
+    },
+    {
+      "name": "功能模块筛选：发出带 module 的请求且结果集变化",
+      "ok": true,
+      "chosen": "登录",
+      "calls": [
+        "http://127.0.0.1:5173/api/admin/logs?page=1&size=10&module=%E7%99%BB%E5%BD%95"
+      ],
+      "baseTotal": "第 1 / 1283 页 · 每页 10 条 · 共 12,828 条",
+      "afterTotal": "第 1 / 154 页 · 每页 10 条 · 共 1,531 条"
+    },
+    {
+      "name": "功能模块下拉有真实模块选项",
+      "ok": true,
+      "optCount": 18
+    },
+    {
+      "name": "操作结果筛选：发出带 result 的请求",
+      "ok": true,
+      "calls": [
+        "http://127.0.0.1:5173/api/admin/logs?page=1&size=10&module=%E7%99%BB%E5%BD%95&result=%E6%88%90%E5%8A%9F"
+      ],
+      "total": "第 1 / 91 页 · 每页 10 条 · 共 902 条"
+    },
+    {
+      "name": "关键词筛选：发出带 keyword 的请求且空结果有反馈",
+      "ok": true,
+      "calls": [
+        "http://127.0.0.1:5173/api/admin/logs?page=1&size=10&keyword=REVIEW_UNIQUE_8891&module=%E7%99%BB%E5%BD%95&result=%E6%88%90%E5%8A%9F"
+      ],
+      "rows": 0,
+      "emptyText": 1
+    },
+    {
+      "name": "筛选区不混杂「只在当前页过滤」的注入控件",
+      "ok": false,
+      "hasInjectedSearch": true,
+      "injectedInFilterBar": true,
+      "injectedPlaceholder": "在当前结果中即时筛选…",
+      "injectedChips": 4,
+      "nativeFilterControls": 4
+    },
+    {
+      "name": "看板导出报表：点击后产生真实文件下载",
+      "ok": false,
+      "url": "/admin/dashboard",
+      "downloads": [],
+      "toastOnly": true
+    },
+    {
+      "name": "农户导出名册：点击后产生真实文件下载",
+      "ok": false,
+      "url": "/admin/farmers",
+      "downloads": [],
+      "toastOnly": true
+    },
+    {
+      "name": "食堂导出名册：点击后产生真实文件下载",
+      "ok": false,
+      "url": "/admin/canteens",
+      "downloads": [],
+      "toastOnly": true
+    },
+    {
+      "name": "农产品导入模板：按钮存在",
+      "ok": false,
+      "url": "/admin/products"
+    },
+    {
+      "name": "操作日志导出（对照组：应为真下载）：点击后产生真实文件下载",
+      "ok": true,
+      "url": "/admin/logs",
+      "downloads": [
+        "操作日志_2026-11-10.csv"
+      ],
+      "toastOnly": false
+    },
+    {
+      "name": "编辑/新增弹窗在视口垂直居中（偏差 <= 24px）",
+      "ok": false,
+      "cases": [
+        {
+          "label": "食堂-新增",
+          "opened": true,
+          "top": 191,
+          "bottom": 513,
+          "left": 524,
+          "right": 1124,
+          "h": 322,
+          "w": 600,
+          "viewportH": 900,
+          "viewportW": 1440,
+          "centerOffsetY": -98,
+          "centerOffsetX": 104,
+          "overflows": false
+        },
+        {
+          "label": "农产品-新增",
+          "opened": true,
+          "top": 191,
+          "bottom": 563,
+          "left": 514,
+          "right": 1134,
+          "h": 372,
+          "w": 620,
+          "viewportH": 900,
+          "viewportW": 1440,
+          "centerOffsetY": -73,
+          "centerOffsetX": 104,
+          "overflows": false
+        },
+        {
+          "label": "采购需求-发布",
+          "opened": false
+        }
+      ]
+    },
+    {
+      "name": "弹窗不溢出视口",
+      "ok": true,
+      "cases": [
+        {
+          "label": "食堂-新增",
+          "opened": true,
+          "top": 191,
+          "bottom": 513,
+          "left": 524,
+          "right": 1124,
+          "h": 322,
+          "w": 600,
+          "viewportH": 900,
+          "viewportW": 1440,
+          "centerOffsetY": -98,
+          "centerOffsetX": 104,
+          "overflows": false
+        },
+        {
+          "label": "农产品-新增",
+          "opened": true,
+          "top": 191,
+          "bottom": 563,
+          "left": 514,
+          "right": 1134,
+          "h": 372,
+          "w": 620,
+          "viewportH": 900,
+          "viewportW": 1440,
+          "centerOffsetY": -73,
+          "centerOffsetX": 104,
+          "overflows": false
+        },
+        {
+          "label": "采购需求-发布",
+          "opened": false
+        }
+      ]
+    },
+    {
+      "name": "页面滚动后弹窗仍以视口为中心",
+      "ok": false,
+      "scrolled": {
+        "scrollY": 0,
+        "centerOffsetY": -98,
+        "top": 191
+      }
+    },
+    {
+      "name": "不存在「只弹提示、不产生任何副作用」的假按钮",
+      "ok": false,
+      "count": 1,
+      "files": [
+        "frontend/src/views/farmer/Settlement.vue"
+      ]
+    },
+    {
+      "name": "审计期间 0 控制台错误",
+      "ok": true,
+      "count": 0,
+      "samples": []
+    }
+  ]
+}

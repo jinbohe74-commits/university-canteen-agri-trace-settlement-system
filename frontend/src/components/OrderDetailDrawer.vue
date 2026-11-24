@@ -25,6 +25,18 @@
           </el-steps>
         </div>
 
+        <!-- 当前阶段的可执行动作：不再让 50/70/80/90 只停留在标签和步骤条上 -->
+        <OrderStageActions
+          v-if="order"
+          :order="order"
+          :order-id="orderId"
+          :delivery="delivery"
+          :inbound="inbound"
+          :settlement="settlement"
+          :evaluation="evaluation"
+          :role="userStore.role"
+        />
+
         <el-descriptions :column="2" border size="small" class="desc">
           <el-descriptions-item label="产品">
             {{ order.productName }}（{{ order.categoryName }}）
@@ -103,10 +115,10 @@
               <div class="sub-title">入库记录</div>
               <el-descriptions :column="2" border size="small">
                 <el-descriptions-item label="下单 / 实收">
-                  {{ fmtNum(inbound.orderQuantity) }} / {{ fmtNum(inbound.receiveQuantity) }} kg
+                  {{ fmtQty(inbound.orderQuantity) }} / {{ fmtQty(inbound.receiveQuantity) }} kg
                 </el-descriptions-item>
                 <el-descriptions-item label="损耗">
-                  {{ fmtNum(inbound.lossQuantity) }} kg（{{ inbound.lossRate }}%）
+                  {{ fmtQty(inbound.lossQuantity) }} kg（{{ inbound.lossRate }}%）
                 </el-descriptions-item>
                 <el-descriptions-item label="验收人">{{ inbound.operatorName }}</el-descriptions-item>
                 <el-descriptions-item label="入库时间">{{ fmtDate(inbound.inboundTime) }}</el-descriptions-item>
@@ -159,9 +171,13 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { adminApi, farmerApi, purchaserApi } from '@/api'
+import { useUserStore } from '@/store/user'
 import StatusTag from './StatusTag.vue'
 import StarRate from './StarRate.vue'
-import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'
+import OrderStageActions from './OrderStageActions.vue'
+import { fmtDate, fmtMoney, fmtNum, fmtQty } from '@/utils/format'
+
+const userStore = useUserStore()
 
 const props = defineProps({
   modelValue: Boolean,
@@ -225,7 +241,7 @@ const events = computed(() => {
     list.push({
       time: fmtDate(inbound.value.inboundTime),
       title: '食堂入库',
-      desc: `实收 ${fmtNum(inbound.value.receiveQuantity)}kg，损耗 ${fmtNum(inbound.value.lossQuantity)}kg（${inbound.value.lossRate}%）`
+      desc: `实收 ${fmtQty(inbound.value.receiveQuantity)}kg，损耗 ${fmtQty(inbound.value.lossQuantity)}kg（${inbound.value.lossRate}%）`
     })
   }
   if (settlement.value) {
@@ -274,12 +290,12 @@ watch(
 }
 
 .dh-title {
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
 }
 
 .dh-no {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   margin-top: 3px;
 }
@@ -314,25 +330,25 @@ watch(
   grid-template-columns: 90px minmax(0, 1fr) 110px 58px;
   gap: 8px;
   align-items: center;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   padding: 8px 10px;
   border-radius: 8px;
-  background: #f8fbfa;
+  background: var(--surface-2);
 }
 
 .hash-mini {
   margin-top: 12px;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   word-break: break-all;
-  background: #f7faf9;
+  background: var(--surface-2);
   padding: 8px 10px;
   border-radius: 8px;
 }
 
 .sub-title {
   margin: 16px 0 10px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
 }
 
@@ -344,10 +360,10 @@ watch(
 
 .eval-content {
   margin-top: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-text-2);
   line-height: 1.8;
-  background: #f8fbfa;
+  background: var(--surface-2);
   padding: 10px 12px;
   border-radius: 8px;
 }
@@ -357,7 +373,7 @@ watch(
   grid-template-columns: minmax(0, 1fr) 60px 110px;
   align-items: center;
   gap: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   padding: 9px 0;
   border-bottom: 1px dashed var(--c-border);
 }
@@ -373,7 +389,7 @@ watch(
 }
 
 .warn-text {
-  color: #b45309;
+  color: var(--warn);
   font-weight: 600;
 }
 

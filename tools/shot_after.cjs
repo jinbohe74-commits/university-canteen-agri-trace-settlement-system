@@ -1,0 +1,23 @@
+const path=require('path'),fs=require('fs')
+const BASE='http://127.0.0.1:5173',API='http://127.0.0.1:8080'
+const OUT=path.join(__dirname,'..','docs','roleplay_2026-11-10','after');fs.mkdirSync(OUT,{recursive:true})
+const G=path.join(process.env.APPDATA,'npm','node_modules');module.paths.push(G)
+const {chromium}=require(path.join(G,'playwright'))
+const sleep=ms=>new Promise(r=>setTimeout(r,ms))
+async function login(u,r){const res=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:'123456',expectedRole:r})});return (await res.json()).data}
+async function open(b,d){const c=await b.newContext({viewport:{width:1440,height:900}});await c.addInitScript(([t,u,rn,mn])=>{sessionStorage.setItem('ct_token',t);sessionStorage.setItem('ct_user',u);sessionStorage.setItem('ct_role_name',rn);sessionStorage.setItem('ct_menus',mn)},[d.token,JSON.stringify(d.user),d.roleName||'',JSON.stringify(d.menus||[])]);return await c.newPage()}
+;(async()=>{const b=await chromium.launch({channel:'msedge'})
+const q=await open(b,await login('inspector01','INSPECTOR'))
+await q.goto(BASE+'/inspector/quality',{waitUntil:'domcontentloaded'});await sleep(2800)
+await q.screenshot({path:path.join(OUT,'1-质检录入-提交常驻.png')})
+await q.goto(BASE+'/inspector/delivery',{waitUntil:'domcontentloaded'});await sleep(2600)
+await q.screenshot({path:path.join(OUT,'2-配送任务-行内可推进.png')})
+const f=await open(b,await login('farmer01','FARMER'))
+await f.goto(BASE+'/farmer/orders',{waitUntil:'domcontentloaded'});await sleep(2400)
+await f.screenshot({path:path.join(OUT,'3-农户订单-有活可干.png')})
+const a=await open(b,await login('admin','ADMIN'))
+await a.goto(BASE+'/admin/logs',{waitUntil:'domcontentloaded'});await sleep(2200)
+const inp=a.locator('input[placeholder*="操作人"]').first();await inp.fill('丰禾')
+await a.locator('button:has-text("查询")').first().click();await sleep(2200)
+await a.screenshot({path:path.join(OUT,'4-操作日志-信用可查.png')})
+await b.close();console.log('shots ok')})()

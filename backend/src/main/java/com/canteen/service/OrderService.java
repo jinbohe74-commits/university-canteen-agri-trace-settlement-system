@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.canteen.common.BizException;
 import com.canteen.common.LoginUser;
 import com.canteen.common.PageResult;
+import com.canteen.common.SqlLike;
 import com.canteen.common.UserContext;
 import com.canteen.entity.*;
 import com.canteen.mapper.*;
@@ -38,6 +39,7 @@ public class OrderService {
     private final PurchaseDemandMapper demandMapper;
     private final RefService refService;
     private final LogService logService;
+    private final NotificationService notificationService;
 
     /** 状态机：当前状态 -> 允许的下一状态 */
     private static final Map<Integer, Set<Integer>> MACHINE = new java.util.HashMap<>();
@@ -47,7 +49,7 @@ public class OrderService {
         MACHINE.put(20, Set.of(30, 99));
         MACHINE.put(30, Set.of(40, 41));
         MACHINE.put(40, Set.of(50, 99));
-        MACHINE.put(41, Set.of(99));
+        MACHINE.put(41, Set.of(99, 30));   // 修复：不合格批次允许退回待质检复检，不再是死路
         MACHINE.put(50, Set.of(60));
         MACHINE.put(60, Set.of(70, 99));
         MACHINE.put(70, Set.of(80));
@@ -108,20 +110,29 @@ public class OrderService {
             qw.ge(Orders::getCreateTime, LocalDateTime.now().minusDays(days));
         }
         if (StringUtils.hasText(keyword)) {
-            qw.and(w -> w.like(Orders::getOrderNo, keyword)
-                    .or().like(Orders::getBatchNo, keyword)
-                    .or().inSql(Orders::getFarmerId,
-                            "SELECT id FROM farmer WHERE name LIKE '%" + keyword.replace("'", "") + "%'")
-                    .or().inSql(Orders::getProductId,
-                            "SELECT id FROM product WHERE name LIKE '%" + keyword.replace("'", "") + "%'"));
+            // 修复 P2：关键词参数绑定 + 剥离 LIKE 通配符，杜绝注入与 %25 绕过筛选
+            String like = SqlLike.contains(keyword);
+            if (like == null) {
+                qw.apply("1 = 0");
+            } else {
+                qw.and(w -> w.apply("order_no LIKE {0}", like)
+                        .or().apply("batch_no LIKE {0}", like)
+                        .or().apply("farmer_id IN (SELECT id FROM farmer WHERE name LIKE {0})", like)
+                        .or().apply("product_id IN (SELECT id FROM product WHERE name LIKE {0})", like));
+            }
         }
         qw.orderByDesc(Orders::getCreateTime);
         IPage<Orders> p = ordersMapper.selectPage(new Page<>(page, size), qw);
         return PageResult.of(p, refService::toOrderVO);
     }
 
-    public Orders getById(Long id) {
-        Orders o = ordersMapper.selectById(id);
+    /** 采购单下的第一张履约子单（单笔下单时用于回传订单号） */
+    public Orders firstOfPo(Long poId) {
+        return ordersMapper.selectOne(new LambdaQueryWrapper<Orders>()
+                .eq(Orders::getPoId, poId).orderByAsc(Orders::getId).last("LIMIT 1"));
+    }
+
+    public Orders getById(Long id) {        Orders o = ordersMapper.selectById(id);
         if (o == null) {
             throw new BizException(404, "订单不存在");
         }
@@ -234,6 +245,12 @@ public class OrderService {
     @Transactional
     public void ship(Long orderId, Integer version) {
         changeStatus(orderId, 30, version);
+        Orders o = ordersMapper.selectById(orderId);
+        if (o != null) {
+            notificationService.toOrderParties(orderId, "SHIP", o.getOrderNo(),
+                    "新批次待质检", "订单 " + o.getOrderNo() + " 已由农户发货，请安排到货质检",
+                    Map.of("INSPECTOR", "/inspector/tasks", "CANTEEN", "/purchaser/orders"));
+        }
     }
 
     /** 订单取消 */
@@ -280,6 +297,16 @@ public class OrderService {
     @Transactional
     public Orders create(Long demandId, Long sourceId, java.math.BigDecimal quantity,
                          LocalDateTime expectedDelivery) {
+        return create(demandId, sourceId, quantity, expectedDelivery, null);
+    }
+
+    /**
+     * 带采购单归属的下单。一次提交多个品项时由 {@link PurchaseOrderService} 逐项调用，
+     * 明细日志由采购单统一记一条，避免一次采购刷出几十条操作日志。
+     */
+    @Transactional
+    public Orders create(Long demandId, Long sourceId, java.math.BigDecimal quantity,
+                         LocalDateTime expectedDelivery, Long poId) {
         SupplySource s = sourceMapper.selectById(sourceId);
         if (s == null) {
             throw new BizException(404, "货源不存在");
@@ -288,10 +315,21 @@ public class OrderService {
             throw new BizException("该货源当前不可下单（" + s.getStatus() + "）");
         }
         if (quantity == null || quantity.signum() <= 0) {
-            throw new BizException("下单数量必须大于 0");
+            throw new BizException(400, "下单数量必须大于 0");
+        }
+        if (s.getQuantity() == null || s.getQuantity().signum() <= 0) {
+            throw new BizException(409, "该货源已无可供应量");
         }
         if (quantity.compareTo(s.getQuantity()) > 0) {
             throw new BizException("下单数量不能超过货源可供数量（剩余 " + s.getQuantity() + s.getUnit() + "）");
+        }
+        // 修复 P1-5：成交单价必须为正，防止生成负/零金额订单
+        if (s.getPrice() == null || s.getPrice().signum() <= 0) {
+            throw new BizException(400, "货源报价必须大于 0，无法下单");
+        }
+        // 修复 P1-10：原子扣减库存并检查影响行数；失败时事务整体回滚，不会留下半条订单
+        if (sourceMapper.deductStock(sourceId, quantity) == 0) {
+            throw new BizException(409, "货源库存不足或已被其他订单占用，请刷新后重试");
         }
         PurchaseDemand d = demandId == null ? null : demandMapper.selectById(demandId);
         Long canteenId = d != null ? d.getCanteenId() : UserContext.canteenId();
@@ -303,6 +341,7 @@ public class OrderService {
         o.setOrderNo(com.canteen.common.Codes.next(datePart, 4, (int) (ordersMapper.selectCount(null) % 9000 + 1),
                 code -> ordersMapper.selectCount(new LambdaQueryWrapper<Orders>().eq(Orders::getOrderNo, code)) > 0));
         o.setDemandId(demandId);
+        o.setPoId(poId);
         o.setSourceId(sourceId);
         o.setFarmerId(s.getFarmerId());
         o.setCanteenId(canteenId);
@@ -326,21 +365,14 @@ public class OrderService {
         item.setCreateTime(LocalDateTime.now());
         itemMapper.insert(item);
 
-        // 扣减货源可供数量
-        java.math.BigDecimal left = s.getQuantity().subtract(quantity);
-        s.setQuantity(left);
-        s.setSoldQuantity(s.getSoldQuantity() == null ? quantity : s.getSoldQuantity().add(quantity));
-        if (left.signum() <= 0) {
-            s.setStatus("已售罄");
-        }
-        sourceMapper.updateById(s);
-
         if (d != null) {
             d.setStatus("已成交");
             demandMapper.updateById(d);
         }
-        logService.record("订单管理", "生成采购订单 " + o.getOrderNo() + "，农户 #" + s.getFarmerId()
-                + "，金额 ¥" + o.getTotalAmount());
+        if (poId == null) {
+            logService.record("订单管理", "生成采购订单 " + o.getOrderNo() + "，农户 #" + s.getFarmerId()
+                    + "，金额 ¥" + o.getTotalAmount());
+        }
         return o;
     }
 }

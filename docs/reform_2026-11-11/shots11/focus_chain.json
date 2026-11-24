@@ -1,0 +1,67 @@
+[
+  {
+    "name": "[ADMIN] 待办 path 全部带定位（38 条）",
+    "ok": true,
+    "detail": "ok"
+  },
+  {
+    "name": "[ADMIN] /admin/settlements?focus=JS20261111400 → 定位「JS20261111400」",
+    "ok": true,
+    "detail": "弹窗1 关键词[结算单,审核] 未找到=false err="
+  },
+  {
+    "name": "[ADMIN] /admin/orders?focus=DD202610080262 → 定位「DD202610080262」",
+    "ok": true,
+    "detail": "弹窗1 关键词[订单,批次,金额] 未找到=false err="
+  },
+  {
+    "name": "[ADMIN] /admin/warnings?focus=YJ20261111210 → 定位「YJ20261111210」",
+    "ok": true,
+    "detail": "弹窗1 关键词[预警,处置,等级] 未找到=false err="
+  },
+  {
+    "name": "[ADMIN] /admin/farmers?focus=F9936 → 定位「8」",
+    "ok": true,
+    "detail": "弹窗1 关键词[农户,信用,认证] 未找到=false err="
+  },
+  {
+    "name": "[PURCHASER] 待办 path 全部带定位（8 条）",
+    "ok": true,
+    "detail": "ok"
+  },
+  {
+    "name": "[PURCHASER] /purchaser/inbound?focus=DD202610080312 → 定位「DD202610080312」",
+    "ok": true,
+    "detail": "弹窗0 关键词[实收,入库,批次] 未找到=false err="
+  },
+  {
+    "name": "[PURCHASER] /purchaser/demands?focus=X20261110133 → 定位「X20261110133」",
+    "ok": true,
+    "detail": "弹窗1 关键词[报价,比价,需求] 未找到=false err="
+  },
+  {
+    "name": "[INSPECTOR] 待办 path 全部带定位（4 条）",
+    "ok": true,
+    "detail": "ok"
+  },
+  {
+    "name": "[INSPECTOR] /inspector/quality?orderId=363&focus=DD202611110361 → 定位「DD202611110361」",
+    "ok": true,
+    "detail": "弹窗0 关键词[质检,批次,结论] 未找到=false err="
+  },
+  {
+    "name": "[INSPECTOR] /inspector/delivery?focus=DD202610060264 → 定位「DD202610060264」",
+    "ok": true,
+    "detail": "弹窗0 关键词[配送,批次,车辆] 未找到=false err="
+  },
+  {
+    "name": "[FARMER] 待办 path 全部带定位（4 条）",
+    "ok": true,
+    "detail": "ok"
+  },
+  {
+    "name": "[FARMER] /farmer/orders?status=10&focus=DD202611100901 → 定位「DD202611100901」",
+    "ok": true,
+    "detail": "弹窗1 关键词[订单,批次,收货] 未找到=false err="
+  }
+]

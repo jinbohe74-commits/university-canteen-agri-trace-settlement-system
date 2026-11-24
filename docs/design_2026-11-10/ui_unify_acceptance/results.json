@@ -1,0 +1,338 @@
+{
+  "summary": {
+    "total": 28,
+    "pass": 28,
+    "failed": 0,
+    "infos": 0,
+    "ratios": {
+      "day": 16.07,
+      "paper": 12.99,
+      "night": 14.66
+    },
+    "hues": {
+      "day": 166.2,
+      "paper": 166.2,
+      "night": 164.8
+    },
+    "hueSpread": 1.3999999999999773,
+    "consoleErrors": 0,
+    "badResponses": 0,
+    "shots": [
+      {
+        "label": "统一底座 · 登录页（摄影为固定内容资产）",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D1-登录.png"
+      },
+      {
+        "label": "统一底座 · day 模式 · 同一张订单页",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D2-day-订单.png"
+      },
+      {
+        "label": "统一底座 · paper 模式 · 同一张订单页",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D2-paper-订单.png"
+      },
+      {
+        "label": "统一底座 · night 模式 · 同一张订单页",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D2-night-订单.png"
+      },
+      {
+        "label": "night 模式 · 管理员驾驶舱（与订单页同一骨架）",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D3-night-驾驶舱.png"
+      },
+      {
+        "label": "night 模式 · 批次溯源（与订单页同一骨架）",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D4-night-溯源.png"
+      },
+      {
+        "label": "night 模式 · 结算审核（表格密集页）",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D5-night-结算.png"
+      },
+      {
+        "label": "day 模式 · 同一驾驶舱（只有明度变化，骨架不变）",
+        "file": "docs\\design_2026-11-10\\ui_unify_acceptance\\D6-day-驾驶舱.png"
+      }
+    ]
+  },
+  "results": [
+    {
+      "name": "首屏默认模式为 day",
+      "ok": true,
+      "mode": "day"
+    },
+    {
+      "name": "登录表单不预填任何凭据",
+      "ok": true
+    },
+    {
+      "name": "登录页品牌主视觉在三档下完全一致（内容资产，不随模式切换）",
+      "ok": true,
+      "assets": [
+        {
+          "mode": "day",
+          "image": "brand-hero.png"
+        },
+        {
+          "mode": "paper",
+          "image": "brand-hero.png"
+        },
+        {
+          "mode": "night",
+          "image": "brand-hero.png"
+        }
+      ]
+    },
+    {
+      "name": "登录跳转后外观仍为全局默认",
+      "ok": true,
+      "mode": "day"
+    },
+    {
+      "name": "默认模式：跨 5 个页面外观恒定（不再按路由分配三套皮肤）",
+      "ok": true,
+      "traceDefault": [
+        {
+          "url": "/admin/dashboard",
+          "mode": "day"
+        },
+        {
+          "url": "/admin/orders",
+          "mode": "day"
+        },
+        {
+          "url": "/admin/settlements",
+          "mode": "day"
+        },
+        {
+          "url": "/admin/trace",
+          "mode": "day"
+        },
+        {
+          "url": "/admin/users",
+          "mode": "day"
+        }
+      ]
+    },
+    {
+      "name": "顶栏可切换为 night",
+      "ok": true
+    },
+    {
+      "name": "night 模式：跨 5 个页面外观恒定",
+      "ok": true,
+      "nightTrace": [
+        {
+          "url": "/admin/dashboard",
+          "mode": "night"
+        },
+        {
+          "url": "/admin/orders",
+          "mode": "night"
+        },
+        {
+          "url": "/admin/settlements",
+          "mode": "night"
+        },
+        {
+          "url": "/admin/trace",
+          "mode": "night"
+        },
+        {
+          "url": "/admin/users",
+          "mode": "night"
+        }
+      ]
+    },
+    {
+      "name": "night 模式：跨 5 个页面 0 处低对比文本（对比度 < 3.0）",
+      "ok": true,
+      "count": 0,
+      "samples": []
+    },
+    {
+      "name": "night 模式：跨 5 个页面 0 处浅色白块（二维码功能白底除外）",
+      "ok": true,
+      "count": 0,
+      "samples": []
+    },
+    {
+      "name": "night 模式：跨 5 个页面设计骨架完全一致",
+      "ok": true,
+      "distinctShells": 1,
+      "sample": {
+        "sideDisplay": "flex",
+        "sideWidth": "208px",
+        "sideFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "navTextDisplay": "block",
+        "crumbDisplay": "flex",
+        "cmdbarDisplay": "flex",
+        "topnavCount": 0,
+        "pageTitleSize": "24px",
+        "bodyFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "radiusToken": "6px",
+        "navWToken": "208px",
+        "densToken": "1"
+      }
+    },
+    {
+      "name": "模式 day 正文/面板对比度 >= 4.5:1",
+      "ok": true,
+      "ratio": 16.07,
+      "ink": "#10251F",
+      "surface": "#FFFFFF"
+    },
+    {
+      "name": "模式 paper 正文/面板对比度 >= 4.5:1",
+      "ok": true,
+      "ratio": 12.99,
+      "ink": "#22302A",
+      "surface": "#FBF8F1"
+    },
+    {
+      "name": "模式 night 正文/面板对比度 >= 4.5:1",
+      "ok": true,
+      "ratio": 14.66,
+      "ink": "#E8F2EE",
+      "surface": "#111F2A"
+    },
+    {
+      "name": "三档明度模式的骨架完全相同（侧栏/字体/圆角/导航/密度）",
+      "ok": true,
+      "day": {
+        "sideDisplay": "flex",
+        "sideWidth": "208px",
+        "sideFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "navTextDisplay": "block",
+        "crumbDisplay": "flex",
+        "cmdbarDisplay": "flex",
+        "topnavCount": 0,
+        "pageTitleSize": "24px",
+        "bodyFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "radiusToken": "6px",
+        "navWToken": "208px",
+        "densToken": "1"
+      },
+      "paper": {
+        "sideDisplay": "flex",
+        "sideWidth": "208px",
+        "sideFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "navTextDisplay": "block",
+        "crumbDisplay": "flex",
+        "cmdbarDisplay": "flex",
+        "topnavCount": 0,
+        "pageTitleSize": "24px",
+        "bodyFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "radiusToken": "6px",
+        "navWToken": "208px",
+        "densToken": "1"
+      },
+      "night": {
+        "sideDisplay": "flex",
+        "sideWidth": "208px",
+        "sideFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "navTextDisplay": "block",
+        "crumbDisplay": "flex",
+        "cmdbarDisplay": "flex",
+        "topnavCount": 0,
+        "pageTitleSize": "24px",
+        "bodyFont": "Inter, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Source Han Sans SC\", sans-serif",
+        "radiusToken": "6px",
+        "navWToken": "208px",
+        "densToken": "1"
+      }
+    },
+    {
+      "name": "三档背景色确实不同（切换生效，不是没换）",
+      "ok": true,
+      "bgs": {
+        "day": "#F5F8F7",
+        "paper": "#F3EFE6",
+        "night": "#0B141C"
+      }
+    },
+    {
+      "name": "三档对比度自检值互不重复（L-028 防滞后一轮）",
+      "ok": true,
+      "ratios": {
+        "day": 16.07,
+        "paper": 12.99,
+        "night": 14.66
+      }
+    },
+    {
+      "name": "三档 accent 色相一致（同一品牌色相的明度适配，色相差 <= 12°）",
+      "ok": true,
+      "hues": {
+        "day": 166.2,
+        "paper": 166.2,
+        "night": 164.8
+      },
+      "hueSpread": 1.3999999999999773,
+      "accents": {
+        "day": "#167A63",
+        "paper": "#167A63",
+        "night": "#4FD1B0"
+      }
+    },
+    {
+      "name": "Ctrl+K 打开命令面板",
+      "ok": true,
+      "cmdVisible": 1
+    },
+    {
+      "name": "命令面板实时过滤",
+      "ok": true,
+      "filtered": 2
+    },
+    {
+      "name": "命令面板回车直达目标页",
+      "ok": true,
+      "url": "http://127.0.0.1:5173/admin/settlements"
+    },
+    {
+      "name": "筛选统一走后端，无 DOM 层假筛选工具条",
+      "ok": true,
+      "search": 0,
+      "livebar": 0,
+      "chips": 0,
+      "rowOps": 0,
+      "serverFilter": 1,
+      "tabRows": 0
+    },
+    {
+      "name": "状态筛选工具条不重复（不生成第二套 chip）",
+      "ok": true,
+      "tabRows": 0,
+      "injectedChips": 0
+    },
+    {
+      "name": "表格行内不再注入「复制」按钮（首列不再被撑破）",
+      "ok": true,
+      "rowOps": 0
+    },
+    {
+      "name": "勾选后批量浮动条出现且计数正确",
+      "ok": true,
+      "selBoxes": 10,
+      "barOn": 1,
+      "cnt": "1"
+    },
+    {
+      "name": "溯源时间线节点可展开",
+      "ok": true,
+      "titles": 5
+    },
+    {
+      "name": "弱动效开关写入 html.reduce-motion",
+      "ok": true
+    },
+    {
+      "name": "全程 0 控制台错误",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "name": "全程 0 前端 4xx 响应",
+      "ok": true,
+      "badResponses": []
+    }
+  ]
+}

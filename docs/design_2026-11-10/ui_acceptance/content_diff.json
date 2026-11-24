@@ -1,0 +1,745 @@
+{
+  "summary": {
+    "total_vue": 37,
+    "views": 28,
+    "views_identical": 0,
+    "components_and_layout": 9,
+    "allowed_shell_changes": [
+      "components/BaseChart.vue",
+      "components/StatCard.vue",
+      "layout/AppLayout.vue"
+    ],
+    "unexpected_changes": [
+      "views/admin/Canteens.vue",
+      "views/admin/Config.vue",
+      "views/admin/Dashboard.vue",
+      "views/admin/Farmers.vue",
+      "views/admin/Logs.vue",
+      "views/admin/Orders.vue",
+      "views/admin/Products.vue",
+      "views/admin/Settlements.vue",
+      "views/admin/Trace.vue",
+      "views/admin/Users.vue",
+      "views/admin/Warnings.vue",
+      "views/farmer/Credit.vue",
+      "views/farmer/Messages.vue",
+      "views/farmer/Orders.vue",
+      "views/farmer/Settlement.vue",
+      "views/farmer/Sources.vue",
+      "views/farmer/Workbench.vue",
+      "views/inspector/Delivery.vue",
+      "views/inspector/Exception.vue",
+      "views/inspector/Quality.vue",
+      "views/inspector/Tasks.vue",
+      "views/login/index.vue",
+      "views/purchaser/Demands.vue",
+      "views/purchaser/Evaluation.vue",
+      "views/purchaser/Inbound.vue",
+      "views/purchaser/Match.vue",
+      "views/purchaser/Orders.vue",
+      "views/purchaser/Sources.vue"
+    ],
+    "visible_text_mismatches_in_views": [
+      "views/admin/Canteens.vue",
+      "views/admin/Config.vue",
+      "views/admin/Dashboard.vue",
+      "views/admin/Farmers.vue",
+      "views/admin/Logs.vue",
+      "views/admin/Orders.vue",
+      "views/admin/Products.vue",
+      "views/admin/Settlements.vue",
+      "views/admin/Trace.vue",
+      "views/admin/Users.vue",
+      "views/admin/Warnings.vue",
+      "views/farmer/Credit.vue",
+      "views/farmer/Messages.vue",
+      "views/farmer/Orders.vue",
+      "views/farmer/Settlement.vue",
+      "views/farmer/Sources.vue",
+      "views/farmer/Workbench.vue",
+      "views/inspector/Delivery.vue",
+      "views/inspector/Exception.vue",
+      "views/inspector/Quality.vue",
+      "views/inspector/Tasks.vue",
+      "views/login/index.vue",
+      "views/purchaser/Demands.vue",
+      "views/purchaser/Evaluation.vue",
+      "views/purchaser/Inbound.vue",
+      "views/purchaser/Match.vue",
+      "views/purchaser/Orders.vue",
+      "views/purchaser/Sources.vue"
+    ],
+    "layout_business_contract": {
+      "刷新后服务端复核身份": true,
+      "退出登录走 store.logout": true,
+      "待办数量走管理员接口": true,
+      "账号信息用 VNode 防 XSS（非 HTML 拼接）": true,
+      "角色待办分流保留": true,
+      "交互层按要求安装": true
+    },
+    "pass": false
+  },
+  "files": [
+    {
+      "file": "App.vue",
+      "status": "IDENTICAL",
+      "code_equal": true,
+      "text_equal": true,
+      "diff": []
+    },
+    {
+      "file": "components/BaseChart.vue",
+      "status": "ALLOWED_SHELL_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/components/BaseChart.vue",
+        "+++ current/components/BaseChart.vue",
+        "@@ -15,2 +15,51 @@",
+        " let chart = null",
+        "+let observer = null",
+        "+",
+        "+/* 主题色读 html 上的设计 token 终值（经验库 L-028）：",
+        "+   自定义属性不参与 CSS 过渡插值，任何时刻读到的都是目标方案的颜色。 */",
+        "+function theme() {",
+        "+  const cs = getComputedStyle(document.documentElement)",
+        "+  const get = (n, fallback) => cs.getPropertyValue(n).trim() || fallback",
+        "+  return {",
+        "+    ink: get('--ink', '#0F172A'),",
+        "+    muted: get('--muted', '#6B7C93'),"
+      ]
+    },
+    {
+      "file": "components/OrderDetailDrawer.vue",
+      "status": "IDENTICAL",
+      "code_equal": true,
+      "text_equal": true,
+      "diff": []
+    },
+    {
+      "file": "components/SectionCard.vue",
+      "status": "IDENTICAL",
+      "code_equal": true,
+      "text_equal": true,
+      "diff": []
+    },
+    {
+      "file": "components/StarRate.vue",
+      "status": "IDENTICAL",
+      "code_equal": true,
+      "text_equal": true,
+      "diff": []
+    },
+    {
+      "file": "components/StatCard.vue",
+      "status": "ALLOWED_SHELL_CHANGE",
+      "code_equal": false,
+      "text_equal": true,
+      "diff": [
+        "--- backup/components/StatCard.vue",
+        "+++ current/components/StatCard.vue",
+        "@@ -6,3 +6,3 @@",
+        "     <div class=\"stat-label\">{{ label }}</div>",
+        "-    <div class=\"stat-value\" :style=\"{ color: valueColor || '#111827' }\">",
+        "+    <div class=\"stat-value\" :style=\"{ color: valueColor || 'var(--ink)' }\">",
+        "       {{ value }}<small v-if=\"suffix\">{{ suffix }}</small>"
+      ]
+    },
+    {
+      "file": "components/StatusTag.vue",
+      "status": "IDENTICAL",
+      "code_equal": true,
+      "text_equal": true,
+      "diff": []
+    },
+    {
+      "file": "components/TracePanel.vue",
+      "status": "IDENTICAL",
+      "code_equal": true,
+      "text_equal": true,
+      "diff": []
+    },
+    {
+      "file": "layout/AppLayout.vue",
+      "status": "ALLOWED_SHELL_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/layout/AppLayout.vue",
+        "+++ current/layout/AppLayout.vue",
+        "@@ -1,9 +1,10 @@",
+        " <template>",
+        "-  <div class=\"layout\">",
+        "-    <aside class=\"sidebar\">",
+        "-      <div class=\"brand\">",
+        "-        <div class=\"brand-mark\">农</div>",
+        "-        <div class=\"brand-text\">",
+        "-          <div class=\"brand-title\">农校直供</div>",
+        "-          <div class=\"brand-sub\">溯源·结算管理平台</div>",
+        "+  <div class=\"lay-shell\">",
+        "+    <!-- 侧栏：全站唯一骨架（208px 图标+文字），与明度模式无关 -->",
+        "+    <aside class=\"lay-side\">"
+      ]
+    },
+    {
+      "file": "views/admin/Canteens.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Canteens.vue",
+        "+++ current/views/admin/Canteens.vue",
+        "@@ -218,2 +218,4 @@",
+        " import { fmtDay, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -300,3 +302,4 @@",
+        " const exportRoster = () => {",
+        "-  ElMessage.success(`已导出《食堂名册》，共 ${total.value} 条记录`)",
+        "+  const n = exportTableDom(stamped('食堂名册'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')",
+        " }",
+        "@@ -355,2 +358,3 @@"
+      ]
+    },
+    {
+      "file": "views/admin/Config.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Config.vue",
+        "+++ current/views/admin/Config.vue",
+        "@@ -193,2 +193,3 @@",
+        " import SectionCard from '@/components/SectionCard.vue'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -313,2 +314,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/admin/Dashboard.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Dashboard.vue",
+        "+++ current/views/admin/Dashboard.vue",
+        "@@ -1,10 +1,13 @@",
+        " <template>",
+        "-  <div class=\"page\" v-loading=\"loading\">",
+        "-    <div class=\"page-head\">",
+        "+  <div class=\"page db-page\" v-loading=\"loading\">",
+        "+    <!-- 页头：真实刷新时间 + 实时连接状态，不再伪造增长率 -->",
+        "+    <div class=\"page-head db-head\">",
+        "       <div>",
+        "-        <h2 class=\"page-title\">数据看板</h2>",
+        "-        <p class=\"page-sub\">平台运营全局态势 · 数据截至 {{ data.serverTime || '—' }}</p>",
+        "+        <h2 class=\"page-title\">运营总览</h2>",
+        "+        <p class=\"page-sub\">平台全局态势 · 数据截至 {{ data.serverTime || '—' }} · {{ data.today || '' }}</p>"
+      ]
+    },
+    {
+      "file": "views/admin/Farmers.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Farmers.vue",
+        "+++ current/views/admin/Farmers.vue",
+        "@@ -260,2 +260,4 @@",
+        " import { fmtDay, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -402,3 +404,4 @@",
+        " const exportRoster = () => {",
+        "-  ElMessage.success(`已导出《农户/合作社名册》，共 ${total.value} 条记录`)",
+        "+  const n = exportTableDom(stamped('农户合作社名册'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')",
+        " }",
+        "@@ -513,2 +516,3 @@"
+      ]
+    },
+    {
+      "file": "views/admin/Logs.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Logs.vue",
+        "+++ current/views/admin/Logs.vue",
+        "@@ -39,4 +39,5 @@",
+        "           v-model=\"query.keyword\"",
+        "-          placeholder=\"操作人 / 操作内容\"",
+        "+          placeholder=\"操作人 / 操作内容（输入即查）\"",
+        "           clearable",
+        "+          @input=\"onKeywordInput\"",
+        "           @keyup.enter=\"search\"",
+        "@@ -69,3 +70,6 @@",
+        "         <div class=\"filter-spacer\"></div>",
+        "-        <span class=\"muted small\">累计 {{ fmtNum(stats.total) }} 条 · 异常 {{ fmtNum(stats.failed) }} 条</span>",
+        "+        <span class=\"muted small\">",
+        "+          当前筛选 <b class=\"result-count\">{{ fmtNum(list.total) }}</b> 条"
+      ]
+    },
+    {
+      "file": "views/admin/Orders.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Orders.vue",
+        "+++ current/views/admin/Orders.vue",
+        "@@ -197,2 +197,3 @@",
+        " import { fmtDate, fmtMoney, fmtNum, fmtWan, today } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -385,2 +386,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(() => {"
+      ]
+    },
+    {
+      "file": "views/admin/Products.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Products.vue",
+        "+++ current/views/admin/Products.vue",
+        "@@ -257,2 +257,4 @@",
+        " import { fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { downloadCsv, stamped } from '@/utils/export'",
+        " ",
+        "@@ -370,3 +372,9 @@",
+        " const importTemplate = () => {",
+        "-  ElMessage.success('已下载《农产品导入模板》，请按品类、单位与参考价填写后上传')",
+        "+  const n = downloadCsv(stamped('农产品导入模板'),",
+        "+    ['品名', '品类', '单位', '参考价(元)', '产地', '规格', '状态'],",
+        "+    [",
+        "+      ['大白菜（示例，导入前请删除）', '叶菜类', 'kg', '2.50', '本地基地', '散装', '正常'],"
+      ]
+    },
+    {
+      "file": "views/admin/Settlements.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Settlements.vue",
+        "+++ current/views/admin/Settlements.vue",
+        "@@ -355,2 +355,3 @@",
+        " import { fmtMoney, fmtNum, today } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -585,2 +586,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/admin/Trace.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Trace.vue",
+        "+++ current/views/admin/Trace.vue",
+        "@@ -87,2 +87,4 @@",
+        " import TracePanel from '@/components/TracePanel.vue'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTextReport, stamped } from '@/utils/export'",
+        " ",
+        "@@ -126,4 +128,5 @@",
+        " const scanQuery = () => {",
+        "-  ElMessage.info('已唤起扫码识别，请将批次二维码对准扫码枪或摄像头')",
+        "+  // 扫码枪本质是把批次号敲进输入框；这里如实聚焦输入框，不再假称唤起摄像头",
+        "   if (searchInput.value && searchInput.value.focus) searchInput.value.focus()",
+        "+  ElMessage.info('已聚焦批次号输入框：请用扫码枪扫描，或粘贴二维码中的批次号后回车')",
+        " }"
+      ]
+    },
+    {
+      "file": "views/admin/Users.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Users.vue",
+        "+++ current/views/admin/Users.vue",
+        "@@ -238,2 +238,3 @@",
+        " import { fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -512,2 +513,3 @@",
+        " ",
+        "+useAutoRefresh(loadUsers)",
+        " onMounted(() => {"
+      ]
+    },
+    {
+      "file": "views/admin/Warnings.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/admin/Warnings.vue",
+        "+++ current/views/admin/Warnings.vue",
+        "@@ -229,2 +229,3 @@",
+        " import { fmtDate, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -491,2 +492,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/farmer/Credit.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/farmer/Credit.vue",
+        "+++ current/views/farmer/Credit.vue",
+        "@@ -173,2 +173,3 @@",
+        " import { fmtDate, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -240,2 +241,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/farmer/Messages.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/farmer/Messages.vue",
+        "+++ current/views/farmer/Messages.vue",
+        "@@ -74,2 +74,3 @@",
+        " import { fmtDate } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -78,3 +79,4 @@",
+        " const cat = ref('all')",
+        "-const readAll = ref(false)",
+        "+// 已读状态持久化，刷新页面后不会「又变回未读」",
+        "+const readAll = ref(localStorage.getItem('ct_msg_read_all') === '1')",
+        " ",
+        "@@ -167,3 +169,4 @@",
+        "   readAll.value = true"
+      ]
+    },
+    {
+      "file": "views/farmer/Orders.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/farmer/Orders.vue",
+        "+++ current/views/farmer/Orders.vue",
+        "@@ -164,2 +164,4 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -342,5 +344,7 @@",
+        " const exportOrders = () => {",
+        "-  ElMessage.success(`已导出 ${pageInfo.value.total} 条订单数据`)",
+        "-}",
+        "-",
+        "+  const n = exportTableDom(stamped('农户订单'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')"
+      ]
+    },
+    {
+      "file": "views/farmer/Settlement.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/farmer/Settlement.vue",
+        "+++ current/views/farmer/Settlement.vue",
+        "@@ -193,2 +193,4 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -262,5 +264,7 @@",
+        " const exportBill = () => {",
+        "-  ElMessage.success(`对账单已导出：${pageInfo.value.total} 条结算记录`)",
+        "-}",
+        "-",
+        "+  const n = exportTableDom(stamped('农户对账单'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')"
+      ]
+    },
+    {
+      "file": "views/farmer/Sources.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/farmer/Sources.vue",
+        "+++ current/views/farmer/Sources.vue",
+        "@@ -212,2 +212,4 @@",
+        " import { fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -380,5 +382,7 @@",
+        " const exportSources = () => {",
+        "-  ElMessage.success(`已导出 ${pageInfo.value.total} 条货源数据`)",
+        "-}",
+        "-",
+        "+  const n = exportTableDom(stamped('供货货源'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')"
+      ]
+    },
+    {
+      "file": "views/farmer/Workbench.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/farmer/Workbench.vue",
+        "+++ current/views/farmer/Workbench.vue",
+        "@@ -157,2 +157,3 @@",
+        " import { fmtDate, fmtMoney, fmtNum, today } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -282,2 +283,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/inspector/Delivery.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/inspector/Delivery.vue",
+        "+++ current/views/inspector/Delivery.vue",
+        "@@ -205,2 +205,3 @@",
+        " import { fmtDate, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -286,2 +287,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/inspector/Exception.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/inspector/Exception.vue",
+        "+++ current/views/inspector/Exception.vue",
+        "@@ -112,2 +112,3 @@",
+        " import { inspectorApi } from '@/api'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -180,2 +181,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/inspector/Quality.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/inspector/Quality.vue",
+        "+++ current/views/inspector/Quality.vue",
+        "@@ -8,3 +8,3 @@",
+        "       <div class=\"page-actions\">",
+        "-        <el-button plain @click=\"printReport\"><el-icon><Printer /></el-icon>打印报告</el-button>",
+        "+        <el-button plain @click=\"printReport\"><el-icon><Download /></el-icon>导出报告</el-button>",
+        "       </div>",
+        "@@ -91,8 +91,9 @@",
+        "             <div class=\"sub-block-title\" style=\"margin-top: 18px\">",
+        "-              检测报告 / 现场照片（已上传 3 张）",
+        "+              检测报告 / 现场照片（已上传 {{ photos.length }} 张）",
+        "             </div>",
+        "             <div class=\"photo-row\">",
+        "-              <div v-for=\"i in 3\" :key=\"i\" class=\"photo-ph\">"
+      ]
+    },
+    {
+      "file": "views/inspector/Tasks.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/inspector/Tasks.vue",
+        "+++ current/views/inspector/Tasks.vue",
+        "@@ -96,2 +96,3 @@",
+        " import { fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -175,2 +176,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/login/index.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/login/index.vue",
+        "+++ current/views/login/index.vue",
+        "@@ -45,3 +45,3 @@",
+        "           <h2>欢迎回来</h2>",
+        "-          <p>请选择角色并登录您的工作台</p>",
+        "+          <p>选择角色将校验账号身份；也可直接登录由系统自动识别</p>",
+        "         </div>",
+        "@@ -119,3 +119,4 @@",
+        "   remember: false,",
+        "-  role: 'ADMIN'",
+        "+  // 默认不选角色：避免「默认管理员高亮」误导，且不影响直接登录",
+        "+  role: ''",
+        " })",
+        "@@ -136,5 +137,6 @@"
+      ]
+    },
+    {
+      "file": "views/purchaser/Demands.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/purchaser/Demands.vue",
+        "+++ current/views/purchaser/Demands.vue",
+        "@@ -245,2 +245,4 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -366,5 +368,7 @@",
+        " const exportDemands = () => {",
+        "-  ElMessage.success(`已导出 ${total.value} 条采购需求（含期望价、状态与报价数）`)",
+        "-}",
+        "-",
+        "+  const n = exportTableDom(stamped('采购需求'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')"
+      ]
+    },
+    {
+      "file": "views/purchaser/Evaluation.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/purchaser/Evaluation.vue",
+        "+++ current/views/purchaser/Evaluation.vue",
+        "@@ -169,2 +169,3 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -275,2 +276,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    },
+    {
+      "file": "views/purchaser/Inbound.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/purchaser/Inbound.vue",
+        "+++ current/views/purchaser/Inbound.vue",
+        "@@ -272,2 +272,3 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -410,2 +411,3 @@",
+        " ",
+        "+useAutoRefresh(loadRecent)",
+        " onMounted(() => {"
+      ]
+    },
+    {
+      "file": "views/purchaser/Match.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/purchaser/Match.vue",
+        "+++ current/views/purchaser/Match.vue",
+        "@@ -167,2 +167,3 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -299,2 +300,3 @@",
+        " ",
+        "+useAutoRefresh(loadPending)",
+        " onMounted(async () => {"
+      ]
+    },
+    {
+      "file": "views/purchaser/Orders.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/purchaser/Orders.vue",
+        "+++ current/views/purchaser/Orders.vue",
+        "@@ -139,2 +139,4 @@",
+        " import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        "+import { exportTableDom, stamped } from '@/utils/export'",
+        " ",
+        "@@ -225,5 +227,7 @@",
+        " const exportOrders = () => {",
+        "-  ElMessage.success(`订单导出已生成，共 ${total.value} 笔${store.orgName ? '（' + store.orgName + '）' : ''}`)",
+        "-}",
+        "-",
+        "+  const n = exportTableDom(stamped('采购订单'))",
+        "+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')"
+      ]
+    },
+    {
+      "file": "views/purchaser/Sources.vue",
+      "status": "UNEXPECTED_CHANGE",
+      "code_equal": false,
+      "text_equal": false,
+      "diff": [
+        "--- backup/views/purchaser/Sources.vue",
+        "+++ current/views/purchaser/Sources.vue",
+        "@@ -184,2 +184,3 @@",
+        " import { fmtMoney, fmtNum } from '@/utils/format'",
+        "+import { useAutoRefresh } from '@/utils/useAutoRefresh'",
+        " ",
+        "@@ -318,2 +319,3 @@",
+        " ",
+        "+useAutoRefresh(load)",
+        " onMounted(load)"
+      ]
+    }
+  ]
+}

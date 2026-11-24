@@ -23,7 +23,7 @@
       />
       <StatCard
         label="待审核" :value="fmtNum(stats.pending)" icon="Clock"
-        foot="需尽快处理" color="orange"
+        foot="点击筛出待审核" color="orange" clickable @click="filterPending"
       />
       <StatCard
         label="平均信用分" :value="fmtNum(stats.avgCredit, 1)" icon="Star"
@@ -40,10 +40,7 @@
         >
           <template #prefix><el-icon><Search /></el-icon></template>
         </el-input>
-        <el-select v-model="query.type" placeholder="主体类型" clearable style="width: 136px" @change="search">
-          <el-option label="全部类型" value="" />
-          <el-option v-for="t in TYPES" :key="t" :label="t" :value="t" />
-        </el-select>
+        <!-- 主体类型由下方带数量的分段控件承担，这里不再放重复的下拉 -->
         <el-select v-model="query.status" placeholder="认证状态" clearable style="width: 136px" @change="search">
           <el-option label="全部状态" value="" />
           <el-option v-for="s in STATUS" :key="s" :label="s" :value="s" />
@@ -253,11 +250,14 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtDay, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTableDom, stamped } from '@/utils/export'
 
 const TYPES = ['合作社', '生产基地', '个体农户']
 const STATUS = ['已认证', '待审核', '已停用']
@@ -268,6 +268,7 @@ const CREDIT_LEVELS = [
   { value: '风险', label: '风险（<80）' }
 ]
 
+const route = useRoute()
 const loading = ref(false)
 const rows = ref([])
 const total = ref(0)
@@ -310,20 +311,17 @@ const countOf = (type) => {
   return Number(hit?.value || 0)
 }
 
+/* 分段控件只表达「主体类型」一个维度，带数量。
+   认证状态属于另一个维度，走筛选条下拉 + 顶部「待审核」卡片点击，
+   不再和类型混在同一排（同一维度两个入口是上一版最容易被绕晕的地方）。 */
 const tabs = computed(() => [
   { key: 'all', label: '全部农户', count: Number(stats.value.total || 0) },
   { key: '合作社', label: '合作社', count: countOf('合作社') },
   { key: '生产基地', label: '生产基地', count: countOf('生产基地') },
-  { key: '个体农户', label: '个体农户', count: countOf('个体农户') },
-  { key: 'pending', label: '待审核', count: Number(stats.value.pending || 0) }
+  { key: '个体农户', label: '个体农户', count: countOf('个体农户') }
 ])
 
-const activeTab = computed(() => {
-  if (!query.type && !query.status) return 'all'
-  if (!query.type && query.status === '待审核') return 'pending'
-  if (query.type && !query.status) return query.type
-  return ''
-})
+const activeTab = computed(() => query.type || 'all')
 
 const creditColor = (v) => {
   const n = Number(v) || 0
@@ -373,17 +371,17 @@ const reset = () => {
   load()
 }
 
+/* 点「待审核」卡片 = 筛出待审核农户：把统计数字变成可执行动作，
+   也替代了原来混在类型标签里的「待审核」入口 */
+const filterPending = () => {
+  query.status = '待审核'
+  query.page = 1
+  load()
+}
+
 const selectTab = (key) => {
-  if (key === 'all') {
-    query.type = ''
-    query.status = ''
-  } else if (key === 'pending') {
-    query.type = ''
-    query.status = '待审核'
-  } else {
-    query.type = key
-    query.status = ''
-  }
+  // 只切换类型维度，不隐式清空用户已选的认证状态
+  query.type = key === 'all' ? '' : key
   query.page = 1
   load()
 }
@@ -400,7 +398,8 @@ const onPageChange = (page) => {
 }
 
 const exportRoster = () => {
-  ElMessage.success(`已导出《农户/合作社名册》，共 ${total.value} 条记录`)
+  const n = exportTableDom(stamped('农户合作社名册'))
+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')
 }
 
 const openCreate = () => {
@@ -511,12 +510,35 @@ const viewAction = async () => {
   setStatus(row.id, row.name, next)
 }
 
-onMounted(load)
+/* 从待办「去审核」跳进来：定位到该农户并打开档案。
+   注意不要在 useFocusLocator 的 onMounted 里再触发一次 load()：
+   本页 load() 有 seq 竞态守卫，两次并发会让先发的那次结果被丢弃，
+   于是"筛到了却拿不到行"，表现为永远提示未找到。这里串行处理。 */
+onMounted(async () => {
+  const no = String(route.query.focus || '').trim()
+  if (no) {
+    // 先把编号填进筛选再拉数据：农户可能不在第一页，光靠前端 find 找不到
+    query.keyword = no
+    query.status = ''
+    query.type = ''
+    query.creditLevel = ''
+    query.page = 1
+  }
+  await load()
+  if (!no) return
+  const hit = (rows.value || []).find(
+    (r) => String(r.farmerNo || '') === no || String(r.id) === no
+  )
+  if (hit) openView(hit)
+})
+
+useAutoRefresh(load)
 </script>
 
 <style scoped>
 .table-card {
-  overflow: hidden;
+  /* 不裁切表格：固定列阴影与横向滚动条必须可见（L-040） */
+  overflow: visible;
 }
 
 .tab-bar {
@@ -537,7 +559,7 @@ onMounted(load)
   border-radius: 15px;
   background: #f4f7f5;
   color: var(--c-text-2);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   cursor: pointer;
   transition: all 0.16s ease;
 }
@@ -556,7 +578,7 @@ onMounted(load)
 
 .tab-num {
   font-family: var(--font-num);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -565,14 +587,14 @@ onMounted(load)
 }
 
 .cell-main {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
   line-height: 1.35;
 }
 
 .cell-sub {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 2px;
 }
@@ -585,7 +607,7 @@ onMounted(load)
 
 .credit-num {
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--fs-base);
 }
 
 .op-links {
@@ -594,11 +616,11 @@ onMounted(load)
 }
 
 .link-danger {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .link-danger:hover {
-  color: #b91c1c;
+  color: var(--danger);
 }
 
 .archive-head {
@@ -607,8 +629,8 @@ onMounted(load)
   gap: 12px;
   padding: 13px 15px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f0fdf4, #e8f7ee);
-  border: 1px solid #d6f0e0;
+  background: linear-gradient(135deg, var(--surface-2), var(--accent-soft));
+  border: 1px solid var(--accent-soft);
   margin-bottom: 14px;
 }
 
@@ -618,10 +640,10 @@ onMounted(load)
   border-radius: 12px;
   display: grid;
   place-items: center;
-  font-size: 17px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #34d399, #15803d);
+  background: linear-gradient(135deg, #34d399, var(--accent));
   flex-shrink: 0;
 }
 
@@ -629,14 +651,14 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .archive-sub {
-  font-size: 11.5px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
   margin-top: 3px;
 }
 
@@ -646,13 +668,13 @@ onMounted(load)
 }
 
 .ac-label {
-  font-size: 11px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
 
 .ac-value {
   font-family: var(--font-num);
-  font-size: 22px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   line-height: 1.25;
 }

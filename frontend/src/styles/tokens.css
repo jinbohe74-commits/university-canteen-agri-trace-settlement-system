@@ -1,65 +1,302 @@
+/* ==========================================================================
+   农校直供 · 统一设计系统 token（2026-11-10 二次收敛）
+   --------------------------------------------------------------------------
+   设计原则（针对「切换方案像换了几个系统」的机制性修正）：
+   1. 一套底座，三档明度。字体族、导航骨架、圆角、阴影、密度、组件语言、
+      交互清单全部是**全局唯一常量**，不随 html[data-mode] 变化。
+   2. html[data-mode] 只覆盖「颜色语义变量」，且三档共享同一品牌色相
+      （青绿 h≈167），只做明度适配 —— 类似浅色/深色模式，不是三套皮肤。
+   3. 主题不再按路由自动分配。用户选一次，全站恒定（localStorage: ct_ui_mode）。
+   4. --c-* 是旧版兼容别名，统一指向新 token；28 个业务 view 的 scoped 样式
+      无需改动即可跟随主题（经验库 L-020 内容保真）。
+   5. 对比度自检只读 html 上的 token 终值，不读后代元素的过渡插值色（L-028）。
+   ========================================================================== */
+
+/* ========================== 唯一底座：与明度模式无关 ========================== */
+:root,
+html[data-mode] {
+  /* 排版：全站一套字体栈，标题不再随主题切换衬线/无衬线 */
+  --font-body: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+  --font-display: var(--font-body);
+  --font-num: "Inter", "SF Mono", "Consolas", "Roboto Mono", monospace;
+
+  /* 排版比例尺（2026-11-10 易用性整改新增）
+     ------------------------------------------------------------------
+     整改前字号是散落硬编码：表头 11px、正文 12.5px、标签 10.5px、
+     卡片标签 11.5px，全站 29 个页面每页 40~168 处小于 12px。中文在
+     12px 以下辨识度骤降，长时间读表格会"说不出地累"。
+     这里定 7 档，任何字号都必须引用令牌，禁止再写裸 px。
+     --fs-2xs 只允许用于纯装饰（菜单编号、徽标角标），不得承载信息。 */
+  --fs-2xs: 11px;      /* 装饰：编号 / 角标 */
+  --fs-xs: 12px;       /* 辅助说明 / 页脚 / 标签 */
+  --fs-sm: 13px;       /* 次要正文：表格表头、元信息、行内操作 */
+  --fs-base: 14px;     /* 正文：表格单元格、按钮、表单 */
+  --fs-md: 15px;       /* 强调：卡片标题、区块标题 */
+  --fs-lg: 18px;       /* 页面内大标题 */
+  --fs-xl: 24px;       /* 页面标题 */
+  --fs-display: 28px;  /* 关键指标数值 */
+
+  /* 行高：中文正文 1.6 起，表格 1.5 起 */
+  --lh-tight: 1.25;
+  --lh-base: 1.6;
+  --lh-loose: 1.75;
+
+  /* 几何：全站一套圆角与阴影 */
+  --radius: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 99px;
+  --shadow: 0 1px 2px rgba(16, 37, 31, .06);
+  --shadow-lg: 0 12px 32px rgba(16, 37, 31, .14);
+
+  /* 布局骨架：左侧栏永远存在、永远带文字，宽度与顶栏高度恒定 */
+  --nav-w: 208px;
+  --top-h: 56px;
+  --dens: 1;
+
+  /* 动效与层级 */
+  --ease: cubic-bezier(.2, .7, .3, 1);
+  --dur: .28s;
+  --z-top: 60;
+  --z-pop: 80;
+  --z-toast: 90;
+
+  /* 内容资产：品牌摄影图是固定的内容，不随明度模式切换 */
+  --hero: url("/design/brand-hero.png");
+
+  /* 以下三项保留为统一常量，确保任何历史 var() 引用都不会落空 */
+  --grid: none;
+  --grid-size: auto;
+  --paper: 0;
+  --glow: none;
+  --letter: 0;
+}
+
+/* ==================== 兼容别名：历史页面的 --c-* 命名 ====================
+   改版前的 tokens 用的是 --c-primary / --c-muted / --c-border 这套名字，
+   全站还有 218 处引用。变量没定义时，`border: 1px solid var(--x)` 这类声明
+   会在计算值阶段整条失效（边框直接消失、文字落回继承色），肉眼很难定位。
+   这里做一次集中映射：值全部指向新 token，主题切换时自动跟随。 */
 :root {
-  /* 主色：绿色农业风 */
-  --c-primary: #16a34a;
-  --c-primary-dark: #15803d;
-  --c-primary-light: #22c55e;
-  --c-primary-soft: #e8f7ee;
-  --c-primary-softer: #f2fbf5;
+  --c-primary: var(--accent);
+  --c-primary-dark: var(--accent);
+  --c-primary-light: var(--accent-soft);
+  --c-primary-soft: var(--accent-soft);
+  --c-muted: var(--muted);
+  --c-muted-2: var(--ink-2);
+  --c-text-2: var(--ink-2);
+  --c-text-3: var(--muted);
+  --c-border: var(--line);
+  --c-border-strong: var(--line-strong);
+  --c-fill-2: var(--surface-2);
+  --c-red: var(--danger);
+}
 
-  /* 侧边栏深墨绿渐变 */
-  --c-sidebar-1: #0e2b20;
-  --c-sidebar-2: #174934;
-  --c-sidebar-text: rgba(233, 245, 238, 0.72);
-  --c-sidebar-text-active: #ffffff;
+/* ========================== day · 浅色（默认） ========================== */
+html[data-mode="day"] {
+  --bg: #F5F8F7;
+  --surface: #FFFFFF;
+  --surface-2: #F0F5F3;
+  --surface-3: #E4EDE9;
+  --line: #DFE9E5;
+  --line-strong: #C4D6CF;
+  --ink: #10251F;
+  --ink-2: #3A5149;
+  --muted: #6E857D;
+  --accent: #167A63;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E6F4EF;
+  --accent-2: #B4633C;
+  --gold: #B98F3E;
+  --ok: #167A63;
+  --warn: #B4741B;
+  --danger: #C0453C;
+  --info: #2C6E8F;
+  /* 语义浅底：图标底、状态标签底。深色档要换成透明色，否则就是刺眼白块 */
+  --ok-soft: #E7F5EF;
+  --warn-soft: #FAF0DF;
+  --danger-soft: #FBEAE8;
+  --info-soft: #E6F0F6;
+  --mode-name: "浅色";
+  color-scheme: light;
+}
 
-  /* 中性色 */
-  --c-bg: #eef2f1;
-  --c-card: #ffffff;
-  --c-border: #e8eeec;
-  --c-border-strong: #dbe5e1;
-  --c-text: #111827;
-  --c-text-2: #374151;
-  --c-muted: #6b7280;
-  --c-muted-2: #9ca3af;
-  --c-th: #f7faf9;
+/* ========================== paper · 暖纸 ==========================
+   与 day 只差表面色温，品牌色、字体、几何、布局完全一致。
+   不再有衬线、直角、纸纹网格、编号导航等「另一套系统」的特征。 */
+html[data-mode="paper"] {
+  --bg: #F3EFE6;
+  --surface: #FBF8F1;
+  --surface-2: #EFEADF;
+  --surface-3: #E4DDCE;
+  --line: #DCD4C3;
+  --line-strong: #C3B9A2;
+  --ink: #22302A;
+  --ink-2: #4C5C50;
+  --muted: #7E8474;
+  --accent: #167A63;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E2EDE3;
+  --accent-2: #B4633C;
+  --gold: #B98F3E;
+  --ok: #167A63;
+  --warn: #B4741B;
+  --danger: #B4453C;
+  --info: #2C6E8F;
+  --ok-soft: #E6F0E4;
+  --warn-soft: #F7EEDC;
+  --danger-soft: #FAE9E5;
+  --info-soft: #E5EFF5;
+  --mode-name: "暖纸";
+  color-scheme: light;
+}
 
-  /* 语义色 */
-  --c-blue: #3b82f6;
-  --c-orange: #f59e0b;
-  --c-red: #ef4444;
-  --c-purple: #8b5cf6;
-  --c-teal: #0d9488;
-  --c-cyan: #06b6d4;
+/* ========================== night · 深色 ==========================
+   同一品牌色相提亮以适配深底，几何与骨架仍与 day/paper 完全一致。 */
+html[data-mode="night"] {
+  --bg: #0B141C;
+  --surface: #111F2A;
+  --surface-2: #17293A;
+  --surface-3: #1E3346;
+  --line: #23384A;
+  --line-strong: #30506A;
+  --ink: #E8F2EE;
+  --ink-2: #B4C9C2;
+  --muted: #8FA7B2;
+  --accent: #4FD1B0;
+  --accent-ink: #06231F;
+  --accent-soft: rgba(79, 209, 176, .13);
+  --accent-2: #E5A85B;
+  --gold: #E5A85B;
+  --ok: #4FD1B0;
+  --warn: #E5A85B;
+  --danger: #F0786F;
+  --info: #63A8F5;
+  --ok-soft: rgba(79, 209, 176, .13);
+  --warn-soft: rgba(229, 168, 91, .14);
+  --danger-soft: rgba(240, 120, 111, .14);
+  --info-soft: rgba(99, 168, 245, .14);
+  --mode-name: "深色";
+  color-scheme: dark;
+}
 
-  /* 尺寸 */
-  --sidebar-w: 232px;
-  --header-h: 60px;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow-card: 0 2px 10px rgba(16, 42, 32, 0.05);
-  --shadow-pop: 0 12px 32px rgba(16, 42, 32, 0.12);
-  --font: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Helvetica Neue",
-    Helvetica, Arial, sans-serif;
-  --font-num: "DIN Alternate", "Helvetica Neue", "PingFang SC", sans-serif;
+/* ==========================================================================
+   兼容别名层：所有旧 --c-* 都指向统一 token，改明度模式即整体重算
+   ========================================================================== */
+html {
+  --c-primary: var(--accent);
+  --c-primary-dark: var(--accent);
+  --c-primary-light: var(--accent-2);
+  --c-primary-soft: var(--accent-soft);
+  --c-primary-softer: var(--surface-2);
+  --c-sidebar-1: var(--surface);
+  --c-sidebar-2: var(--surface-2);
+  --c-sidebar-text: var(--ink-2);
+  --c-sidebar-text-active: var(--ink);
+  --c-bg: var(--bg);
+  --c-card: var(--surface);
+  --c-border: var(--line);
+  --c-border-strong: var(--line-strong);
+  --c-text: var(--ink);
+  --c-text-2: var(--ink-2);
+  --c-muted: var(--muted);
+  --c-muted-2: var(--muted);
+  --c-th: var(--surface-2);
+  --c-blue: var(--info);
+  --c-orange: var(--warn);
+  --c-red: var(--danger);
+  --c-purple: var(--info);
+  --c-teal: var(--accent-2);
+  --c-cyan: var(--accent-2);
+  --sidebar-w: var(--nav-w);
+  --header-h: var(--top-h);
+  --radius-sm: var(--radius);
+  --shadow-card: var(--shadow);
+  --shadow-pop: var(--shadow-lg);
+  --font: var(--font-body);
+  font-family: var(--font-body);
+  color-scheme: light;
+}
 
-  /* Element Plus 主题变量覆盖 */
-  --el-color-primary: #16a34a;
-  --el-color-primary-light-3: #4bbf78;
-  --el-color-primary-light-5: #7fd1a0;
-  --el-color-primary-light-7: #b2e3c6;
-  --el-color-primary-light-8: #cbeed9;
-  --el-color-primary-light-9: #e8f7ee;
-  --el-color-primary-dark-2: #15803d;
-  --el-color-success: #16a34a;
-  --el-color-warning: #f59e0b;
-  --el-color-danger: #ef4444;
-  --el-color-info: #6b7280;
-  --el-border-radius-base: 8px;
-  --el-font-family: var(--font);
-  --el-text-color-primary: #111827;
-  --el-text-color-regular: #374151;
-  --el-border-color: #e8eeec;
-  --el-border-color-light: #eef3f1;
-  --el-fill-color-blank: #ffffff;
-  --el-bg-color: #ffffff;
+html[data-mode="night"] { color-scheme: dark; }
+
+/* ---------- Element Plus 主题映射（只映射颜色，几何由底座统一） ---------- */
+html {
+  --el-color-primary: var(--accent);
+  --el-color-primary-light-3: var(--accent-2);
+  --el-color-primary-light-5: var(--accent-2);
+  --el-color-primary-light-7: var(--accent-soft);
+  --el-color-primary-light-8: var(--accent-soft);
+  --el-color-primary-light-9: var(--accent-soft);
+  --el-color-primary-dark-2: var(--accent);
+  --el-color-success: var(--ok);
+  --el-color-warning: var(--warn);
+  --el-color-danger: var(--danger);
+  --el-color-error: var(--danger);
+  --el-color-info: var(--muted);
+  --el-border-radius-base: var(--radius);
+  --el-border-radius-small: var(--radius);
+  --el-font-family: var(--font-body);
+  /* 字号也交给令牌，避免 Element 默认 14px 与页面 12.5px 混排产生"两种字号"观感 */
+  --el-font-size-extra-large: 18px;
+  --el-font-size-large: var(--fs-md);
+  --el-font-size-medium: var(--fs-md);
+  --el-font-size-base: var(--fs-base);
+  --el-font-size-small: var(--fs-sm);
+  --el-font-size-extra-small: var(--fs-xs);
+  --el-text-color-primary: var(--ink);
+  --el-text-color-regular: var(--ink-2);
+  --el-text-color-secondary: var(--muted);
+  --el-text-color-placeholder: var(--muted);
+  --el-border-color: var(--line);
+  --el-border-color-light: var(--line);
+  --el-border-color-lighter: var(--line);
+  --el-fill-color-blank: var(--surface);
+  --el-fill-color-light: var(--surface-2);
+  --el-fill-color: var(--surface-2);
+  --el-bg-color: var(--surface);
+  --el-bg-color-page: var(--bg);
+  --el-bg-color-overlay: var(--surface);
+  --el-disabled-bg-color: var(--surface-2);
+  --el-mask-color: rgba(8, 18, 30, .45);
+  --el-table-border-color: var(--line);
+  --el-table-header-bg-color: var(--surface-2);
+  --el-table-header-text-color: var(--muted);
+  --el-table-text-color: var(--ink-2);
+  --el-table-row-hover-bg-color: var(--accent-soft);
+  --el-table-tr-bg-color: var(--surface);
+  --el-input-bg-color: var(--surface);
+  --el-button-hover-bg-color: var(--accent-soft);
+  --el-button-hover-text-color: var(--accent);
+}
+
+/* 深色档把 Element Plus 的「浅色阶梯」拉回暗色系，避免刺眼白块。
+   只改颜色，不改圆角/字体/布局。 */
+html[data-mode="night"] {
+  --el-color-primary-light-3: #2AAE9B;
+  --el-color-primary-light-5: #227E72;
+  --el-color-primary-light-7: #1B4A47;
+  --el-color-primary-light-8: #173B3A;
+  --el-color-primary-light-9: rgba(79, 209, 176, .13);
+  --el-color-success-light-9: rgba(79, 209, 176, .13);
+  --el-color-warning-light-9: rgba(229, 168, 91, .14);
+  --el-color-danger-light-9: rgba(240, 120, 111, .14);
+  --el-color-info-light-9: var(--surface-2);
+  --el-fill-color-blank: var(--surface);
+  --el-fill-color-light: var(--surface-2);
+  --el-fill-color: var(--surface-2);
+  --el-border-color: var(--line-strong);
+  --el-border-color-light: var(--line);
+  --el-border-color-lighter: var(--line);
+  --el-text-color-placeholder: var(--muted);
+  --el-input-bg-color: var(--surface);
+  --el-button-hover-bg-color: var(--surface-3);
+  --el-button-hover-text-color: var(--accent);
+  --el-mask-color: rgba(3, 9, 17, .72);
+  --el-table-tr-bg-color: var(--surface);
+  --el-table-header-bg-color: var(--surface-2);
+  --el-table-row-hover-bg-color: var(--surface-3);
+  --el-popover-bg-color: var(--surface);
+  --el-dialog-bg-color: var(--surface);
+  --el-drawer-bg-color: var(--surface);
+  --el-dropdown-menu-box-shadow: var(--shadow-lg);
 }

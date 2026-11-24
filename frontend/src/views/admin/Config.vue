@@ -191,6 +191,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api'
 import SectionCard from '@/components/SectionCard.vue'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const WEIGHTS = [
   { key: 'match_weight_category', w: 'W1', name: '品类匹配度', desc: '供需产品品类、规格的匹配度' },
@@ -268,7 +269,18 @@ const buildPayload = () => {
   return payload
 }
 
+const WEIGHT_KEYS = [
+  'match_weight_category', 'match_weight_price', 'match_weight_quantity',
+  'match_weight_credit', 'match_weight_distance'
+]
+
 const save = async () => {
+  // 与服务端校验保持一致：五项权重之和必须等于 1
+  const sum = WEIGHT_KEYS.reduce((acc, k) => acc + (Number(model[k]) || 0), 0)
+  if (Math.abs(sum - 1) > 1e-6) {
+    ElMessage.error(`五项匹配权重之和必须等于 1（当前 ${sum.toFixed(2)}）`)
+    return
+  }
   saving.value = true
   try {
     await adminApi.saveConfig(buildPayload())
@@ -300,6 +312,7 @@ const restoreDefault = async () => {
   }
 }
 
+useAutoRefresh(load)
 onMounted(load)
 </script>
 
@@ -329,25 +342,25 @@ onMounted(load)
 .sum-chip {
   padding: 2px 10px;
   border-radius: 8px;
-  background: #e8f7ee;
-  color: #15803d;
-  font-size: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--fs-sm);
   font-weight: 600;
   font-family: var(--font-num);
 }
 
 .sum-chip.bad {
-  background: #fdeaea;
-  color: #b91c1c;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .tip-bar {
   margin-bottom: 16px;
   padding: 9px 12px;
   border-radius: 9px;
-  background: #f2fbf5;
-  border: 1px dashed #cbeed9;
-  font-size: 12px;
+  background: var(--surface-2);
+  border: 1px dashed var(--accent-soft);
+  font-size: var(--fs-sm);
   color: #3f6b55;
   line-height: 1.7;
 }
@@ -369,24 +382,24 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .w-tag {
   padding: 0 5px;
   border-radius: 5px;
-  background: #f1f5f4;
-  color: #64748b;
-  font-size: 10.5px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--fs-2xs);
   font-weight: 700;
   line-height: 16px;
 }
 
 .w-desc {
   margin-top: 3px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -396,25 +409,25 @@ onMounted(load)
 
 .w-slider :deep(.el-slider__runway) {
   height: 5px;
-  background: #eef3f1;
+  background: var(--surface-2);
 }
 
 .w-slider :deep(.el-slider__bar) {
   height: 5px;
-  background: linear-gradient(90deg, #4ade80, #16a34a);
+  background: linear-gradient(90deg, #4ade80, var(--accent));
 }
 
 .w-slider :deep(.el-slider__button) {
   width: 14px;
   height: 14px;
-  border: 2px solid #16a34a;
+  border: 2px solid var(--accent);
 }
 
 .w-val {
   text-align: right;
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 700;
-  color: #15803d;
+  color: var(--accent);
   font-family: var(--font-num);
 }
 
@@ -425,12 +438,12 @@ onMounted(load)
   margin-top: 16px;
   padding-top: 12px;
   border-top: 1px dashed var(--c-border);
-  font-size: 11.5px;
-  color: #15803d;
+  font-size: var(--fs-xs);
+  color: var(--accent);
 }
 
 .w-foot.bad {
-  color: #b45309;
+  color: var(--warn);
 }
 
 .credit-list {
@@ -452,14 +465,14 @@ onMounted(load)
 }
 
 .rr-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .rr-desc {
   margin-top: 2px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -471,7 +484,7 @@ onMounted(load)
 }
 
 .unit {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
@@ -479,7 +492,7 @@ onMounted(load)
   margin-top: 12px;
   padding-top: 10px;
   border-top: 1px dashed var(--c-border);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   line-height: 1.7;
 }
@@ -498,14 +511,14 @@ onMounted(load)
 }
 
 .kv-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .kv-desc {
   margin-top: 2px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -530,14 +543,14 @@ onMounted(load)
 }
 
 .sw-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .sw-desc {
   margin-top: 2px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 

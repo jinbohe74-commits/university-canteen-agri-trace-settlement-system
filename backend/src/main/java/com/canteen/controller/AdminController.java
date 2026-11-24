@@ -7,6 +7,7 @@ import com.canteen.common.PageResult;
 import com.canteen.common.Result;
 import com.canteen.entity.*;
 import com.canteen.mapper.OperationLogMapper;
+import com.canteen.mapper.QualityReportMapper;
 import com.canteen.mapper.StatMapper;
 import com.canteen.service.*;
 import com.canteen.vo.OrderVO;
@@ -36,13 +37,44 @@ public class AdminController {
     private final ConfigService configService;
     private final TraceService traceService;
     private final StatMapper statMapper;
+    private final QualityReportMapper qualityReportMapper;
     private final OperationLogMapper logMapper;
     private final LogService logService;
 
     // ---------------------------------------------------------------- 看板
+    /**
+     * @param priceProducts 行情对比的商品 id，逗号分隔（最多 4 个）；不传则取成交最活跃的两个
+     * @param priceDays     行情统计窗口天数（7 / 30 / 90 / 180），默认 30
+     */
     @GetMapping("/dashboard")
-    public Result<Map<String, Object>> dashboard() {
-        return Result.success(dashboardService.adminDashboard());
+    public Result<Map<String, Object>> dashboard(
+            @RequestParam(required = false) String priceProducts,
+            @RequestParam(required = false) Integer priceDays) {
+        return Result.success(dashboardService.adminDashboard(priceProducts, priceDays));
+    }
+
+    /** 看板「质检合格率」的明细依据：真实质检报告流水，供指标抽屉下钻 */
+    @GetMapping("/quality-reports")
+    public Result<List<Map<String, Object>>> qualityReports(
+            @RequestParam(defaultValue = "50") int limit) {
+        int n = Math.max(1, Math.min(limit, 200));
+        List<QualityReport> list = qualityReportMapper.selectList(
+                new LambdaQueryWrapper<QualityReport>()
+                        .orderByDesc(QualityReport::getId).last("LIMIT " + n));
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (QualityReport q : list) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", q.getId());
+            m.put("orderId", q.getOrderId());
+            m.put("batchNo", q.getBatchNo());
+            m.put("result", q.getResult());
+            m.put("inspector", q.getInspector());
+            m.put("sampleQty", q.getSampleQty());
+            m.put("inspectTime", q.getInspectTime());
+            m.put("remark", q.getRemark());
+            rows.add(m);
+        }
+        return Result.success(rows);
     }
 
     // ---------------------------------------------------------------- 农户
@@ -157,8 +189,23 @@ public class AdminController {
         return Result.success(userService.roles());
     }
 
+    /** 新建/改绑账号时可选业务档案：只列没被其他账号占用的农户或食堂。 */
+    @GetMapping("/users/bindable")
+    public Result<List<Map<String, Object>>> bindable(@RequestParam String roleType,
+                                                      @RequestParam(required = false) Long userId) {
+        return Result.success(userService.bindable(roleType, userId));
+    }
+
+    /** 生成一个符合密码策略的随机初始密码，供管理员"重新生成"按钮使用。 */
+    @GetMapping("/users/password-suggestion")
+    public Result<Map<String, Object>> passwordSuggestion() {
+        Map<String, Object> res = new LinkedHashMap<>();
+        res.put("password", userService.generatePassword());
+        return Result.success(res);
+    }
+
     @PostMapping("/users")
-    public Result<SysUser> saveUser(@RequestBody Map<String, Object> body) {
+    public Result<Map<String, Object>> saveUser(@RequestBody Map<String, Object> body) {
         SysUser u = new SysUser();
         u.setId(body.get("id") == null ? null : Long.valueOf(String.valueOf(body.get("id"))));
         u.setUsername((String) body.get("username"));
@@ -167,7 +214,9 @@ public class AdminController {
         u.setRoleType((String) body.get("roleType"));
         u.setStatus(body.get("status") == null ? 1 : Integer.valueOf(String.valueOf(body.get("status"))));
         Long roleId = body.get("roleId") == null ? null : Long.valueOf(String.valueOf(body.get("roleId")));
-        return Result.success("保存成功", userService.save(u, (String) body.get("password"), roleId));
+        Long farmerId = body.get("farmerId") == null ? null : Long.valueOf(String.valueOf(body.get("farmerId")));
+        Long canteenId = body.get("canteenId") == null ? null : Long.valueOf(String.valueOf(body.get("canteenId")));
+        return Result.success("保存成功", userService.save(u, (String) body.get("password"), roleId, farmerId, canteenId));
     }
 
     @PutMapping("/users/{id}/status")
@@ -177,9 +226,10 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/password")
-    public Result<Void> resetPassword(@PathVariable Long id) {
-        userService.resetPassword(id);
-        return Result.success();
+    public Result<Map<String, Object>> resetPassword(@PathVariable Long id) {
+        Map<String, Object> res = new LinkedHashMap<>();
+        res.put("password", userService.resetPassword(id));
+        return Result.success("密码已重置，请立即保存新密码（仅展示一次）", res);
     }
 
     @PostMapping("/roles/{roleId}/menus")
@@ -370,7 +420,8 @@ public class AdminController {
         if (StringUtils.hasText(date)) {
             qw.apply("DATE(create_time) = {0}", date);
         }
-        qw.orderByDesc(OperationLog::getId);
+        // 按发生时间倒序：种子数据的 id 顺序与 create_time 不同序，按 id 排会让时间乱跳
+        qw.orderByDesc(OperationLog::getCreateTime).orderByDesc(OperationLog::getId);
         IPage<OperationLog> p = logMapper.selectPage(new Page<>(page, size), qw);
         Map<String, Object> stats = new LinkedHashMap<>();
         stats.put("todayLogs", statMapper.todayLogs());

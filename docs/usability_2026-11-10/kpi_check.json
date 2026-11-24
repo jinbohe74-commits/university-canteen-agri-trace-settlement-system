@@ -1,0 +1,181 @@
+{
+  "at": "2026-11-10T09:33:30.662Z",
+  "total": 15,
+  "suspicious": 0,
+  "rows": [
+    {
+      "user": "admin",
+      "path": "/admin/dashboard",
+      "kpi": [],
+      "tableRows": 0,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/canteens",
+      "kpi": [
+        "合作食堂=4",
+        "日均供餐（人次）=8,200",
+        "本月采购订单=346",
+        "履约合格率=100%"
+      ],
+      "tableRows": 5,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/farmers",
+      "kpi": [
+        "认证农户/合作社=24",
+        "入驻生产基地=22",
+        "待审核=6",
+        "平均信用分=87.4"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/logs",
+      "kpi": [
+        "今日操作记录=212",
+        "今日登录=3",
+        "异常登录=13",
+        "审计完整率=100%"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/orders",
+      "kpi": [
+        "待接单=4",
+        "配送中=6",
+        "待结算=2",
+        "今日订单=0"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/products",
+      "kpi": [
+        "在管品类=86",
+        "在售农产品=214",
+        "供货农户=1,701",
+        "价格波动预警=211"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/settlements",
+      "kpi": [
+        "待审核结算单=2",
+        "本月已结算=0",
+        "损耗扣款=¥ 0.00",
+        "实际结算=¥ 0.00"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "admin",
+      "path": "/admin/warnings",
+      "kpi": [
+        "证照过期=1",
+        "质检不合格=9",
+        "价格波动=0",
+        "订单逾期=12"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "farmer24",
+      "path": "/farmer/workbench",
+      "kpi": [
+        "待接单=0",
+        "配送中=0",
+        "本月收入=¥ 0.00",
+        "信用分=92 分"
+      ],
+      "tableRows": 0,
+      "suspicious": false
+    },
+    {
+      "user": "farmer24",
+      "path": "/farmer/sources",
+      "kpi": [
+        "在售货源=7",
+        "累计发布=25",
+        "本月成交=56",
+        "已售罄=1"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "farmer24",
+      "path": "/farmer/orders",
+      "kpi": [
+        "待接单=0",
+        "配送中=0",
+        "待结算=0",
+        "本月完成=19"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "farmer24",
+      "path": "/farmer/settlement",
+      "kpi": [
+        "本月收入=¥ 0.00",
+        "累计收入=¥ 7,801.24",
+        "待审核结算单=0 笔"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "inspector01",
+      "path": "/inspector/tasks",
+      "kpi": [
+        "待质检=5",
+        "今日已检=0",
+        "配送中=6",
+        "不合格=3"
+      ],
+      "tableRows": 5,
+      "suspicious": false
+    },
+    {
+      "user": "purchaser01",
+      "path": "/purchaser/demands",
+      "kpi": [
+        "匹配中=5",
+        "已成交=9",
+        "平均报价数=4",
+        "已撤回=4"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    },
+    {
+      "user": "purchaser01",
+      "path": "/purchaser/orders",
+      "kpi": [
+        "进行中=13",
+        "待入库=1",
+        "待结算=0",
+        "本月完成=83"
+      ],
+      "tableRows": 10,
+      "suspicious": false
+    }
+  ]
+}

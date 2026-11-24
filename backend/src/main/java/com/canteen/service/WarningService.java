@@ -42,9 +42,14 @@ public class WarningService {
             qw.eq(Warning::getStatus, status);
         }
         if (StringUtils.hasText(keyword)) {
-            qw.and(w -> w.like(Warning::getTarget, keyword).or().like(Warning::getContent, keyword));
+            // 预警编号也要能搜：待办/通知给出的是编号，搜不到就等于"给了线索却查无此单"
+            qw.and(w -> w.like(Warning::getWarningNo, keyword)
+                    .or().like(Warning::getTarget, keyword)
+                    .or().like(Warning::getContent, keyword));
         }
-        qw.orderByDesc(Warning::getTriggerTime);
+        // 未处置的永远排前面：历史已完成 77 条、待处置 24 条，
+        // 只按时间倒序会让"处置完的先出现"，把真正要干的挤下去。
+        qw.last("ORDER BY FIELD(status,'待处理','待确认','已完成','已忽略'), trigger_time DESC");
         IPage<Warning> p = warningMapper.selectPage(new Page<>(page, size), qw);
         return PageResult.of(p);
     }
@@ -118,6 +123,12 @@ public class WarningService {
 
     @Transactional
     public void create(String level, String type, String target, String content) {
+        create(level, type, target, content, null);
+    }
+
+    /** 带现场照片的重载：异常上报要走这条，照片与预警一起留痕 */
+    @Transactional
+    public void create(String level, String type, String target, String content, List<String> photoUrls) {
         Warning w = new Warning();
         String yp = "YJ" + java.time.LocalDate.now().toString().replace("-", "");
         w.setWarningNo(com.canteen.common.Codes.next(yp, 3, (int) (warningMapper.selectCount(null) % 800 + 100),
@@ -126,6 +137,9 @@ public class WarningService {
         w.setWarningType(type);
         w.setTarget(target);
         w.setContent(content);
+        if (photoUrls != null && !photoUrls.isEmpty()) {
+            w.setPhotoUrls(String.join(";", photoUrls));
+        }
         w.setStatus("待处理");
         w.setTriggerTime(LocalDateTime.now());
         warningMapper.insert(w);

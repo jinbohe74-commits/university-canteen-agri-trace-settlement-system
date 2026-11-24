@@ -1,0 +1,28 @@
+{
+  "lowContrast": {
+    "/admin/orders": [],
+    "/admin/dashboard": [],
+    "/admin/trace": [],
+    "/admin/settlements": [],
+    "/admin/users": [],
+    "/admin/farmers": [],
+    "/admin/canteens": [],
+    "/admin/products": [],
+    "/admin/warnings": [],
+    "/admin/config": [],
+    "/admin/logs": []
+  },
+  "brightBlocks": {
+    "/admin/orders": [],
+    "/admin/dashboard": [],
+    "/admin/trace": [],
+    "/admin/settlements": [],
+    "/admin/users": [],
+    "/admin/farmers": [],
+    "/admin/canteens": [],
+    "/admin/products": [],
+    "/admin/warnings": [],
+    "/admin/config": [],
+    "/admin/logs": []
+  }
+}

@@ -1,0 +1,17 @@
+const path=require('path');const BASE='http://127.0.0.1:5173',API='http://127.0.0.1:8080'
+const OUT=path.join(__dirname,'..','docs','procurement_2026-11-10','shots')
+const G=path.join(process.env.APPDATA,'npm','node_modules');module.paths.push(G)
+const {chromium}=require(path.join(G,'playwright'));const sleep=ms=>new Promise(r=>setTimeout(r,ms))
+async function login(u,r){const res=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:'123456',expectedRole:r})});return (await res.json()).data}
+;(async()=>{const b=await chromium.launch({channel:'msedge'})
+const d=await login('purchaser01','PURCHASER')
+const c=await b.newContext({viewport:{width:1440,height:900}})
+await c.addInitScript(([t,u,rn,mn])=>{sessionStorage.setItem('ct_token',t);sessionStorage.setItem('ct_user',u);sessionStorage.setItem('ct_role_name',rn);sessionStorage.setItem('ct_menus',mn)},[d.token,JSON.stringify(d.user),d.roleName||'',JSON.stringify(d.menus||[])])
+const p=await c.newPage();p.__e=[];p.on('pageerror',e=>p.__e.push(e.message.slice(0,140)))
+await p.goto(BASE+'/purchaser/stock',{waitUntil:'domcontentloaded'});await sleep(3000)
+console.log('在库行数',await p.locator('.el-table__body tbody tr').count())
+await p.screenshot({path:path.join(OUT,'8-库存清单.png')})
+await p.locator('.el-radio-button__inner',{hasText:'采购建议'}).click();await sleep(1500)
+await p.screenshot({path:path.join(OUT,'9-采购建议.png')})
+console.log('errors',p.__e.slice(0,3))
+await b.close()})().catch(e=>{console.error(e);process.exit(1)})

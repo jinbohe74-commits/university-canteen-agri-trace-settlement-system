@@ -1,0 +1,47 @@
+{
+  "orderNo": "DD202610250270\n复制",
+  "qty": 137,
+  "steps": [
+    {
+      "name": "农户发布货源",
+      "ok": true,
+      "note": "货源发布成功，已进入智能匹配候选池"
+    },
+    {
+      "name": "采购员下单",
+      "ok": true,
+      "note": "下单成功，已通知农户接单"
+    },
+    {
+      "name": "农户接单",
+      "ok": false,
+      "note": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.el-table__body tbody tr').first().locat"
+    },
+    {
+      "name": "农户发货",
+      "ok": false,
+      "note": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.el-table__body tbody tr').first().locat"
+    },
+    {
+      "name": "质检录检合格",
+      "ok": false,
+      "note": "没有提示"
+    },
+    {
+      "name": "采购入库确认",
+      "ok": false,
+      "note": "locator.inputValue: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.el-input-number input').first()\u001b[2"
+    },
+    {
+      "name": "农户能看到这单结算",
+      "ok": true,
+      "note": "在结算列表里找到了"
+    },
+    {
+      "name": "评价页能找到这单",
+      "ok": false,
+      "note": "评价页看不到刚入库的单"
+    }
+  ],
+  "errors": []
+}

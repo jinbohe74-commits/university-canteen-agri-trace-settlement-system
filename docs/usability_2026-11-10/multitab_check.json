@@ -1,0 +1,139 @@
+{
+  "summary": {
+    "at": "2026-11-11T14:35:46.567Z",
+    "total": 16,
+    "pass": 16,
+    "fail": 0
+  },
+  "results": [
+    {
+      "name": "A 标签登录农户成功",
+      "ok": true,
+      "detail": {
+        "role": "FARMER",
+        "tail": "GoRz6OkLp95Q",
+        "lsToken": null,
+        "lsUser": null
+      }
+    },
+    {
+      "name": "A 标签会话不写 localStorage（避免全标签共享）",
+      "ok": true,
+      "detail": {
+        "role": "FARMER",
+        "tail": "GoRz6OkLp95Q",
+        "lsToken": null,
+        "lsUser": null
+      }
+    },
+    {
+      "name": "B 标签登录管理员成功",
+      "ok": true,
+      "detail": {
+        "role": "ADMIN",
+        "tail": "ytL0IWovnLmw"
+      }
+    },
+    {
+      "name": "两个标签页持有各自的令牌",
+      "ok": true,
+      "detail": {
+        "A": "GoRz6OkLp95Q",
+        "B": "ytL0IWovnLmw",
+        "sameLength": false
+      }
+    },
+    {
+      "name": "A 标签切换页面后仍在农户端",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5173/farmer/sources"
+      }
+    },
+    {
+      "name": "A 标签页面仍有数据",
+      "ok": true,
+      "detail": {
+        "rows": 10
+      }
+    },
+    {
+      "name": "A 标签未出现 403",
+      "ok": true,
+      "detail": {
+        "e403": 0
+      }
+    },
+    {
+      "name": "A 标签未出现「无权访问」提示",
+      "ok": true,
+      "detail": {
+        "toast": []
+      }
+    },
+    {
+      "name": "A 标签刷新后仍是农户身份",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5173/farmer/sources",
+        "role": "FARMER",
+        "tail": "GoRz6OkLp95Q"
+      }
+    },
+    {
+      "name": "A 标签刷新后没有被踢到管理员端",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5173/farmer/sources"
+      }
+    },
+    {
+      "name": "B 标签刷新后仍是管理员身份",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5173/admin/dashboard",
+        "role": "ADMIN",
+        "tail": "ytL0IWovnLmw"
+      }
+    },
+    {
+      "name": "B 标签未出现 403",
+      "ok": true,
+      "detail": {
+        "e403": 0
+      }
+    },
+    {
+      "name": "另一标签退出登录不影响 A 的身份",
+      "ok": true,
+      "detail": {
+        "role": "FARMER",
+        "tail": "GoRz6OkLp95Q"
+      }
+    },
+    {
+      "name": "C 标签登录质检员成功",
+      "ok": true,
+      "detail": {
+        "role": "INSPECTOR",
+        "tail": "u5YsjlQ8egww"
+      }
+    },
+    {
+      "name": "C 标签切换页面正常且无 403",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5173/inspector/quality",
+        "e403": 0
+      }
+    },
+    {
+      "name": "三个标签页全程 0 控制台错误",
+      "ok": true,
+      "detail": {
+        "count": 0,
+        "samples": []
+      }
+    }
+  ]
+}

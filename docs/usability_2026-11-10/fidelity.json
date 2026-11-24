@@ -1,0 +1,350 @@
+{
+  "summary": {
+    "files_compared": 38,
+    "lost_capability_files": 0,
+    "files_with_new_lines_outside_allowlist": 13,
+    "pass": true
+  },
+  "lost": [],
+  "unexpected": [
+    {
+      "file": "layout/AppLayout.vue",
+      "count": 72,
+      "samples": [
+        "+          <button class=\"lay-icon-btn\" title=\"实时动态（跨角色操作）\" @click.stop=\"toggleNotify\">",
+        "+            <span v-if=\"rt.unread > 0\" class=\"lay-badge\">{{ rt.unread > 99 ? '99+' : rt.unread }}</span>",
+        "+            <span class=\"lay-live-dot\" :class=\"{ on: rt.connected }\"></span>"
+      ]
+    },
+    {
+      "file": "views/admin/Dashboard.vue",
+      "count": 226,
+      "samples": [
+        "+        <h2 class=\"page-title\">运营总览</h2>",
+        "+        <p class=\"page-sub\">平台全局态势 · 数据截至 {{ data.serverTime || '—' }} · {{ data.today || '' }}</p>",
+        "+          <i></i>{{ rt.connected ? '实时同步中' : '轮询同步中' }}"
+      ]
+    },
+    {
+      "file": "views/admin/Logs.vue",
+      "count": 20,
+      "samples": [
+        "+          placeholder=\"操作人 / 操作内容（输入即查）\"",
+        "+          @input=\"onKeywordInput\"",
+        "+        <span class=\"muted small\">"
+      ]
+    },
+    {
+      "file": "views/admin/Products.vue",
+      "count": 3,
+      "samples": [
+        "+    ['品名', '品类', '单位', '参考价(元)', '产地', '规格', '状态'],",
+        "+    [",
+        "+    ])"
+      ]
+    },
+    {
+      "file": "views/admin/Trace.vue",
+      "count": 30,
+      "samples": [
+        "+  const t = trace.value",
+        "+  if (!t) {",
+        "+  const lines = ["
+      ]
+    },
+    {
+      "file": "views/farmer/Messages.vue",
+      "count": 1,
+      "samples": [
+        "+  localStorage.setItem('ct_msg_read_all', '1')"
+      ]
+    },
+    {
+      "file": "views/farmer/Orders.vue",
+      "count": 1,
+      "samples": [
+        "+}"
+      ]
+    },
+    {
+      "file": "views/farmer/Settlement.vue",
+      "count": 1,
+      "samples": [
+        "+}"
+      ]
+    },
+    {
+      "file": "views/farmer/Sources.vue",
+      "count": 1,
+      "samples": [
+        "+}"
+      ]
+    },
+    {
+      "file": "views/inspector/Quality.vue",
+      "count": 75,
+      "samples": [
+        "+                   title=\"点击移除\" @click=\"removePhoto(i)\">",
+        "+                <img :src=\"p.url\" :alt=\"p.name\" />",
+        "+                <span>{{ p.name }}</span>"
+      ]
+    },
+    {
+      "file": "views/login/index.vue",
+      "count": 4,
+      "samples": [
+        "+          <p>选择角色将校验账号身份；也可直接登录由系统自动识别</p>",
+        "+  form.role = form.role === r.code ? '' : r.code",
+        "+      remember: form.remember,"
+      ]
+    },
+    {
+      "file": "views/purchaser/Demands.vue",
+      "count": 1,
+      "samples": [
+        "+}"
+      ]
+    },
+    {
+      "file": "views/purchaser/Orders.vue",
+      "count": 1,
+      "samples": [
+        "+}"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "file": "App.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/BaseChart.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/CmdPalette.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/OrderDetailDrawer.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/SectionCard.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/StarRate.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/StatCard.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/StatusTag.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "components/TracePanel.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "layout/AppLayout.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Canteens.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Config.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Dashboard.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Farmers.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Logs.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {
+        "api": [
+          "adminApi.auditPolicy"
+        ]
+      }
+    },
+    {
+      "file": "views/admin/Orders.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Products.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Settlements.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Trace.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Users.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/admin/Warnings.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/farmer/Credit.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/farmer/Messages.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/farmer/Orders.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/farmer/Settlement.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/farmer/Sources.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/farmer/Workbench.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/inspector/Delivery.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/inspector/Exception.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/inspector/Quality.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/inspector/Tasks.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/login/index.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/purchaser/Demands.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/purchaser/Evaluation.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/purchaser/Inbound.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/purchaser/Match.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/purchaser/Orders.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    },
+    {
+      "file": "views/purchaser/Sources.vue",
+      "status": "OK",
+      "lost": {},
+      "added": {}
+    }
+  ]
+}

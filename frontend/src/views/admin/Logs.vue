@@ -37,8 +37,9 @@
       <div class="filter-bar">
         <el-input
           v-model="query.keyword"
-          placeholder="操作人 / 操作内容"
+          placeholder="操作人 / 操作内容（输入即查）"
           clearable
+          @input="onKeywordInput"
           @keyup.enter="search"
         >
           <template #prefix><el-icon><Search /></el-icon></template>
@@ -67,7 +68,10 @@
           <el-icon><RefreshLeft /></el-icon>重置
         </el-button>
         <div class="filter-spacer"></div>
-        <span class="muted small">累计 {{ fmtNum(stats.total) }} 条 · 异常 {{ fmtNum(stats.failed) }} 条</span>
+        <span class="muted small">
+          当前筛选 <b class="result-count">{{ fmtNum(list.total) }}</b> 条
+          · 全站累计 {{ fmtNum(stats.total) }} 条 · 异常 {{ fmtNum(stats.failed) }} 条
+        </span>
       </div>
 
       <div class="table-wrap">
@@ -125,10 +129,11 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
 import { fmtNum, today } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const loading = ref(false)
 const exporting = ref(false)
@@ -185,8 +190,23 @@ const onPage = (p) => {
   load()
 }
 
-const showPolicy = () => {
-  ElMessage.info('审计策略：登录与业务操作日志全量留存 180 天，按操作人/模块/结果可追溯，异常登录自动锁定并记录')
+/* 输入即查：所有筛选都落到服务端，不再用「只过滤当前 10 条」的假交互 */
+let kwTimer = null
+const onKeywordInput = () => {
+  clearTimeout(kwTimer)
+  kwTimer = setTimeout(() => search(), 320)
+}
+
+const showPolicy = async () => {
+  try {
+    await adminApi.auditPolicy()
+    await ElMessageBox.alert(
+      '登录与业务操作日志全量留存 180 天；可按操作人、功能模块、操作结果、日期组合筛选，' +
+      '支持导出当前筛选结果；连续输错 5 次自动锁定 10 分钟并写入失败日志；' +
+      '跨角色写操作由实时事件通道同步，管理端可即时查看。',
+      '审计策略', { confirmButtonText: '知道了' }
+    )
+  } catch (e) { /* 取消或接口异常，不额外报错 */ }
 }
 
 const downloadCsv = (filename, header, rows) => {
@@ -227,29 +247,33 @@ const exportLogs = async () => {
 }
 
 onMounted(load)
+// 其他角色的写操作会实时进来，日志页自动追加而不打断当前筛选
+useAutoRefresh(load)
 </script>
 
 <style scoped>
 .time-d {
-  font-size: 12px;
-  color: #27362f;
+  font-size: var(--fs-sm);
+  color: var(--ink);
 }
 
 .time-t {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 1px;
 }
 
 .cell-main {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .cell-sub {
   margin-top: 2px;
-  font-size: 11.5px;
-  color: #9ca3af;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
+
+.result-count { color: var(--ink); font-weight: 700; }
 </style>

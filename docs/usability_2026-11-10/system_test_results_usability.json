@@ -1,0 +1,493 @@
+{
+  "summary": {
+    "total": 69,
+    "pass": 67,
+    "fail": 0,
+    "info": 2
+  },
+  "cases": [
+    {
+      "group": "A 可用性",
+      "name": "健康检查返回 UP",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='操作成功'",
+      "expected": "HTTP 200 / code 200 / status UP"
+    },
+    {
+      "group": "A 可用性",
+      "name": "admin 登录成功",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='登录成功'",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "farmer24 登录成功",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='登录成功'",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "purchaser01 登录成功",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='登录成功'",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 可用性",
+      "name": "inspector01 登录成功",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='登录成功'",
+      "expected": "code 200 + token"
+    },
+    {
+      "group": "A 认证",
+      "name": "账号不存在 / 密码错误统一文案（不可枚举账号）",
+      "status": "PASS",
+      "observed": "code=401/401, msg='用户名或密码错误'/'用户名或密码错误'",
+      "expected": "同为 401 且文案一致"
+    },
+    {
+      "group": "A 认证",
+      "name": "未登录访问管理接口返回真实 HTTP 401",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='未登录或登录已过期'",
+      "expected": "HTTP 401 + code 401"
+    },
+    {
+      "group": "A 认证",
+      "name": "未鉴权的角色字典不再泄露演示账号",
+      "status": "PASS",
+      "observed": "含 demoAccount=False",
+      "expected": "不含演示账号字段"
+    },
+    {
+      "group": "B 越权",
+      "name": "admin → ADMIN 前缀 放行",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='操作成功'",
+      "expected": "code 200"
+    },
+    {
+      "group": "B 越权",
+      "name": "admin → FARMER 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "admin → PURCHASER 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "admin → INSPECTOR 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "farmer24 → ADMIN 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "farmer24 → FARMER 前缀 放行",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='操作成功'",
+      "expected": "code 200"
+    },
+    {
+      "group": "B 越权",
+      "name": "farmer24 → PURCHASER 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "farmer24 → INSPECTOR 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "purchaser01 → ADMIN 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "purchaser01 → FARMER 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "purchaser01 → PURCHASER 前缀 放行",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='操作成功'",
+      "expected": "code 200"
+    },
+    {
+      "group": "B 越权",
+      "name": "purchaser01 → INSPECTOR 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "inspector01 → ADMIN 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "inspector01 → FARMER 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "inspector01 → PURCHASER 前缀 403 阻断",
+      "status": "PASS",
+      "observed": "HTTP 403, code=403, msg='无权访问该资源'",
+      "expected": "HTTP 403 + code 403"
+    },
+    {
+      "group": "B 越权",
+      "name": "inspector01 → INSPECTOR 前缀 放行",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='操作成功'",
+      "expected": "code 200"
+    },
+    {
+      "group": "B 越权",
+      "name": "未登录 → ADMIN 前缀 401",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='未登录或登录已过期'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "B 越权",
+      "name": "未登录 → FARMER 前缀 401",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='未登录或登录已过期'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "B 越权",
+      "name": "未登录 → PURCHASER 前缀 401",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='未登录或登录已过期'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "B 越权",
+      "name": "未登录 → INSPECTOR 前缀 401",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='未登录或登录已过期'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "C 文件",
+      "name": "无 token 上传被拒绝",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='未登录或登录已过期'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "C 文件",
+      "name": "已登录用户可正常上传合法 PNG",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='上传成功'",
+      "expected": "code 200 + url"
+    },
+    {
+      "group": "C 文件",
+      "name": "上传文件免鉴权读取被拒绝",
+      "status": "PASS",
+      "observed": "HTTP 401, 64 bytes",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "C 文件",
+      "name": "已登录用户受控下载内容一致",
+      "status": "PASS",
+      "observed": "HTTP 200, 12 bytes",
+      "expected": "HTTP 200 + 原始字节"
+    },
+    {
+      "group": "C 文件",
+      "name": "type 路径穿越被拒绝且未写出目录外文件",
+      "status": "PASS",
+      "observed": "HTTP 200, code=400, msg='上传目录名不合法（仅允许小写字母、数字、下划线与短横线）', 逃逸目录存在=False",
+      "expected": "code 400 + 无越界文件"
+    },
+    {
+      "group": "C 文件",
+      "name": "非白名单扩展名被拒绝",
+      "status": "PASS",
+      "observed": "HTTP 200, code=400, msg='仅支持上传 jpg,jpeg,png,pdf,webp 格式的文件'",
+      "expected": "code 400"
+    },
+    {
+      "group": "C 文件",
+      "name": "扩展名与文件内容不符被拒绝（魔术字节校验）",
+      "status": "PASS",
+      "observed": "HTTP 200, code=400, msg='文件内容与扩展名不符，请上传真实文件'",
+      "expected": "code 400"
+    },
+    {
+      "group": "D 认证",
+      "name": "用旧硬编码密钥伪造的管理员 token 被拒绝",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='登录凭证无效，请重新登录'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "D 认证",
+      "name": "篡改 payload 角色但保留旧签名被拒绝",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='登录凭证无效，请重新登录'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "E 认证",
+      "name": "注销后旧 token 立即失效",
+      "status": "PASS",
+      "observed": "HTTP 401, code=401, msg='登录凭证已失效，请重新登录'",
+      "expected": "HTTP 401"
+    },
+    {
+      "group": "E 认证",
+      "name": "重新登录的新 token 未被吊销误杀",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='操作成功'",
+      "expected": "code 200"
+    },
+    {
+      "group": "F 校验",
+      "name": "空质检请求返回 400 参数校验错误（非 404/500）",
+      "status": "PASS",
+      "observed": "HTTP 200, code=400, msg='请填写批次号；请选择质检结论；请选择要质检的订单'",
+      "expected": "code 400"
+    },
+    {
+      "group": "F 校验",
+      "name": "非法分页参数返回 400 而非 500",
+      "status": "PASS",
+      "observed": "HTTP 200, code=400, msg='参数格式不合法：page'",
+      "expected": "code 400"
+    },
+    {
+      "group": "F 校验",
+      "name": "空格分隔日期被正确接受（LocalDateTime 双格式契约）",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='需求发布成功，系统已启动智能匹配', demandNo=X20261110128",
+      "expected": "code 200"
+    },
+    {
+      "group": "F 校验",
+      "name": "非法日期返回 400 且不回显内部异常堆栈",
+      "status": "PASS",
+      "observed": "HTTP 200, code=400, msg='请求数据格式不合法，请检查字段类型与日期格式', 含堆栈=False",
+      "expected": "code 400 + 固定文案"
+    },
+    {
+      "group": "G 查询",
+      "name": "keyword=% 不再绕过筛选命中全表（LIKE 通配符已转义）",
+      "status": "PASS",
+      "observed": "wild=0, 不存在关键词=0",
+      "expected": "两者均接近 0"
+    },
+    {
+      "group": "G 查询",
+      "name": "keyword 含 SQL 片段时接口正常返回（参数化查询）",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200"
+    },
+    {
+      "group": "H 闭环",
+      "name": "存在已完成且带批次号的订单",
+      "status": "PASS",
+      "observed": "扫描 50 条",
+      "expected": "至少 1 条"
+    },
+    {
+      "group": "H 闭环",
+      "name": "订单详情可查询",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + data"
+    },
+    {
+      "group": "H 闭环",
+      "name": "批次溯源返回批次号与 64 位存证哈希",
+      "status": "PASS",
+      "observed": "code=200, 含批次号=True",
+      "expected": "code 200 + SHA-256"
+    },
+    {
+      "group": "H 闭环",
+      "name": "订单状态字典完整（12 个状态）",
+      "status": "PASS",
+      "observed": "12 个",
+      "expected": ">= 12"
+    },
+    {
+      "group": "H 闭环",
+      "name": "farmer24 主页面接口返回业务数据",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + 非空 data"
+    },
+    {
+      "group": "H 闭环",
+      "name": "purchaser01 主页面接口返回业务数据",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + 非空 data"
+    },
+    {
+      "group": "H 闭环",
+      "name": "inspector01 主页面接口返回业务数据",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200 + 非空 data"
+    },
+    {
+      "group": "I 写路径",
+      "name": "发布采购需求成功",
+      "status": "PASS",
+      "observed": "HTTP 200, code=200, msg='需求发布成功，系统已启动智能匹配', demandNo=X20261110129",
+      "expected": "code 200 + demandNo"
+    },
+    {
+      "group": "I 写路径",
+      "name": "新需求可按 id 查询",
+      "status": "PASS",
+      "observed": "code=200",
+      "expected": "code 200"
+    },
+    {
+      "group": "I 写路径",
+      "name": "智能匹配返回不超过 Top5 的结果",
+      "status": "PASS",
+      "observed": "code=200, results=5",
+      "expected": "code 200 + <=5"
+    },
+    {
+      "group": "I 写路径",
+      "name": "负数需求数量被拒绝",
+      "status": "PASS",
+      "observed": "HTTP 0, code=400, msg='需求数量必须大于 0'",
+      "expected": "code 400"
+    },
+    {
+      "group": "I 写路径",
+      "name": "不存在的需求匹配返回业务错误而非 500",
+      "status": "PASS",
+      "observed": "code=404",
+      "expected": "非 500"
+    },
+    {
+      "group": "L 数据",
+      "name": "全量结算单满足金额公式",
+      "status": "PASS",
+      "observed": "不一致 0 条",
+      "expected": "0 条"
+    },
+    {
+      "group": "L 数据",
+      "name": "订单号唯一",
+      "status": "PASS",
+      "observed": "重复 0 组",
+      "expected": "0 组"
+    },
+    {
+      "group": "L 数据",
+      "name": "数据库 26 张表（25 业务 + 1 实时事件）",
+      "status": "PASS",
+      "observed": "26 张, sys_event=True",
+      "expected": "26 张且含 sys_event"
+    },
+    {
+      "group": "L 数据",
+      "name": "演示库订单总量（观察项）",
+      "status": "INFO",
+      "observed": "326 条",
+      "expected": "与修复前基线 330 条一致"
+    },
+    {
+      "group": "L 数据",
+      "name": "清理前测试需求数量（观察项）",
+      "status": "INFO",
+      "observed": "2 条",
+      "expected": "脚本结束时应为 0"
+    },
+    {
+      "group": "M 配置",
+      "name": "application.yml 不再包含明文 JWT 密钥",
+      "status": "PASS",
+      "observed": "含硬编码密钥=False",
+      "expected": "使用环境变量/随机密钥文件"
+    },
+    {
+      "group": "M 配置",
+      "name": "不再配置与表结构脱节的全局逻辑删除字段",
+      "status": "PASS",
+      "observed": "含 logic-delete-field=False",
+      "expected": "未配置"
+    },
+    {
+      "group": "M 配置",
+      "name": "CORS 白名单化，不再允许任意来源",
+      "status": "PASS",
+      "observed": "已配置具体来源",
+      "expected": "显式白名单"
+    },
+    {
+      "group": "M 配置",
+      "name": "登录页不再展示明文默认口令",
+      "status": "PASS",
+      "observed": "含 123456=False",
+      "expected": "不展示"
+    },
+    {
+      "group": "M 运维",
+      "name": "stop.bat 改为按进程命令行精确识别",
+      "status": "PASS",
+      "observed": "调用精确停止脚本",
+      "expected": "不再按端口无差别 taskkill"
+    },
+    {
+      "group": "C 文件",
+      "name": "上传探针文件已清理（不留垃圾文件）",
+      "status": "PASS",
+      "observed": "残留 0 个",
+      "expected": "0 个"
+    },
+    {
+      "group": "I 写路径",
+      "name": "测试需求已精确清理（可重复执行）",
+      "status": "PASS",
+      "observed": "残留 0 条",
+      "expected": "0 条"
+    }
+  ]
+}

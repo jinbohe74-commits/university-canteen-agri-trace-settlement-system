@@ -118,7 +118,7 @@
               <StatusTag type="warning" :value="row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="112" align="right">
+          <el-table-column label="操作" width="120" align="right" fixed="right">
             <template #default="{ row }">
               <span class="link" @click.stop="openView(row)">查看</span>
               <span class="link" @click.stop="openHandle(row)">处理</span>
@@ -162,6 +162,20 @@
           <div class="wr"><span>处置人</span><b>{{ viewData.warning.handler || '—' }}</b></div>
           <div class="wr"><span>处置时间</span><b>{{ viewData.warning.handleTime ? fmtDate(viewData.warning.handleTime) : '—' }}</b></div>
           <div class="wr"><span>处置备注</span><b>{{ viewData.warning.handleRemark || '—' }}</b></div>
+        </div>
+        <!-- 现场照片：质检员上报时真实上传，处置前必须能看 -->
+        <div v-if="photosOf(viewData.warning).length" class="wd-photos">
+          <div class="wd-photos-title">现场照片（{{ photosOf(viewData.warning).length }} 张）</div>
+          <div class="wd-photo-row">
+            <div
+              v-for="(u, i) in photosOf(viewData.warning)" :key="u"
+              class="wd-photo" :title="'查看第 ' + (i + 1) + ' 张'"
+              @click="openPhoto(u)"
+            >
+              <el-icon><Picture /></el-icon>
+              <span>照片 {{ i + 1 }}</span>
+            </div>
+          </div>
         </div>
         <div class="suggest">
           <div class="suggest-title"><el-icon><MagicStick /></el-icon>处置建议</div>
@@ -220,6 +234,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useFocusLocator, makeListFocus } from '@/utils/focusLocator'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
@@ -227,6 +242,7 @@ import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import BaseChart from '@/components/BaseChart.vue'
 import { fmtDate, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const TYPE_COLOR = {
   证照预警: '#f59e0b',
@@ -381,6 +397,30 @@ const onPage = (p) => {
   load()
 }
 
+/**
+ * 现场照片地址（分号分隔）。
+ * /api/files/** 是受控下载，必须带登录态，所以不能直接当 <img src> 或 <a href>，
+ * 否则一律 401。这里统一走带 token 的请求，取回 blob 再展示。
+ */
+const photosOf = (w) => {
+  const raw = w && w.photoUrls
+  return raw ? String(raw).split(';').filter(Boolean) : []
+}
+
+const openPhoto = async (url) => {
+  try {
+    const token = sessionStorage.getItem('ct_token') || ''
+    const res = await fetch(url, { headers: token ? { Authorization: 'Bearer ' + token } : {} })
+    if (!res.ok) throw new Error('HTTP ' + res.status)
+    const blobUrl = URL.createObjectURL(await res.blob())
+    window.open(blobUrl, '_blank', 'noopener')
+    // 给新窗口留出加载时间再回收
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000)
+  } catch (e) {
+    ElMessage.error('照片打开失败：' + (e?.message || '请确认文件仍在服务器上'))
+  }
+}
+
 const onSelectionChange = (rows) => {
   selection.value = rows
 }
@@ -464,12 +504,12 @@ const oneClickHandle = async () => {
 
 const showRules = () => {
   ElMessageBox.alert(
-    '<div style="line-height:2;font-size:13px">' +
+    '<div style="line-height:2;font-size: var(--fs-base)">' +
       '<div><b>证照预警：</b>营业执照 / 检测报告到期前 <b>30 天</b> 起逐日提醒</div>' +
       '<div><b>价格预警：</b>日均价较周参考价波动超过 <b>±15%</b> 即触发</div>' +
       '<div><b>订单逾期：</b>下单后超过 <b>2 天</b> 未接单 / 未发货即触发</div>' +
       '<div><b>损耗预警：</b>入库损耗率超过 <b>5%</b> 阈值即触发</div>' +
-      '<div style="margin-top:8px;color:#6b7280;font-size:12px">以上阈值均可在「系统参数配置 → 食安预警阈值」中调整，无需修改代码。</div>' +
+      '<div style="margin-top:8px;color:#6b7280;font-size: var(--fs-sm)">以上阈值均可在「系统参数配置 → 食安预警阈值」中调整，无需修改代码。</div>' +
       '</div>',
     '食安预警规则',
     { dangerouslyUseHTMLString: true, confirmButtonText: '知道了' }
@@ -478,7 +518,7 @@ const showRules = () => {
 
 const showSubscribe = () => {
   ElMessageBox.alert(
-    '<div style="line-height:2;font-size:13px">' +
+    '<div style="line-height:2;font-size: var(--fs-base)">' +
       '<div><b>订阅范围：</b>证照预警 / 质检预警 / 价格预警 / 逾期预警（全量）</div>' +
       '<div><b>推送渠道：</b>站内消息 · 短信（由系统参数开关控制）</div>' +
       '<div><b>推送对象：</b>系统管理员、食堂采购员</div>' +
@@ -489,6 +529,9 @@ const showSubscribe = () => {
   )
 }
 
+useAutoRefresh(load)
+/* 从工作台带 ?focus= 进来时自动筛选并打开该预警 */
+useFocusLocator(makeListFocus({ query, load, rows: () => list.records, open: openView }))
 onMounted(load)
 </script>
 
@@ -524,7 +567,7 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 
 .dl-dot {
@@ -541,26 +584,26 @@ onMounted(load)
 .dl-val {
   margin-left: auto;
   font-weight: 600;
-  color: #111827;
+  color: var(--ink);
   font-family: var(--font-num);
 }
 
 /* 表格 */
 .cell-main {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .cell-sub {
   margin-top: 2px;
-  font-size: 11px;
-  color: #9ca3af;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
 
 .content-cell {
-  font-size: 12.5px;
-  color: #374151;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
   line-height: 1.6;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -570,7 +613,7 @@ onMounted(load)
 
 /* 弹窗 */
 .w-detail {
-  font-size: 13px;
+  font-size: var(--fs-base);
 }
 
 .wd-head {
@@ -583,19 +626,19 @@ onMounted(load)
 }
 
 .wd-no {
-  font-size: 13.5px;
+  font-size: var(--fs-base);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .wd-content {
   margin: 12px 0;
   padding: 11px 13px;
   border-radius: 9px;
-  background: #f8fbfa;
-  border: 1px solid #eef3f1;
-  font-size: 12.5px;
-  color: #27362f;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2);
+  font-size: var(--fs-sm);
+  color: var(--ink);
   line-height: 1.75;
 }
 
@@ -605,16 +648,52 @@ onMounted(load)
   gap: 6px;
 }
 
+.wd-photos {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+
+.wd-photos-title {
+  font-size: var(--fs-xs);
+  color: var(--c-muted);
+  margin-bottom: 6px;
+}
+
+.wd-photo-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wd-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.wd-photo:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .wr {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .wr b {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 600;
   text-align: right;
 }
@@ -631,14 +710,14 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
-  color: #b45309;
+  color: var(--warn);
 }
 
 .suggest-text {
   margin-top: 5px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: #7c4a08;
   line-height: 1.7;
 }

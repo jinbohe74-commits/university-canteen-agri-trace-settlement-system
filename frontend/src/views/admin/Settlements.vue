@@ -23,7 +23,7 @@
         :foot="'金额 ¥ ' + fmtMoney(stats.pendingAmount)"
       />
       <StatCard
-        label="已结算" :value="fmtNum(stats.settledCount)" icon="CircleCheck" color="green"
+        label="本月已结算" :value="fmtNum(stats.settledCount)" icon="CircleCheck" color="green"
         :foot="'本月 ' + fmtNum(stats.monthCount) + ' 笔'"
       />
       <StatCard
@@ -181,7 +181,7 @@
               <StatusTag type="settlement" :value="row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="120" align="right">
+          <el-table-column label="操作" width="132" align="right" fixed="right">
             <template #default="{ row }">
               <span class="link" @click.stop="openDetail(row)">明细</span>
               <span v-if="row.status === '待审核'" class="link" @click.stop="openAudit(row)">审核</span>
@@ -210,6 +210,7 @@
     <!-- 明细弹窗 -->
     <el-dialog v-model="detailVisible" title="结算明细" width="640px" :close-on-click-modal="false">
       <div v-loading="detailLoading" class="dlg-body">
+        <div v-if="detailError" class="dlg-error">{{ detailError }}</div>
         <template v-if="detail">
           <div class="dlg-head">
             <div>
@@ -347,12 +348,14 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useFocusLocator, makeListFocus } from '@/utils/focusLocator'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
 import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtMoney, fmtNum, today } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const RULES = [
   { name: '订单金额', desc: '下单数量 × 成交单价' },
@@ -368,12 +371,15 @@ const loading = ref(false)
 const exporting = ref(false)
 const stats = ref({})
 const list = reactive({ records: [], total: 0, page: 1, size: 10, pages: 0 })
-const query = reactive({ page: 1, size: 10, status: '', period: null, keyword: '' })
+/* 默认停在「待审核」：打开这页就是要放款，而统计卡写的"待审核 N 张"也必须与列表一致。
+   原来默认全部、按创建时间倒序，第一屏混着已结算，数字和列表对不上。 */
+const query = reactive({ page: 1, size: 10, status: '待审核', period: null, keyword: '' })
 const selection = ref([])
 
 const detailVisible = ref(false)
 const detailLoading = ref(false)
 const detail = ref(null)
+const detailError = ref('')
 
 const auditVisible = ref(false)
 const auditing = ref(false)
@@ -443,7 +449,7 @@ const search = () => {
 
 const reset = () => {
   query.keyword = ''
-  query.status = ''
+  query.status = '待审核'
   query.period = null
   query.page = 1
   load()
@@ -459,14 +465,22 @@ const onSelectionChange = (rows) => {
 }
 
 const openDetail = async (row) => {
+  if (!row?.id) {
+    ElMessage.warning('这条结算单缺少主键，无法读取明细；请刷新列表后重试')
+    return
+  }
   detailVisible.value = true
   detail.value = null
+  detailError.value = ''
   detailLoading.value = true
   try {
     const res = await adminApi.settlementDetail(row.id)
     detail.value = res.data || null
+    if (!detail.value) detailError.value = '该结算单没有返回明细数据'
   } catch (e) {
-    detailVisible.value = false
+    /* 以前在这里直接关掉弹窗：用户看到的是「点了没反应」。
+       现在保留弹窗并写明失败原因。 */
+    detailError.value = e?.message || '明细加载失败，请稍后重试'
   } finally {
     detailLoading.value = false
   }
@@ -583,6 +597,9 @@ const exportBills = async () => {
   }
 }
 
+useAutoRefresh(load)
+/* 从通知/待办工作台带 ?focus=<单号> 进来时，自动筛选并打开这一单 */
+useFocusLocator(makeListFocus({ query, load, rows: () => list.records, open: openDetail }))
 onMounted(load)
 </script>
 
@@ -598,12 +615,12 @@ onMounted(load)
 .formula {
   padding: 13px 16px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #f0fdf4, #e6f8ee);
-  border: 1px solid #d6f0e0;
+  background: linear-gradient(135deg, var(--surface-2), var(--accent-soft));
+  border: 1px solid var(--accent-soft);
   font-family: var(--font-num);
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
   letter-spacing: 0.2px;
   text-align: center;
 }
@@ -613,7 +630,7 @@ onMounted(load)
   align-items: flex-start;
   gap: 6px;
   margin: 10px 2px 14px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   line-height: 1.7;
 }
@@ -632,14 +649,14 @@ onMounted(load)
 .rule-item {
   padding: 10px 12px;
   border-radius: 9px;
-  background: #f8fbfa;
-  border: 1px solid #eef3f1;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2);
 }
 
 .rule-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 700;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .rule-name::before {
@@ -655,7 +672,7 @@ onMounted(load)
 
 .rule-desc {
   margin-top: 4px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   line-height: 1.6;
 }
@@ -664,19 +681,19 @@ onMounted(load)
 .eg-box {
   padding: 14px 16px;
   border-radius: 11px;
-  background: linear-gradient(160deg, #f2fbf5, #eaf8ef);
+  background: linear-gradient(160deg, var(--surface-2), #eaf8ef);
   border: 1px solid #d9f0e2;
 }
 
 .eg-head {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .eg-head .mono {
-  font-size: 11.5px;
-  color: #15803d;
+  font-size: var(--fs-xs);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -685,12 +702,12 @@ onMounted(load)
   flex-wrap: wrap;
   gap: 6px 14px;
   margin: 9px 0 11px;
-  font-size: 12px;
-  color: #4b7a60;
+  font-size: var(--fs-sm);
+  color: var(--muted);
 }
 
 .eg-facts b {
-  color: #14532d;
+  color: var(--ink);
   font-family: var(--font-num);
 }
 
@@ -708,12 +725,12 @@ onMounted(load)
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px;
-  color: #4b7a60;
+  font-size: var(--fs-sm);
+  color: var(--muted);
 }
 
 .eg-line .mono {
-  color: #1b2a24;
+  color: var(--ink);
   font-family: var(--font-num);
 }
 
@@ -724,53 +741,65 @@ onMounted(load)
   margin-top: 10px;
   padding: 10px 12px;
   border-radius: 9px;
-  background: #15803d;
-  color: #fff;
+  /* 前景必须跟主题走：night 的 --accent 是亮青绿，写死 #fff 会变成白字压亮底，
+     对比度不足 3:1。--accent-ink 在 day/paper 为白、night 为深色。 */
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .eg-amount span {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   opacity: 0.92;
 }
 
 .eg-amount b {
   font-family: var(--font-num);
-  font-size: 20px;
+  font-size: var(--fs-xl);
   letter-spacing: -0.3px;
 }
 
 .eg-tip {
   margin-top: 9px;
-  font-size: 11.5px;
-  color: #b45309;
+  font-size: var(--fs-xs);
+  color: var(--warn);
   line-height: 1.65;
 }
 
 /* 表格 */
 .cell-main {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .cell-sub {
   margin-top: 2px;
-  font-size: 11.5px;
-  color: #9ca3af;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
 
 .deduct {
-  color: #b45309;
+  color: var(--warn);
 }
 
 .money.pay {
-  color: #14532d;
+  color: var(--ink);
   font-weight: 700;
 }
 
 /* 弹窗 */
 .dlg-body {
   min-height: 80px;
+}
+
+/* 明细读取失败时留在弹窗里说清楚，而不是把弹窗关掉让人以为没反应 */
+.dlg-error {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
 }
 
 .dlg-head {
@@ -783,9 +812,9 @@ onMounted(load)
 }
 
 .dlg-no {
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .amount-grid {
@@ -798,36 +827,36 @@ onMounted(load)
 .amount-item {
   padding: 10px 12px;
   border-radius: 9px;
-  background: #f8fbfa;
-  border: 1px solid #eef3f1;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2);
 }
 
 .amount-item span {
   display: block;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   margin-bottom: 5px;
 }
 
 .amount-item b {
-  font-size: 14px;
-  color: #1b2a24;
+  font-size: var(--fs-base);
+  color: var(--ink);
 }
 
 .amount-item.highlight {
-  background: #e8f7ee;
-  border-color: #cbeed9;
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
 }
 
 .amount-item.highlight b {
-  color: #14532d;
+  color: var(--ink);
 }
 
 .sub-title {
   margin: 16px 0 8px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #111827;
+  color: var(--ink);
 }
 
 .item-list {
@@ -843,13 +872,13 @@ onMounted(load)
   gap: 8px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: #f8fbfa;
-  font-size: 12.5px;
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
 }
 
 .item-name {
   font-weight: 600;
-  color: #27362f;
+  color: var(--ink);
 }
 
 .item-amt {
@@ -866,7 +895,7 @@ onMounted(load)
 .rule-line {
   display: flex;
   gap: 10px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   padding: 6px 0;
   border-bottom: 1px dashed var(--c-border);
 }
@@ -879,28 +908,28 @@ onMounted(load)
   width: 104px;
   flex-shrink: 0;
   font-weight: 600;
-  color: #374151;
+  color: var(--ink-2);
 }
 
 /* 审核弹窗 */
 .audit-summary {
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f8fbfa;
-  border: 1px solid #eef3f1;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2);
 }
 
 .as-row {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   padding: 4px 0;
 }
 
 .as-row b {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 600;
 }
 
@@ -908,12 +937,12 @@ onMounted(load)
   margin-top: 6px;
   padding-top: 9px;
   border-top: 1px dashed var(--c-border-strong);
-  color: #374151;
+  color: var(--ink-2);
 }
 
 .as-row.total b {
-  font-size: 15px;
-  color: #14532d;
+  font-size: var(--fs-md);
+  color: var(--ink);
   font-weight: 700;
 }
 
@@ -925,23 +954,23 @@ onMounted(load)
 .voucher {
   padding: 16px;
   border-radius: 10px;
-  border: 1px dashed #cbeed9;
+  border: 1px dashed var(--accent-soft);
   background: #f7fcf9;
 }
 
 .voucher-title {
   text-align: center;
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 700;
   letter-spacing: 2px;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .voucher-no {
   text-align: center;
   margin: 6px 0 12px;
-  font-size: 11.5px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
 }
 
 .voucher-rows {
@@ -954,12 +983,12 @@ onMounted(load)
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .vr b {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 600;
 }
 
@@ -970,7 +999,7 @@ onMounted(load)
 }
 
 .vr.total b {
-  font-size: 16px;
-  color: #14532d;
+  font-size: var(--fs-md);
+  color: var(--ink);
 }
 </style>

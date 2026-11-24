@@ -1,0 +1,606 @@
+{
+  "ADMIN": {
+    "label": "管理员",
+    "user": "admin",
+    "navCount": 11,
+    "home": {
+      "title": "运营总览",
+      "sub": "平台全局态势 · 数据截至 2026-11-11 17:49 · 2026-11-11",
+      "actions": [
+        "刷新",
+        "导出报表"
+      ],
+      "primary": [],
+      "rows": 0,
+      "emptyText": "",
+      "flowHint": false,
+      "hasGuide": false
+    },
+    "pages": [
+      {
+        "title": "运营总览",
+        "sub": "平台全局态势 · 数据截至 2026-11-11 17:49 · 2026-11-11",
+        "actions": [
+          "刷新",
+          "导出报表"
+        ],
+        "primary": [],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/dashboard",
+        "menu": "数据看板",
+        "errors": []
+      },
+      {
+        "title": "农户/合作社管理",
+        "sub": "维护农户、合作社、生产基地档案，审核入驻资质与认证状态",
+        "actions": [
+          "导出名册",
+          "新增农户"
+        ],
+        "primary": [
+          "新增农户"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/farmers",
+        "menu": "农户/合作社管理",
+        "errors": []
+      },
+      {
+        "title": "食堂档案管理",
+        "sub": "维护各校区食堂基础信息、采购经理与供应商关联关系",
+        "actions": [
+          "导出名册",
+          "新增食堂"
+        ],
+        "primary": [
+          "新增食堂"
+        ],
+        "rows": 5,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/canteens",
+        "menu": "食堂档案管理",
+        "errors": []
+      },
+      {
+        "title": "农产品档案",
+        "sub": "统一维护农产品品类、计量单位、参考价与储存要求，支撑货源发布与价格预警",
+        "actions": [
+          "导入模板",
+          "新增产品"
+        ],
+        "primary": [
+          "导入模板",
+          "新增产品"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/products",
+        "menu": "农产品档案",
+        "errors": []
+      },
+      {
+        "title": "用户与权限",
+        "sub": "管理系统账号、分配角色，基于 RBAC 模型配置菜单与数据权限",
+        "actions": [
+          "角色管理",
+          "新增用户"
+        ],
+        "primary": [
+          "角色管理",
+          "新增用户"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/users",
+        "menu": "用户与权限",
+        "errors": []
+      },
+      {
+        "title": "订单监管",
+        "sub": "全流程监管订单状态流转，支持超时预警、催办与追溯",
+        "actions": [
+          "导出订单",
+          "打印统计"
+        ],
+        "primary": [
+          "打印统计"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/orders",
+        "menu": "订单监管",
+        "errors": []
+      },
+      {
+        "title": "结算审核",
+        "sub": "依据生鲜损耗结算规则，审核入库实收数量与扣款，支持批量结算与凭证导出",
+        "actions": [
+          "导出对账单",
+          "批量审核"
+        ],
+        "primary": [
+          "批量审核"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/settlements",
+        "menu": "结算审核",
+        "errors": []
+      },
+      {
+        "title": "食安预警管理",
+        "sub": "集中监测证照、质检、价格、订单逾期四类风险，阈值后台可配置",
+        "actions": [
+          "预警规则",
+          "预警订阅"
+        ],
+        "primary": [
+          "预警规则",
+          "预警订阅"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/warnings",
+        "menu": "食安预警",
+        "errors": []
+      },
+      {
+        "title": "批次溯源查询",
+        "sub": "一扫即溯：从田间到餐桌全链路批次信息、质检报告与哈希存证",
+        "actions": [
+          "扫码查询",
+          "溯源报告"
+        ],
+        "primary": [
+          "扫码查询",
+          "溯源报告"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/trace",
+        "menu": "批次溯源",
+        "errors": []
+      },
+      {
+        "title": "系统参数配置",
+        "sub": "智能匹配权重、信用加减分规则、食安预警阈值等后台可配置，无需改代码",
+        "actions": [
+          "恢复默认",
+          "保存配置"
+        ],
+        "primary": [
+          "恢复默认",
+          "保存配置"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/config",
+        "menu": "系统参数配置",
+        "errors": []
+      },
+      {
+        "title": "操作日志",
+        "sub": "完整记录用户登录、业务操作与系统任务，支持审计追溯与异常排查",
+        "actions": [
+          "导出日志",
+          "审计策略"
+        ],
+        "primary": [
+          "审计策略"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/admin/logs",
+        "menu": "操作日志",
+        "errors": []
+      }
+    ]
+  },
+  "FARMER": {
+    "label": "农户",
+    "user": "farmer24",
+    "navCount": 7,
+    "home": {
+      "title": "我的工作台",
+      "sub": "2026-11-11 · 合作社 · 景德镇近郊绿源基地",
+      "actions": [
+        "刷新",
+        "发布货源"
+      ],
+      "primary": [
+        "发布货源"
+      ],
+      "rows": 0,
+      "emptyText": "",
+      "flowHint": false,
+      "hasGuide": false
+    },
+    "pages": [
+      {
+        "title": "我的工作台",
+        "sub": "2026-11-11 · 合作社 · 景德镇近郊绿源基地",
+        "actions": [
+          "刷新",
+          "发布货源"
+        ],
+        "primary": [
+          "发布货源"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/workbench",
+        "menu": "我的工作台",
+        "errors": []
+      },
+      {
+        "title": "货源管理",
+        "sub": "维护可供农产品、数量与报价，货源将进入智能匹配候选池",
+        "actions": [
+          "导出货源",
+          "发布货源"
+        ],
+        "primary": [
+          "发布货源"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/sources",
+        "menu": "货源管理",
+        "errors": []
+      },
+      {
+        "title": "订单管理",
+        "sub": "查看食堂采购订单，完成接单、发货与批次绑定，跟踪订单全流程",
+        "actions": [
+          "导出订单",
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/orders",
+        "menu": "订单管理",
+        "errors": []
+      },
+      {
+        "title": "结算与收入",
+        "sub": "查看结算单、损耗扣款明细与收入统计",
+        "actions": [
+          "导出对账单",
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/settlement",
+        "menu": "结算与收入",
+        "errors": []
+      },
+      {
+        "title": "信用评价",
+        "sub": "信用分由履约、质检、损耗与采购评价共同决定，直接影响智能匹配排名",
+        "actions": [
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 8,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/credit",
+        "menu": "信用评价",
+        "errors": []
+      },
+      {
+        "title": "消息提醒",
+        "sub": "新订单、结算与预警通知（站内信）",
+        "actions": [
+          "全部已读"
+        ],
+        "primary": [
+          "全部已读"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/messages",
+        "menu": "消息提醒",
+        "errors": []
+      },
+      {
+        "title": "需求大厅",
+        "sub": "食堂发布的采购需求都在这里，报价后由采购员横向比价定标，中标即生成采购单",
+        "actions": [
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/farmer/demands",
+        "menu": "需求大厅",
+        "errors": []
+      }
+    ]
+  },
+  "PURCHASER": {
+    "label": "采购员",
+    "user": "purchaser01",
+    "navCount": 8,
+    "home": {
+      "title": "采购需求管理",
+      "sub": "发布采购需求，系统自动推送农户并启动五因子智能匹配",
+      "actions": [
+        "导出需求"
+      ],
+      "primary": [],
+      "rows": 10,
+      "emptyText": "",
+      "flowHint": false,
+      "hasGuide": false
+    },
+    "pages": [
+      {
+        "title": "采购需求管理",
+        "sub": "发布采购需求，系统自动推送农户并启动五因子智能匹配",
+        "actions": [
+          "导出需求"
+        ],
+        "primary": [],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/demands",
+        "menu": "采购需求",
+        "errors": []
+      },
+      {
+        "title": "货源大厅",
+        "sub": "按品类、价格、信用筛选货源；勾选多个品项加入采购单，一次提交即可，不用一个个下单",
+        "actions": [
+          "刷新货源"
+        ],
+        "primary": [],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/sources",
+        "menu": "货源大厅",
+        "errors": []
+      },
+      {
+        "title": "智能匹配",
+        "sub": "需求单 X20261111145 · 基于五因子加权模型自动推荐 Top5 货源",
+        "actions": [
+          "重新匹配",
+          "调整权重"
+        ],
+        "primary": [
+          "重新匹配",
+          "调整权重"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/match",
+        "menu": "智能匹配",
+        "errors": []
+      },
+      {
+        "title": "我的订单",
+        "sub": "第一食堂采购订单全流程跟踪，支持收货入库、结算与溯源",
+        "actions": [
+          "发布需求",
+          "导出"
+        ],
+        "primary": [
+          "发布需求"
+        ],
+        "rows": 10,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/orders",
+        "menu": "我的订单",
+        "errors": []
+      },
+      {
+        "title": "入库确认（生鲜损耗）",
+        "sub": "扫码核对批次，录入实收数量与质检结果，系统按损耗自动计算结算金额",
+        "actions": [
+          "刷新记录"
+        ],
+        "primary": [],
+        "rows": 5,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/inbound",
+        "menu": "入库确认",
+        "errors": []
+      },
+      {
+        "title": "采购评价",
+        "sub": "对已完成订单进行多维评分，评价结果纳入农户信用与智能匹配权重",
+        "actions": [
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/evaluation",
+        "menu": "采购评价",
+        "errors": []
+      },
+      {
+        "title": "批次溯源查询",
+        "sub": "一扫即溯：从田间到餐桌全链路批次信息、质检报告与哈希存证",
+        "actions": [
+          "扫码查询",
+          "溯源报告"
+        ],
+        "primary": [
+          "扫码查询",
+          "溯源报告"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/trace",
+        "menu": "批次溯源",
+        "errors": []
+      },
+      {
+        "title": "库存与采购建议",
+        "sub": "入库自动加库存、领用自动扣库存；按近 28 天真实领用量算出日均消耗，再给出本周该补多少",
+        "actions": [
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 16,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/purchaser/stock",
+        "menu": "库存与建议",
+        "errors": []
+      }
+    ]
+  },
+  "INSPECTOR": {
+    "label": "质检配送员",
+    "user": "inspector01",
+    "navCount": 5,
+    "home": {
+      "title": "",
+      "sub": "",
+      "actions": [],
+      "primary": [],
+      "rows": 2,
+      "emptyText": "",
+      "flowHint": false,
+      "hasGuide": false
+    },
+    "pages": [
+      {
+        "title": "",
+        "sub": "",
+        "actions": [],
+        "primary": [],
+        "rows": 2,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/inspector/tasks",
+        "menu": "我的任务",
+        "errors": []
+      },
+      {
+        "title": "质检录入",
+        "sub": "录入批次抽检结果，合格后自动生成溯源二维码与存证哈希",
+        "actions": [
+          "导出报告"
+        ],
+        "primary": [],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/inspector/quality",
+        "menu": "质检录入",
+        "errors": []
+      },
+      {
+        "title": "配送任务",
+        "sub": "冷链车辆调度、温度监控与 GPS 轨迹，送达后扫码交付",
+        "actions": [
+          "配送单"
+        ],
+        "primary": [
+          "配送单"
+        ],
+        "rows": 18,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/inspector/delivery",
+        "menu": "配送任务",
+        "errors": []
+      },
+      {
+        "title": "异常上报",
+        "sub": "质检不合格、冷链温度超标、配送异常等情况及时上报，纳入食安预警处置",
+        "actions": [
+          "刷新"
+        ],
+        "primary": [],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": true,
+        "hasGuide": false,
+        "path": "/inspector/exception",
+        "menu": "异常上报",
+        "errors": []
+      },
+      {
+        "title": "批次溯源查询",
+        "sub": "一扫即溯：从田间到餐桌全链路批次信息、质检报告与哈希存证",
+        "actions": [
+          "扫码查询",
+          "溯源报告"
+        ],
+        "primary": [
+          "扫码查询",
+          "溯源报告"
+        ],
+        "rows": 0,
+        "emptyText": "",
+        "flowHint": false,
+        "hasGuide": false,
+        "path": "/inspector/trace",
+        "menu": "批次溯源",
+        "errors": []
+      }
+    ]
+  }
+}

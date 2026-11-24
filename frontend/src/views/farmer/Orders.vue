@@ -22,10 +22,10 @@
       />
       <StatCard
         label="待结算" :value="countOf(80)" icon="Wallet" color="teal"
-        foot="待收货"
+        foot="待食堂结算"
       />
       <StatCard
-        label="本月完成" :value="countOf(100)" icon="CircleCheck" color="green"
+        label="已完成" :value="countOf(100)" icon="CircleCheck" color="green"
         foot="履约良好"
       />
     </div>
@@ -54,16 +54,7 @@
         >
           <template #prefix><el-icon><Search /></el-icon></template>
         </el-input>
-        <el-select v-model="query.status" placeholder="全部状态" clearable>
-          <el-option label="全部" value="" />
-          <el-option label="待接单" value="10" />
-          <el-option label="已接单" value="20" />
-          <el-option label="待质检" value="30" />
-          <el-option label="配送中" value="50" />
-          <el-option label="待结算" value="80" />
-          <el-option label="已完成" value="100" />
-          <el-option label="已取消" value="99" />
-        </el-select>
+        <!-- 订单状态由上方带数量的分段控件统一表达，这里不再放重复的下拉 -->
         <el-select v-model="query.days" placeholder="下单时间">
           <el-option label="近 30 天" :value="30" />
           <el-option label="近 7 天" :value="7" />
@@ -154,7 +145,8 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useFocusLocator, makeListFocus } from '@/utils/focusLocator'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { farmerApi } from '@/api'
 import StatCard from '@/components/StatCard.vue'
@@ -162,8 +154,11 @@ import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import OrderDetailDrawer from '@/components/OrderDetailDrawer.vue'
 import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTableDom, stamped } from '@/utils/export'
 
 const router = useRouter()
+const route = useRoute()
 const loading = ref(false)
 const rows = ref([])
 const stats = ref({})
@@ -174,7 +169,7 @@ const detailId = ref(null)
 
 const query = reactive({ page: 1, size: 10, status: '', keyword: '', days: '' })
 
-const TAB_VALUES = ['10', '50', '80', '100', '99']
+const TAB_VALUES = ['10', '20', '30', '50', '80', '100', '99']
 
 const countOf = (k) => Number(stats.value[String(k)] || 0)
 
@@ -185,6 +180,8 @@ const allCount = computed(() =>
 const tabItems = computed(() => [
   { name: 'all', label: '全部', count: allCount.value },
   { name: '10', label: '待接单', count: countOf(10) },
+  { name: '20', label: '已接单', count: countOf(20) },
+  { name: '30', label: '待质检', count: countOf(30) },
   { name: '50', label: '配送中', count: countOf(50) },
   { name: '80', label: '待结算', count: countOf(80) },
   { name: '100', label: '已完成', count: countOf(100) },
@@ -340,10 +337,23 @@ const copyBatch = async (row) => {
 }
 
 const exportOrders = () => {
-  ElMessage.success(`已导出 ${pageInfo.value.total} 条订单数据`)
+  const n = exportTableDom(stamped('农户订单'))
+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')
 }
 
-onMounted(load)
+useAutoRefresh(load)
+/* 从工作台带 ?focus=<订单号> 进来时自动筛选并打开该订单 */
+useFocusLocator(makeListFocus({ query, load, rows: () => rows.value, open: openDetail }))
+onMounted(() => {
+  /* 「怎么用」引导里的每一步要直接落到对应状态标签，
+     否则用户点「去接单」进来还是"全部"，又得自己找——这正是上一轮反馈的问题。 */
+  const st = String(route.query.status || '')
+  if (st && TAB_VALUES.includes(st)) {
+    query.status = st
+    syncTab()
+  }
+  load()
+})
 </script>
 
 <style scoped>
@@ -369,7 +379,7 @@ onMounted(load)
   line-height: 44px;
   padding: 0 2px;
   margin-right: 24px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   color: var(--c-muted);
 }
 
@@ -402,16 +412,16 @@ onMounted(load)
   padding: 0 5px;
   border-radius: 9px;
   background: #f0f4f2;
-  color: #6b7280;
-  font-size: 10.5px;
+  color: var(--muted);
+  font-size: var(--fs-2xs);
   font-style: normal;
   font-weight: 600;
   line-height: 1;
 }
 
 .status-tabs :deep(.el-tabs__item.is-active) .tab-count {
-  background: #e8f7ee;
-  color: #15803d;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .filter-bar :deep(.el-select) {
@@ -419,24 +429,24 @@ onMounted(load)
 }
 
 .p-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
   line-height: 1.4;
 }
 
 .p-sub {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--c-muted-2);
   margin-top: 1px;
 }
 
 .link-danger {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .link-danger:hover {
-  color: #b91c1c;
+  color: var(--danger);
 }
 
 .order-table :deep(.el-table__cell) {

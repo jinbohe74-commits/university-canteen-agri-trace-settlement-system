@@ -210,6 +210,8 @@ import StatCard from '@/components/StatCard.vue'
 import SectionCard from '@/components/SectionCard.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { exportTableDom, stamped } from '@/utils/export'
 
 const DEFAULT_REMARK = '产地：景德镇近郊绿源基地；新鲜采摘、农残检测合格，支持食堂直供。'
 
@@ -378,9 +380,11 @@ const toggle = async (row) => {
 }
 
 const exportSources = () => {
-  ElMessage.success(`已导出 ${pageInfo.value.total} 条货源数据`)
+  const n = exportTableDom(stamped('供货货源'))
+  ElMessage.success(n ? `已导出当前页 ${n} 条记录` : '当前没有可导出的数据')
 }
 
+useAutoRefresh(load)
 onMounted(async () => {
   await Promise.all([load(), loadProducts()])
 })
@@ -399,20 +403,20 @@ onMounted(async () => {
 }
 
 .p-name {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
   line-height: 1.4;
 }
 
 .p-no {
-  font-size: 10.5px;
+  font-size: var(--fs-2xs);
   color: var(--c-muted-2);
   margin-top: 1px;
 }
 
 .price {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .src-table :deep(.el-table__cell) {
@@ -431,9 +435,9 @@ onMounted(async () => {
   height: 20px;
   padding: 0 8px;
   border-radius: 10px;
-  background: #e8f7ee;
-  color: #15803d;
-  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--fs-xs);
   font-weight: 500;
 }
 
@@ -441,7 +445,7 @@ onMounted(async () => {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--ok);
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
 }
 
@@ -454,7 +458,7 @@ onMounted(async () => {
 }
 
 .src-form :deep(.el-form-item__label) {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   padding-bottom: 4px;
   line-height: 1.4;
@@ -501,19 +505,19 @@ onMounted(async () => {
 }
 
 .up-icon {
-  font-size: 18px;
-  color: #16a34a;
+  font-size: var(--fs-lg);
+  color: var(--accent);
 }
 
 .up-text {
   margin-top: 3px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-text-2);
 }
 
 .up-hint {
   margin-top: 3px;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 

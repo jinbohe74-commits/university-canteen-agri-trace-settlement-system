@@ -58,7 +58,7 @@
       />
       <StatCard
         label="本月收入" :value="'¥ ' + fmtMoney(cards.monthIncome)" icon="Money" color="green"
-        :trend="growthText" :up="(monthGrowth ?? 0) >= 0" foot="已结算入账"
+        :trend="growthText" :up="(monthGrowth ?? 0) >= 0" :foot="incomeFoot"
       />
       <StatCard
         label="信用分" :value="score" suffix=" 分" icon="Star" color="purple"
@@ -69,7 +69,7 @@
     <!-- 收入趋势 + 待处理订单 -->
     <div class="grid-2">
       <SectionCard title="近 6 个月销售收入" :body-style="false">
-        <template #extra><span class="muted small">单位：万元</span></template>
+        <template #extra><span class="muted small">单位：元</span></template>
         <BaseChart :option="incomeOption" height="200px" />
       </SectionCard>
 
@@ -155,6 +155,8 @@ import BaseChart from '@/components/BaseChart.vue'
 import StatusTag from '@/components/StatusTag.vue'
 import OrderDetailDrawer from '@/components/OrderDetailDrawer.vue'
 import { fmtDate, fmtMoney, fmtNum, today } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
+import { useThemeColors } from '@/utils/theme'
 
 const router = useRouter()
 const loading = ref(false)
@@ -195,13 +197,18 @@ const todayTip = computed(() => {
   return '今日暂无待处理订单，请保持货源充足，及时响应新订单'
 })
 
+/* 环比必须和「本月收入」这张卡同源：
+   原来是拿趋势数组最后两个点比（10 月 vs 9 月），却贴在"本月收入 ¥0.00"旁边，
+   于是出现"本月收入 0 元，较上月 +16.6%"这种自相矛盾的读法。 */
+const curYm = new Date().toISOString().slice(0, 7)
 const monthGrowth = computed(() => {
-  const list = incomeTrend.value
-  if (list.length < 2) return null
-  const cur = Number(list[list.length - 1].amount || 0)
-  const prev = Number(list[list.length - 2].amount || 0)
-  if (!prev) return null
-  return Math.round(((cur - prev) / prev) * 1000) / 10
+  const cur = Number(cards.value.monthIncome || 0)
+  if (!cur) return null          // 本月还没结算，不谈环比，避免 0 旁边挂着涨跌
+  const prev = [...incomeTrend.value].reverse()
+    .find((x) => String(x.m || '').slice(0, 7) !== curYm)
+  const base = Number(prev?.amount || 0)
+  if (!base) return null
+  return Math.round(((cur - base) / base) * 1000) / 10
 })
 
 const growthText = computed(() => {
@@ -210,6 +217,9 @@ const growthText = computed(() => {
   return `较上月 ${sign}${monthGrowth.value}%`
 })
 
+const incomeFoot = computed(() => (Number(cards.value.monthIncome || 0) ? '已结算入账' : '本月暂无结算'))
+
+const T = useThemeColors()
 const monthLabel = (m) => (m ? Number(String(m).split('-')[1]) + '月' : '')
 
 const incomeOption = computed(() => {
@@ -219,46 +229,46 @@ const incomeOption = computed(() => {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
-      backgroundColor: 'rgba(15,43,32,.92)',
+      backgroundColor: T.value.ink,
       borderWidth: 0,
-      textStyle: { color: '#fff', fontSize: 12 },
-      valueFormatter: (v) => '¥ ' + Number(v).toFixed(2) + ' 万元'
+      textStyle: { color: T.value.surface, fontSize: 12 },
+      valueFormatter: (v) => '¥ ' + Number(v).toLocaleString('zh-CN') + ' 元'
     },
     xAxis: {
       type: 'category',
       data: list.map((x) => monthLabel(x.m)),
-      axisLine: { lineStyle: { color: '#e5eae8' } },
+      axisLine: { lineStyle: { color: T.value.line } },
       axisTick: { show: false },
-      axisLabel: { color: '#8b9c96', fontSize: 11.5 }
+      axisLabel: { color: T.value.muted, fontSize: 12 }
     },
     yAxis: {
       type: 'value',
-      splitLine: { lineStyle: { color: '#f1f5f3', type: 'dashed' } },
-      axisLabel: { color: '#8b9c96', fontSize: 11, formatter: '{value}' }
+      splitLine: { lineStyle: { color: T.value.line, type: 'dashed' } },
+      axisLabel: { color: T.value.muted, fontSize: 12, formatter: (v) => Number(v).toLocaleString('zh-CN') }
     },
     series: [
       {
         name: '销售收入',
         type: 'bar',
         barWidth: '42%',
-        data: list.map((x) => Number((Number(x.amount || 0) / 10000).toFixed(2))),
+        data: list.map((x) => Number(Number(x.amount || 0).toFixed(0))),
         itemStyle: {
           borderRadius: [6, 6, 0, 0],
           color: {
             type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: '#4ade80' },
-              { offset: 1, color: '#16a34a' }
+              { offset: 0, color: T.value.ok },
+              { offset: 1, color: T.value.accent }
             ]
           }
         },
         label: {
           show: true,
           position: 'top',
-          color: '#15803d',
-          fontSize: 11,
+          color: T.value.ink2,
+          fontSize: 12,
           fontWeight: 600,
-          formatter: (p) => Number(p.value).toFixed(2)
+          formatter: (p) => Number(p.value).toLocaleString('zh-CN')
         }
       }
     ]
@@ -280,6 +290,7 @@ const load = async () => {
   }
 }
 
+useAutoRefresh(load)
 onMounted(load)
 </script>
 
@@ -293,7 +304,7 @@ onMounted(load)
   border-radius: 8px;
   background: #fff;
   border: 1px solid var(--c-border);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-text-2);
 }
 
@@ -310,7 +321,7 @@ onMounted(load)
   margin-bottom: 16px;
   border-radius: 14px;
   color: #fff;
-  background: linear-gradient(115deg, #0d3b29 0%, #15613f 44%, #16a34a 100%);
+  background: linear-gradient(115deg, #0d3b29 0%, #15613f 44%, var(--accent) 100%);
   box-shadow: 0 10px 26px rgba(16, 61, 40, 0.18);
 }
 
@@ -352,7 +363,7 @@ onMounted(load)
   border-radius: 16px;
   display: grid;
   place-items: center;
-  font-size: 24px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: 1px;
   background: rgba(255, 255, 255, 0.16);
@@ -365,14 +376,14 @@ onMounted(load)
 }
 
 .w-hello {
-  font-size: 20px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: 0.3px;
 }
 
 .w-line {
   margin-top: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: rgba(255, 255, 255, 0.82);
   line-height: 1.6;
 }
@@ -409,7 +420,7 @@ onMounted(load)
 
 .wm-num {
   font-family: var(--font-num);
-  font-size: 34px;
+  font-size: var(--fs-display);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.5px;
@@ -418,7 +429,7 @@ onMounted(load)
 
 .wm-label {
   margin-top: 6px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -427,7 +438,7 @@ onMounted(load)
   align-items: center;
   gap: 6px;
   margin-top: 8px;
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 600;
 }
 
@@ -445,6 +456,9 @@ onMounted(load)
   grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
   gap: 14px;
   margin-bottom: 14px;
+  /* 右列只有 1 条待办时，被拉伸到和左侧图表一样高会留下大片空白，
+     看起来像加载失败。按内容高度排列。 */
+  align-items: start;
 }
 
 .grid-lower {
@@ -456,7 +470,9 @@ onMounted(load)
 .todo-list {
   display: flex;
   flex-direction: column;
-  min-height: 200px;
+  /* 原来固定 200px 撑高度：只有 1 条待办时，卡片下半截全空，
+     看着像没加载出来。改为按内容高度。 */
+  min-height: 0;
   padding: 2px 18px;
 }
 
@@ -476,12 +492,12 @@ onMounted(load)
 }
 
 .todo-row:hover {
-  background: #f7fbf9;
+  background: var(--surface-2);
 }
 
 .todo-meta {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -497,8 +513,8 @@ onMounted(load)
 }
 
 .todo-right .money {
-  font-size: 13.5px;
-  color: #111827;
+  font-size: var(--fs-base);
+  color: var(--ink);
 }
 
 /* ---------------- 在售货源 ---------------- */
@@ -513,7 +529,7 @@ onMounted(load)
   align-items: center;
   gap: 9px;
   padding: 7.5px 0;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 
 .src-dot {
@@ -521,12 +537,12 @@ onMounted(load)
   height: 6px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--ok);
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .src-name {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 500;
   width: 82px;
   flex-shrink: 0;
@@ -539,7 +555,7 @@ onMounted(load)
   margin-left: auto;
   font-family: var(--font-num);
   color: var(--c-muted);
-  font-size: 12px;
+  font-size: var(--fs-sm);
 }
 
 .src-price {
@@ -547,8 +563,8 @@ onMounted(load)
   text-align: right;
   font-family: var(--font-num);
   font-weight: 600;
-  color: #15803d;
-  font-size: 12px;
+  color: var(--accent);
+  font-size: var(--fs-sm);
 }
 
 .src-tip {
@@ -558,16 +574,16 @@ onMounted(load)
   margin: 8px 18px 16px;
   padding: 9px 11px;
   border-radius: 8px;
-  background: #f2fbf5;
+  background: var(--surface-2);
   border: 1px solid #dcf0e4;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   line-height: 1.6;
-  color: #4b7a60;
+  color: var(--muted);
 }
 
 .src-tip .el-icon {
   margin-top: 1px;
-  color: #16a34a;
+  color: var(--accent);
 }
 
 /* ---------------- 信用明细 ---------------- */
@@ -591,31 +607,31 @@ onMounted(load)
 }
 
 .credit-reason {
-  font-size: 12.5px;
-  color: #1b2a24;
+  font-size: var(--fs-sm);
+  color: var(--ink);
   font-weight: 500;
   line-height: 1.5;
 }
 
 .credit-sub {
   margin-top: 3px;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
 .credit-delta {
   flex-shrink: 0;
   font-family: var(--font-num);
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 700;
 }
 
 .down-up {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .down-loss {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 @media (max-width: 1180px) {

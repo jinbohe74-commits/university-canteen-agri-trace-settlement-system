@@ -53,12 +53,59 @@ public interface StatMapper {
             "WHERE o.status NOT IN (41,99) GROUP BY pc.category_name ORDER BY cnt DESC")
     List<Map<String, Object>> categoryDistribution();
 
-    /** 近 N 天价格行情 */
-    @Select("SELECT p.name AS product, h.stat_date AS statDate, h.avg_price AS avgPrice " +
+    /**
+     * 可选的行情商品清单：用<b>真实订单成交价</b>统计，而不是只有 9 个品项、
+     * 停在半个月前的 price_history 演示表。这样行情图能覆盖所有实际买过的品项。
+     */
+    @Select("SELECT p.id AS productId, p.name AS name, p.unit, " +
+            "       COALESCE(pc.category_name, '其他') AS categoryName, " +
+            "       COUNT(*) AS orderCount, " +
+            "       ROUND(SUM(o.total_amount) / NULLIF(SUM(o.quantity), 0), 2) AS avgPrice, " +
+            "       MAX(DATE(o.create_time)) AS lastDate, " +
+            "       ROUND(MIN(o.unit_price), 2) AS minPrice, " +
+            "       ROUND(MAX(o.unit_price), 2) AS maxPrice " +
+            "FROM orders o JOIN product p ON p.id = o.product_id " +
+            "LEFT JOIN product_category c ON c.id = p.category_id " +
+            "LEFT JOIN product_category pc ON pc.id = c.parent_id " +
+            "WHERE o.status NOT IN (41, 99) AND o.quantity > 0 " +
+            "GROUP BY p.id, p.name, p.unit, pc.category_name " +
+            "ORDER BY orderCount DESC, p.id")
+    List<Map<String, Object>> priceProducts();
+
+    /** 选定商品在近 N 天的每日成交均价（真实成交，非行情快照） */
+    @Select("<script>SELECT o.product_id AS productId, p.name AS product, " +
+            "DATE(o.create_time) AS statDate, " +
+            "ROUND(SUM(o.total_amount) / NULLIF(SUM(o.quantity), 0), 2) AS avgPrice, " +
+            "ROUND(SUM(o.quantity), 1) AS qty, COUNT(*) AS cnt " +
+            "FROM orders o JOIN product p ON p.id = o.product_id " +
+            "WHERE o.status NOT IN (41, 99) AND o.quantity > 0 " +
+            "AND o.create_time &gt;= DATE_SUB(CURDATE(), INTERVAL #{days} DAY) " +
+            "AND o.product_id IN " +
+            "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach> " +
+            "GROUP BY o.product_id, p.name, DATE(o.create_time) " +
+            "ORDER BY statDate, o.product_id</script>")
+    List<Map<String, Object>> priceTrendDaily(@Param("ids") List<Long> ids, @Param("days") int days);
+
+    /** 长窗口（>30 天）按周聚合：每天只有一两单时折线会全是锯齿，按周才看得出趋势 */
+    @Select("<script>SELECT o.product_id AS productId, p.name AS product, " +
+            "DATE(DATE_SUB(o.create_time, INTERVAL WEEKDAY(o.create_time) DAY)) AS statDate, " +
+            "ROUND(SUM(o.total_amount) / NULLIF(SUM(o.quantity), 0), 2) AS avgPrice, " +
+            "ROUND(SUM(o.quantity), 1) AS qty, COUNT(*) AS cnt " +
+            "FROM orders o JOIN product p ON p.id = o.product_id " +
+            "WHERE o.status NOT IN (41, 99) AND o.quantity > 0 " +
+            "AND o.create_time &gt;= DATE_SUB(CURDATE(), INTERVAL #{days} DAY) " +
+            "AND o.product_id IN " +
+            "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach> " +
+            "GROUP BY o.product_id, p.name, " +
+            "DATE(DATE_SUB(o.create_time, INTERVAL WEEKDAY(o.create_time) DAY)) " +
+            "ORDER BY statDate, o.product_id</script>")
+    List<Map<String, Object>> priceTrendWeekly(@Param("ids") List<Long> ids, @Param("days") int days);
+
+    /** 有价格历史的商品里最新的两个（同名商品可能有多条档案，只取真正有数据的） */
+    @Select("SELECT h.product_id AS productId, p.name AS name, MAX(h.stat_date) AS lastDate " +
             "FROM price_history h JOIN product p ON p.id = h.product_id " +
-            "WHERE h.product_id IN (#{p1}, #{p2}) AND h.stat_date >= #{from} ORDER BY h.stat_date")
-    List<Map<String, Object>> priceTrend(@Param("p1") Long p1, @Param("p2") Long p2,
-                                         @Param("from") String from);
+            "GROUP BY h.product_id, p.name ORDER BY lastDate DESC, h.product_id LIMIT 2")
+    List<Map<String, Object>> topPriceProducts();
 
     @Select("SELECT COUNT(*) FROM settlement WHERE status = '待审核'")
     long pendingSettlements();
@@ -165,6 +212,30 @@ public interface StatMapper {
     @Select("SELECT o.id, o.order_no, o.batch_no, o.status, o.quantity, o.create_time, o.product_id, " +
             "o.farmer_id, o.canteen_id FROM orders o WHERE o.status = 30 ORDER BY o.create_time ASC LIMIT 20")
     List<Map<String, Object>> pendingInspectOrders();
+
+    /**
+     * 质检报告逐批明细（质检员看板的「今日已检 / 不合格」必须有真实行，
+     * 不能拿 status=30 的待检列表冒充）。
+     * <p>todayOnly / onlyUnqualified 由调用方传 0/1，避免 MyBatis 动态 SQL 的额外映射。</p>
+     */
+    @Select("SELECT q.id, q.batch_no AS batchNo, q.result, q.sample_qty AS sampleQty, " +
+            "       q.inspect_time AS inspectTime, q.inspector, q.remark, " +
+            "       o.order_no AS orderNo, o.farmer_id AS farmerId, o.canteen_id AS canteenId, " +
+            "       o.product_id AS productId, o.quantity, o.total_amount AS totalAmount, " +
+            "       p.name AS productName, c.category_name AS categoryName, " +
+            "       f.name AS farmerName, ct.name AS canteenName " +
+            "FROM quality_report q " +
+            "LEFT JOIN orders o ON o.id = q.order_id " +
+            "LEFT JOIN product p ON p.id = o.product_id " +
+            "LEFT JOIN product_category c ON c.id = p.category_id " +
+            "LEFT JOIN farmer f ON f.id = o.farmer_id " +
+            "LEFT JOIN canteen ct ON ct.id = o.canteen_id " +
+            "WHERE (#{todayOnly} = 0 OR DATE(q.inspect_time) = CURDATE()) " +
+            "  AND (#{onlyUnqualified} = 0 OR q.result = '不合格') " +
+            "ORDER BY q.inspect_time DESC LIMIT #{limit}")
+    List<Map<String, Object>> qualityReportList(@Param("todayOnly") int todayOnly,
+                                                @Param("onlyUnqualified") int onlyUnqualified,
+                                                @Param("limit") int limit);
 }
 
 

@@ -9,8 +9,8 @@
         <el-button plain :disabled="!demandId" @click="loadMatch">
           <el-icon><Refresh /></el-icon>重新匹配
         </el-button>
-        <el-button type="primary" @click="adjustWeight">
-          <el-icon><MagicStick /></el-icon>调整权重
+        <el-button type="primary" @click="weightVisible = true">
+          <el-icon><MagicStick /></el-icon>查看权重
         </el-button>
       </div>
     </div>
@@ -111,6 +111,28 @@
     </div>
 
     <!-- 下单弹窗 -->
+    <!-- 权重说明：采购员无权改，但必须能看清「怎么算出来的」，
+         而不是点一下弹一句"由管理员配置"就结束 -->
+    <el-dialog v-model="weightVisible" title="匹配权重说明" width="480px">
+      <div class="weight-list">
+        <div v-for="w in weightItems" :key="w.key" class="weight-row">
+          <span class="weight-k">{{ w.label }}</span>
+          <span class="weight-bar">
+            <span class="weight-fill" :style="{ width: weightPct(w.value) + '%' }"></span>
+          </span>
+          <span class="weight-v mono">{{ w.value }}</span>
+        </div>
+      </div>
+      <div class="weight-formula">综合得分 = {{ formulaText }}（权重之和 {{ weightSumText }}）</div>
+      <div class="weight-note">
+        权重由管理员在「系统参数配置」中统一维护，采购员侧只读；
+        得分越高的货源排在越前，同等分数下信用分优先，保证食品安全。
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="weightVisible = false">知道了</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="orderVisible" title="采购下单" width="500px">
       <div v-if="current">
         <div class="order-box">
@@ -165,6 +187,7 @@ import { ElMessage } from 'element-plus'
 import { purchaserApi } from '@/api'
 import StatusTag from '@/components/StatusTag.vue'
 import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const route = useRoute()
 const router = useRouter()
@@ -177,6 +200,7 @@ const pending = ref([])
 const demandId = ref(route.query.demandId ? Number(route.query.demandId) : null)
 
 const orderVisible = ref(false)
+const weightVisible = ref(false)
 const current = ref(null)
 const orderForm = reactive({ quantity: 1, expectedDelivery: '' })
 
@@ -257,8 +281,12 @@ const loadMatch = async () => {
   }
 }
 
-const adjustWeight = () => {
-  ElMessage.info('权重由管理员在系统参数中统一配置')
+/* 权重只读展示：条形宽度按各项占合计的比例算，让"哪项影响最大"一眼可见 */
+const weightPct = (v) => {
+  const sum = Number(weightSumText.value) || 0
+  const n = Number(v) || 0
+  if (!sum) return 0
+  return Math.max(2, Math.round((n / sum) * 100))
 }
 
 const openOrder = (r) => {
@@ -297,6 +325,7 @@ const goSource = (r) => {
   router.push({ path: '/purchaser/sources', query: { keyword: r.productName } })
 }
 
+useAutoRefresh(loadPending)
 onMounted(async () => {
   if (demandId.value) {
     loadMatch()
@@ -319,35 +348,35 @@ onMounted(async () => {
   align-items: center;
   padding: 16px 20px;
   border-radius: var(--radius);
-  border: 1px solid #d6f0e0;
-  background: linear-gradient(135deg, #f0fdf4, #e6f8ee);
+  border: 1px solid var(--accent-soft);
+  background: linear-gradient(135deg, var(--surface-2), var(--accent-soft));
   box-shadow: var(--shadow-card);
   margin-bottom: 14px;
 }
 
 .mh-label {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   letter-spacing: 1px;
-  color: #15803d;
+  color: var(--accent);
   font-weight: 600;
 }
 
 .mh-title {
   margin-top: 4px;
-  font-size: 20px;
+  font-size: var(--fs-xl);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
   letter-spacing: -0.3px;
 }
 
 .mh-title b {
   font-family: var(--font-num);
-  font-size: 22px;
+  font-size: var(--fs-xl);
 }
 
 .mh-sub {
   margin-top: 5px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: #3f6d55;
 }
 
@@ -362,13 +391,13 @@ onMounted(async () => {
   padding: 12px 14px;
   border-radius: 10px;
   background: #fff;
-  border: 1px dashed #bbe6cb;
+  border: 1px dashed var(--accent-soft);
 }
 
 .mf-title {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #14532d;
+  color: var(--ink);
   line-height: 1.6;
   font-family: var(--font-num);
   word-break: break-word;
@@ -376,8 +405,8 @@ onMounted(async () => {
 
 .mf-note {
   margin-top: 7px;
-  font-size: 11.5px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -393,7 +422,7 @@ onMounted(async () => {
 
 .sel-icon {
   color: var(--c-primary);
-  font-size: 15px;
+  font-size: var(--fs-md);
 }
 
 .rank-list {
@@ -417,7 +446,7 @@ onMounted(async () => {
 }
 
 .match-card.best {
-  border-color: #bbe6cb;
+  border-color: var(--accent-soft);
   background: linear-gradient(180deg, #f8fdfa, #ffffff 62%);
   box-shadow: 0 4px 18px rgba(22, 163, 74, 0.12);
 }
@@ -429,22 +458,22 @@ onMounted(async () => {
   display: grid;
   place-items: center;
   font-family: var(--font-num);
-  font-size: 16px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  background: #f1f5f4;
-  color: #64748b;
+  background: var(--surface-2);
+  color: var(--muted);
   flex-shrink: 0;
 }
 
 .rk-1 {
-  background: linear-gradient(135deg, #fde68a, #f59e0b);
+  background: linear-gradient(135deg, #fde68a, var(--warn));
   color: #7c2d12;
   box-shadow: 0 3px 8px rgba(245, 158, 11, 0.28);
 }
 
 .rk-2 {
   background: linear-gradient(135deg, #eef1f4, #b9c1ca);
-  color: #374151;
+  color: var(--ink-2);
 }
 
 .rk-3 {
@@ -460,7 +489,7 @@ onMounted(async () => {
 }
 
 .mc-farmer {
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
   color: #14372a;
 }
@@ -471,17 +500,17 @@ onMounted(async () => {
 
 .mc-line2 {
   margin-top: 5px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .mc-line2 b {
-  color: #27362f;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .mc-line2 .mc-price {
-  color: #15803d;
+  color: var(--accent);
   font-family: var(--font-num);
 }
 
@@ -500,7 +529,7 @@ onMounted(async () => {
 }
 
 .f-name {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   white-space: nowrap;
   flex-shrink: 0;
@@ -511,7 +540,7 @@ onMounted(async () => {
   flex: 1;
   height: 5px;
   border-radius: 3px;
-  background: #eef3f1;
+  background: var(--surface-2);
   overflow: hidden;
   min-width: 24px;
 }
@@ -527,9 +556,9 @@ onMounted(async () => {
 
 .f-val {
   font-family: var(--font-num);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   font-weight: 600;
-  color: #374151;
+  color: var(--ink-2);
   width: 24px;
   text-align: right;
   flex-shrink: 0;
@@ -545,16 +574,16 @@ onMounted(async () => {
 }
 
 .score-label {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   letter-spacing: 0.5px;
 }
 
 .score-val {
   font-family: var(--font-num);
-  font-size: 27px;
+  font-size: var(--fs-display);
   font-weight: 700;
-  color: #15803d;
+  color: var(--accent);
   letter-spacing: -0.6px;
   line-height: 1.1;
 }
@@ -573,22 +602,22 @@ onMounted(async () => {
   border-radius: 10px;
   border: 1px dashed #cfe6d9;
   background: #f6fbf8;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   line-height: 1.75;
   color: #4b6b5b;
 }
 
 .match-hint .el-icon {
   color: var(--c-primary);
-  font-size: 14px;
+  font-size: var(--fs-base);
   margin-top: 2px;
   flex-shrink: 0;
 }
 
 .match-hint b {
-  color: #15803d;
+  color: var(--accent);
   font-family: var(--font-num);
-  font-size: 13px;
+  font-size: var(--fs-base);
 }
 
 .order-box .ob-grid {
@@ -597,13 +626,13 @@ onMounted(async () => {
   gap: 9px 16px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f7fbf9;
+  background: var(--surface-2);
 }
 
 .ob-item {
   display: flex;
   gap: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   align-items: baseline;
 }
 
@@ -614,7 +643,7 @@ onMounted(async () => {
 }
 
 .ob-item .v {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 500;
 }
 
@@ -632,18 +661,76 @@ onMounted(async () => {
   justify-content: space-between;
   padding-top: 12px;
   border-top: 1px dashed var(--c-border);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .ob-total .money {
-  font-size: 20px;
-  color: #15803d;
+  font-size: var(--fs-xl);
+  color: var(--accent);
 }
 
 @media (max-width: 1180px) {
   .mc-factors {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+/* 权重说明弹窗 */
+.weight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.weight-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-sm);
+}
+
+.weight-k {
+  width: 64px;
+  color: var(--ink-2);
+  flex: none;
+}
+
+.weight-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 5px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.weight-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--accent);
+}
+
+.weight-v {
+  width: 40px;
+  text-align: right;
+  color: var(--ink);
+  flex: none;
+}
+
+.weight-formula {
+  margin-top: 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.weight-note {
+  margin-top: 8px;
+  font-size: var(--fs-xs);
+  color: var(--c-muted-2);
+  line-height: 1.7;
 }
 </style>

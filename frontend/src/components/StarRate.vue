@@ -22,11 +22,11 @@ defineProps({
 }
 
 .stars .el-icon {
-  font-size: 13px;
+  font-size: var(--fs-base);
 }
 
 .on {
-  color: #f59e0b;
+  color: var(--warn);
 }
 
 .off {
@@ -35,8 +35,8 @@ defineProps({
 
 .score {
   margin-left: 5px;
-  font-size: 12.5px;
-  color: #b45309;
+  font-size: var(--fs-sm);
+  color: var(--warn);
   font-weight: 600;
 }
 </style>

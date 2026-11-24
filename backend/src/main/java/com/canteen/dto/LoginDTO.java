@@ -13,4 +13,7 @@ public class LoginDTO {
     private String password;
 
     private Boolean remember = false;
+
+    /** 登录页选中的期望角色（可选）；非空时服务端校验账号实际角色，避免装饰性控件 */
+    private String expectedRole;
 }

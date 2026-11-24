@@ -39,7 +39,23 @@ public class DashboardService {
     private final ConfigService configService;
 
     // ============================================================ 管理员看板
+    /**
+     * 行情默认窗口（天）。
+     * 食堂按周采购，单品 30 天内往往只有 3~5 笔成交，按日画就是几个孤点；
+     * 90 天窗口会自动切换成按周聚合（约 13 个点），趋势才看得出来。
+     */
+    private static final int PRICE_DEFAULT_DAYS = 90;
+    private static final int PRICE_MAX_SERIES = 4;
+
     public Map<String, Object> adminDashboard() {
+        return adminDashboard(null, null);
+    }
+
+    /**
+     * @param priceProducts 用户在前端勾选的商品 id（逗号分隔）；为空则取成交最活跃的两个
+     * @param priceDays     统计窗口天数；空则默认 30 天
+     */
+    public Map<String, Object> adminDashboard(String priceProducts, Integer priceDays) {
         Map<String, Object> m = new LinkedHashMap<>();
         long totalOrders = statMapper.totalOrders();
         BigDecimal totalAmount = statMapper.totalAmount();
@@ -64,18 +80,35 @@ public class DashboardService {
         // 品类分布
         m.put("categoryShare", statMapper.categoryDistribution());
 
-        // 本周价格行情（大白菜 / 西红柿）
-        List<Product> cabbages = productMapper.selectList(new LambdaQueryWrapper<Product>()
-                .eq(Product::getName, "大白菜").last("LIMIT 1"));
-        List<Product> tomatoes = productMapper.selectList(new LambdaQueryWrapper<Product>()
-                .eq(Product::getName, "西红柿").last("LIMIT 1"));
-        Long p1 = cabbages.isEmpty() ? 1L : cabbages.get(0).getId();
-        Long p2 = tomatoes.isEmpty() ? 2L : tomatoes.get(0).getId();
-        m.put("priceTrend", statMapper.priceTrend(p1, p2,
-                LocalDate.now().minusDays(7).toString()));
-        m.put("priceSeries", List.of(
-                Map.of("name", "大白菜", "productId", p1),
-                Map.of("name", "西红柿", "productId", p2)));
+        // 价格行情：默认取成交最活跃的两个品项，但把「能选哪些」也一并返回，
+        // 前端据此渲染品类/商品选择器，不再用写死的 LIMIT 2 让用户只能看两个品种。
+        List<Map<String, Object>> products = statMapper.priceProducts();
+        int days = priceDays == null || priceDays <= 0 ? PRICE_DEFAULT_DAYS
+                : Math.min(priceDays, 365);
+        List<Long> chosen = parseIds(priceProducts);
+        if (chosen.isEmpty()) {
+            chosen = products.stream().limit(2)
+                    .map(x -> ((Number) x.get("productId")).longValue()).toList();
+        }
+        if (chosen.size() > PRICE_MAX_SERIES) {
+            chosen = chosen.subList(0, PRICE_MAX_SERIES);
+        }
+        // 按选中的 id 顺序回填品名，供图例使用；商品被删/无成交时跳过
+        List<Map<String, Object>> series = new ArrayList<>();
+        for (Long id : chosen) {
+            products.stream().filter(x -> id.equals(((Number) x.get("productId")).longValue()))
+                    .findFirst().ifPresent(series::add);
+        }
+        m.put("priceSeries", series);
+        // ≤30 天按日、>30 天按周：窗口拉长后每天只有一两单，按日画全是锯齿
+        m.put("priceTrend", chosen.isEmpty() ? List.of()
+                : (days > 30 ? statMapper.priceTrendWeekly(chosen, days)
+                             : statMapper.priceTrendDaily(chosen, days)));
+        m.put("priceOptions", products);
+        m.put("priceDays", days);
+        m.put("priceMaxSeries", PRICE_MAX_SERIES);
+        // 口径说明：数据来自真实订单成交价，不是行情快照表
+        m.put("priceSource", "真实成交均价（元/kg）· 剔除驳回/作废订单 · 按 " + (days > 30 ? "周" : "日") + "聚合");
 
         // 待办事项
         long pendingSettle = statMapper.pendingSettlements();
@@ -86,8 +119,8 @@ public class DashboardService {
         long qualityPending = statMapper.pendingWarningsByType("质检预警");
         long unqualifiedBatches = statMapper.pendingUnqualifiedWarnings();
         List<Map<String, Object>> todos = new ArrayList<>();
-        todos.add(todo("结算审核", pendingSettle + " 笔结算单待审核", "含 " + pendingLoss.max(BigDecimal.ZERO)
-                + " 元损耗扣款", "/admin/settlements", "amber"));
+        todos.add(todo("SETTLE", "结算审核", pendingSettle + " 笔结算单待审核", "含 " + pendingLoss.max(BigDecimal.ZERO)
+                + " 元损耗扣款 · 点击查看每笔的损耗率与扣款明细", "/admin/settlements", "amber"));
         if (overdue > 0) {
             List<Orders> overdueList = ordersMapper.selectList(new LambdaQueryWrapper<Orders>()
                     .eq(Orders::getStatus, 10)
@@ -97,11 +130,21 @@ public class DashboardService {
             for (Orders o : overdueList) {
                 sb.append(sb.length() == 0 ? "" : "、").append(o.getOrderNo());
             }
-            todos.add(todo("订单监管", overdue + " 个订单逾期未发货", "订单号 " + sb, "/admin/orders", "red"));
+            todos.add(todo("OVERDUE", "订单监管", overdue + " 个订单逾期未发货",
+                    "订单号 " + sb + " · 点击查看逾期天数与责任环节", "/admin/orders", "red"));
         }
-        todos.add(todo("食安预警", expiring + " 家农户证照即将过期", "丰禾农业合作社 · 营业执照",
+        /* 描述里的主体必须来自真实预警表，不再写死某家农户名字（L-037 假数据） */
+        List<Warning> certWarns = warningMapper.selectList(new LambdaQueryWrapper<Warning>()
+                .eq(Warning::getStatus, "待处理")
+                .like(Warning::getWarningType, "证照")
+                .orderByDesc(Warning::getTriggerTime).last("LIMIT 2"));
+        String certTarget = certWarns.isEmpty() ? "暂无待处置证照预警"
+                : certWarns.stream().map(w -> w.getTarget() + " · " + w.getWarningType())
+                .reduce((a, b) -> a + "、" + b).orElse("—");
+        todos.add(todo("CERT", "食安预警", expiring + " 家农户证照即将过期", certTarget,
                 "/admin/warnings", "amber"));
-        todos.add(todo("质检配送", qualityPending + " 笔质检异常待处理", "质检不合格批次 " + unqualifiedBatches + " 笔",
+        todos.add(todo("QUALITY", "质检配送", qualityPending + " 笔质检异常待处理",
+                "质检不合格批次 " + unqualifiedBatches + " 笔 · 点击查看批次与超限项",
                 "/admin/warnings", "teal"));
         m.put("todos", todos);
 
@@ -155,8 +198,34 @@ public class DashboardService {
         return m;
     }
 
-    private Map<String, Object> todo(String module, String title, String desc, String path, String color) {
+    /** 解析逗号分隔的商品 id，非法片段直接忽略（不因一个错值让整块看板 500） */
+    private List<Long> parseIds(String raw) {
+        List<Long> ids = new ArrayList<>();
+        if (raw == null || raw.isBlank()) {
+            return ids;
+        }
+        for (String part : raw.split(",")) {
+            String s = part.trim();
+            if (s.isEmpty()) {
+                continue;
+            }
+            try {
+                long v = Long.parseLong(s);
+                if (v > 0 && !ids.contains(v)) {
+                    ids.add(v);
+                }
+            } catch (NumberFormatException ignored) {
+                // 忽略非法 id
+            }
+        }
+        return ids;
+    }
+
+    /** todoKey 是「点开待办要展示哪一类具体工单」的定位键，前端不再只 router.push(path) */
+    private Map<String, Object> todo(String todoKey, String module, String title, String desc,
+                                     String path, String color) {
         Map<String, Object> t = new LinkedHashMap<>();
+        t.put("todoKey", todoKey);
         t.put("module", module);
         t.put("title", title);
         t.put("desc", desc);
@@ -254,22 +323,21 @@ public class DashboardService {
 
     // ============================================================ 采购员首页统计
     public Map<String, Object> purchaserHome() {
-        Long canteenId = UserContext.getOrNull() == null ? null : UserContext.getOrNull().getCanteenId();
+        // 未绑定食堂时不能"退化成查全量"——那等于让一个没归属的账号看到所有食堂的数据
+        Long canteenId = UserContext.canteenId();
         Map<String, Object> m = new LinkedHashMap<>();
         LambdaQueryWrapper<Orders> base = new LambdaQueryWrapper<Orders>();
-        if (canteenId != null) {
-            base.eq(Orders::getCanteenId, canteenId);
-        }
+        base.eq(Orders::getCanteenId, canteenId);
         m.put("totalOrders", ordersMapper.selectCount(base));
         m.put("pendingInbound", ordersMapper.selectCount(new LambdaQueryWrapper<Orders>()
-                .eq(canteenId != null, Orders::getCanteenId, canteenId).eq(Orders::getStatus, 60)));
+                .eq(Orders::getCanteenId, canteenId).eq(Orders::getStatus, 60)));
         m.put("pendingSettle", ordersMapper.selectCount(new LambdaQueryWrapper<Orders>()
-                .eq(canteenId != null, Orders::getCanteenId, canteenId).eq(Orders::getStatus, 80)));
+                .eq(Orders::getCanteenId, canteenId).eq(Orders::getStatus, 80)));
         m.put("monthDone", ordersMapper.selectCount(new LambdaQueryWrapper<Orders>()
-                .eq(canteenId != null, Orders::getCanteenId, canteenId).eq(Orders::getStatus, 100)
+                .eq(Orders::getCanteenId, canteenId).eq(Orders::getStatus, 100)
                 .apply("DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(NOW(),'%Y-%m')")));
         m.put("pendingEvaluation", ordersMapper.selectCount(new LambdaQueryWrapper<Orders>()
-                .eq(canteenId != null, Orders::getCanteenId, canteenId).eq(Orders::getStatus, 100)
+                .eq(Orders::getCanteenId, canteenId).eq(Orders::getStatus, 100)
                 .notInSql(Orders::getId, "SELECT order_id FROM evaluation")));
         return m;
     }

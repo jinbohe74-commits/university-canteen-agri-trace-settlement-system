@@ -1,6 +1,25 @@
 node_modules/
 dist/
 build/
+target/
 .env
+.env.local
 .DS_Store
 *.log
+.work/
+backend/config/jwt.secret
+backend/config/token-revocations.txt
+backend/uploads/
+
+# 本地凭据与临时解析产物（不上传）
+.tmp_token
+.tmpdocs/
+.build-tmp/
+.tmpbuild/
+.workbuddy/
+
+# 历次改动前的备份快照
+backup_before_*/
+
+# 自动化验收产生的超大原始日志（114 万行，非文档资产）
+verify.json

@@ -1,10 +1,13 @@
 package com.canteen.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.canteen.common.BizException;
+import com.canteen.common.LoginUser;
 import com.canteen.common.PageResult;
+import com.canteen.common.SqlLike;
 import com.canteen.common.UserContext;
 import com.canteen.entity.*;
 import com.canteen.mapper.*;
@@ -21,6 +24,9 @@ import java.util.*;
 
 /**
  * 结算审核：生鲜损耗扣款核算、批量审核、对账凭证
+ *
+ * <p>修复：P1-3 详情归属校验、P1-12 驳回后订单回退可重新入库、
+ * P2 关键词参数绑定 / 数据权限按角色 / 审核改 CAS 防并发重复审核。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -37,9 +43,42 @@ public class SettlementService {
     private final OrderService orderService;
     private final RefService refService;
     private final LogService logService;
+    private final NotificationService notificationService;
+
+    private void applyScope(LambdaQueryWrapper<Settlement> qw) {
+        LoginUser lu = UserContext.getOrNull();
+        if (lu == null || "ADMIN".equals(lu.getRole())) {
+            return;
+        }
+        if ("PURCHASER".equals(lu.getRole())) {
+            Long cid = lu.getCanteenId();
+            qw.eq(Settlement::getCanteenId, cid == null ? -1L : cid);
+        } else if ("FARMER".equals(lu.getRole())) {
+            Long fid = lu.getFarmerId();
+            qw.eq(Settlement::getFarmerId, fid == null ? -1L : fid);
+        }
+    }
+
+    /** 修复 P1-3：带 id 的结算详情补归属校验。 */
+    private void assertScope(Settlement s) {
+        LoginUser lu = UserContext.getOrNull();
+        if (lu == null || "ADMIN".equals(lu.getRole())) {
+            return;
+        }
+        if ("PURCHASER".equals(lu.getRole())) {
+            Long cid = lu.getCanteenId();
+            if (cid == null || !Objects.equals(s.getCanteenId(), cid)) {
+                throw new BizException(403, "无权访问其他食堂的结算单");
+            }
+        } else if ("FARMER".equals(lu.getRole())
+                && !Objects.equals(s.getFarmerId(), lu.getFarmerId())) {
+            throw new BizException(403, "无权访问其他农户的结算单");
+        }
+    }
 
     public PageResult<SettlementVO> page(int page, int size, String status, String period, String keyword) {
         LambdaQueryWrapper<Settlement> qw = new LambdaQueryWrapper<>();
+        applyScope(qw);
         if (StringUtils.hasText(status)) {
             qw.eq(Settlement::getStatus, status);
         }
@@ -47,15 +86,14 @@ public class SettlementService {
             qw.apply("DATE_FORMAT(create_time,'%Y-%m') = {0}", period);
         }
         if (StringUtils.hasText(keyword)) {
-            qw.and(w -> w.like(Settlement::getSettlementNo, keyword)
-                    .or().inSql(Settlement::getOrderId, "SELECT id FROM orders WHERE order_no LIKE '%"
-                            + keyword.replace("'", "") + "%'")
-                    .or().inSql(Settlement::getFarmerId, "SELECT id FROM farmer WHERE name LIKE '%"
-                            + keyword.replace("'", "") + "%'"));
-        }
-        Long canteenId = UserContext.getOrNull() == null ? null : UserContext.getOrNull().getCanteenId();
-        if (canteenId != null && !UserContext.isAdmin()) {
-            qw.eq(Settlement::getCanteenId, canteenId);
+            String like = SqlLike.contains(keyword);
+            if (like == null) {
+                qw.apply("1 = 0");
+            } else {
+                qw.and(w -> w.apply("settlement_no LIKE {0}", like)
+                        .or().apply("order_id IN (SELECT id FROM orders WHERE order_no LIKE {0})", like)
+                        .or().apply("farmer_id IN (SELECT id FROM farmer WHERE name LIKE {0})", like));
+            }
         }
         qw.orderByDesc(Settlement::getCreateTime);
         IPage<Settlement> p = settlementMapper.selectPage(new Page<>(page, size), qw);
@@ -119,6 +157,7 @@ public class SettlementService {
         if (s == null) {
             throw new BizException(404, "结算单不存在");
         }
+        assertScope(s);
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("settlement", toVO(s));
         m.put("items", itemMapper.selectList(new LambdaQueryWrapper<SettlementItem>()
@@ -136,7 +175,10 @@ public class SettlementService {
         return m;
     }
 
-    /** 审核（支持批量） */
+    /**
+     * 审核（支持批量）。修复 P1-12：驳回时把订单原子回退到「已送达(60)」，
+     * 配合 InboundService 复用「已驳回」结算单，形成可重新入库的闭环。
+     */
     @Transactional
     public Map<String, Object> audit(List<Long> ids, boolean pass, String remark) {
         int ok = 0;
@@ -146,21 +188,37 @@ public class SettlementService {
             if (s == null || !"待审核".equals(s.getStatus())) {
                 continue;
             }
-            s.setStatus(pass ? "已结算" : "已驳回");
-            s.setAuditor(UserContext.get().getRealName());
-            s.setConfirmTime(LocalDateTime.now());
-            s.setRemark(StringUtils.hasText(remark) ? remark : s.getRemark());
-            settlementMapper.updateById(s);
+            // CAS 更新：只有仍为「待审核」才能改，避免两个管理员并发重复审核
+            int rows = settlementMapper.update(null, new UpdateWrapper<Settlement>()
+                    .set("status", pass ? "已结算" : "已驳回")
+                    .set("auditor", UserContext.get().getRealName())
+                    .set("confirm_time", LocalDateTime.now())
+                    .set(StringUtils.hasText(remark), "remark", remark)
+                    .eq("id", id).eq("status", "待审核"));
+            if (rows == 0) {
+                continue;
+            }
+            Orders o = ordersMapper.selectById(s.getOrderId());
             if (pass) {
                 ok++;
-                Orders o = ordersMapper.selectById(s.getOrderId());
                 if (o != null && o.getStatus() == 80) {
                     orderService.changeStatus(o.getId(), 90, o.getVersion());
                 }
             } else {
                 rejected++;
+                if (o != null && o.getStatus() == 80) {
+                    ordersMapper.reopenForInbound(o.getId(), o.getVersion());
+                }
             }
             logService.record("结算管理", "审核结算单 " + s.getSettlementNo() + (pass ? "（通过）" : "（驳回）"));
+            if (o != null) {
+                notificationService.toOrderParties(o.getId(), "SETTLE", s.getSettlementNo(),
+                        pass ? "结算已通过" : "结算被驳回",
+                        "结算单 " + s.getSettlementNo() + (pass ? " 审核通过，订单已完成结算"
+                                : " 审核驳回，原因：" + (remark == null ? "未说明" : remark) + "，请重新确认入库"),
+                        pass ? Map.of("FARMER", "/farmer/settlement")
+                             : Map.of("FARMER", "/farmer/settlement", "CANTEEN", "/purchaser/inbound"));
+            }
         }
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("passed", ok);

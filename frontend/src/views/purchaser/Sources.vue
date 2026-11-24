@@ -3,7 +3,7 @@
     <div class="page-head">
       <div>
         <h2 class="page-title">货源大厅</h2>
-        <p class="page-sub">浏览农户在售货源，按品类、价格、信用筛选，可直接下单</p>
+        <p class="page-sub">按品类、价格、信用筛选货源；勾选多个品项加入采购单，一次提交即可，不用一个个下单</p>
       </div>
       <div class="page-actions">
         <el-button plain @click="load"><el-icon><Refresh /></el-icon>刷新货源</el-button>
@@ -104,9 +104,29 @@
           <el-icon><Box /></el-icon>储存要求：{{ s.storageReq || '常温通风' }}
         </div>
 
+        <div class="sc-buy">
+          <el-input-number
+            v-model="draft[s.id]"
+            :min="1"
+            :max="Math.max(1, Number(s.quantity) || 1)"
+            :step="10"
+            :controls="false"
+            size="small"
+            class="sc-qty"
+          />
+          <span class="sc-unit">{{ s.unit }}</span>
+          <el-button
+            :type="inCart(s.id) ? 'success' : 'primary'"
+            size="small"
+            :plain="inCart(s.id)"
+            @click="toggleCart(s)"
+          >
+            {{ inCart(s.id) ? '已加入 ✓' : '加入采购单' }}
+          </el-button>
+        </div>
         <div class="sc-foot">
-          <el-button type="primary" size="small" @click="openOrder(s)">下单</el-button>
-          <el-button size="small" plain @click="showFarmer(s)">查看农户</el-button>
+          <span class="link" @click="showFarmer(s)">查看农户</span>
+          <span class="muted small">已售 {{ fmtNum(s.soldQuantity, 0) }} {{ s.unit }}</span>
         </div>
       </div>
 
@@ -130,49 +150,30 @@
       </div>
     </div>
 
-    <!-- 下单弹窗 -->
-    <el-dialog v-model="orderVisible" title="采购下单" width="500px">
-      <div v-if="current" class="order-box">
-        <div class="ob-grid">
-          <div class="ob-item"><span class="k">产品</span><span class="v">{{ current.productName }}（{{ current.categoryName }}）</span></div>
-          <div class="ob-item"><span class="k">供货农户</span><span class="v">{{ current.farmerName }} · {{ current.farmerType }}</span></div>
-          <div class="ob-item"><span class="k">单价</span><span class="v money">¥{{ fmtMoney(current.price) }}/{{ current.unit }}</span></div>
-          <div class="ob-item"><span class="k">可供数量</span><span class="v">{{ fmtNum(current.quantity) }} {{ current.unit }}</span></div>
-        </div>
-
-        <el-form label-position="top" class="order-form">
-          <el-form-item :label="'下单数量（' + current.unit + '）'">
-            <el-input-number
-              v-model="orderForm.quantity"
-              :min="1"
-              :max="Number(current.quantity)"
-              :step="10"
-              controls-position="right"
-              style="width: 100%"
-            />
-          </el-form-item>
-          <el-form-item label="期望交付时间">
-            <el-date-picker
-              v-model="orderForm.expectedDelivery"
-              type="datetime"
-              format="YYYY-MM-DD HH:mm"
-              value-format="YYYY-MM-DDTHH:mm:ss"
-              placeholder="选择期望交付时间"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </el-form>
-
-        <div class="ob-total">
-          <span>预计订单金额</span>
-          <b class="money">¥{{ orderAmount }}</b>
-        </div>
+    <!-- 采购单购物栏：勾选多个货源后一次提交，替代原来「一个货源一张单」 -->
+    <div class="po-bar" v-if="cartList.length">
+      <div class="po-bar-left">
+        <el-icon class="po-cart"><ShoppingCart /></el-icon>
+        <span class="po-count">{{ cartList.length }} 个品项</span>
+        <span class="po-amount">¥{{ fmtMoney(cartTotal) }}</span>
+        <span class="po-names">{{ cartNames }}</span>
       </div>
-      <template #footer>
-        <el-button @click="orderVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="submitOrder">确认下单</el-button>
-      </template>
-    </el-dialog>
+      <div class="po-bar-right">
+        <el-date-picker
+          v-model="poForm.expectedDelivery"
+          type="datetime"
+          format="YYYY-MM-DD HH:mm"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          placeholder="期望到货时间"
+          size="small"
+          style="width: 186px"
+        />
+        <el-button size="small" plain @click="clearCart">清空</el-button>
+        <el-button size="small" type="primary" :loading="submitting" @click="submitPo">
+          提交采购单（{{ cartList.length }}）
+        </el-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -182,6 +183,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { purchaserApi } from '@/api'
 import { fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const route = useRoute()
 const router = useRouter()
@@ -203,10 +205,12 @@ const filters = reactive({
   sort: ''
 })
 
-const orderVisible = ref(false)
 const submitting = ref(false)
-const current = ref(null)
-const orderForm = reactive({ quantity: 400, expectedDelivery: '' })
+/** 采购单：sourceId -> { source, qty }，同一货源多次加入按最后一次数量覆盖 */
+const cart = reactive({})
+/** 卡片上的数量草稿，避免「加购」前必须先开弹窗 */
+const draft = reactive({})
+const poForm = reactive({ expectedDelivery: '' })
 
 // 排序下拉：默认「最新上架」对应接口 sort 为空，保持 '' | 'price' | 'credit' 契约
 const sortModel = computed({
@@ -230,11 +234,48 @@ const defaultDelivery = () => {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T08:00:00`
 }
 
-const orderAmount = computed(() => {
-  const qty = Number(orderForm.quantity || 0)
-  const price = Number(current.value?.price || 0)
-  return fmtMoney((qty * price).toFixed(2))
-})
+const cartList = computed(() => Object.values(cart))
+
+const inCart = (id) => !!cart[id]
+
+/** 采购单合计金额：按当前单价快照估算，最终以提交时的服务端算价为准 */
+const cartTotal = computed(() =>
+  cartList.value
+    .reduce((sum, c) => sum + Number(c.qty || 0) * Number(c.source.price || 0), 0)
+    .toFixed(2)
+)
+
+const cartNames = computed(() =>
+  cartList.value
+    .slice(0, 4)
+    .map((c) => `${c.source.productName} ${fmtNum(c.qty, 0)}${c.source.unit}`)
+    .join('、') + (cartList.value.length > 4 ? ` 等 ${cartList.value.length} 项` : '')
+)
+
+const toggleCart = (s) => {
+  if (cart[s.id]) {
+    delete cart[s.id]
+    ElMessage.info(`已移出采购单：${s.productName}`)
+    return
+  }
+  const avail = Number(s.quantity || 0)
+  if (avail <= 0) {
+    ElMessage.warning('该货源已无可供应量')
+    return
+  }
+  let qty = Number(draft[s.id] || 0)
+  if (!qty || qty <= 0) qty = Math.min(400, avail)
+  if (qty > avail) {
+    qty = avail
+    ElMessage.warning(`「${s.productName}」最多可供 ${fmtNum(avail, 0)}${s.unit}，已按可供量加入`)
+  }
+  cart[s.id] = { source: s, qty }
+  ElMessage.success(`已加入采购单：${s.productName} ${fmtNum(qty, 0)}${s.unit}`)
+}
+
+const clearCart = () => {
+  Object.keys(cart).forEach((k) => delete cart[k])
+}
 
 const load = async () => {
   loading.value = true
@@ -252,6 +293,12 @@ const load = async () => {
     rows.value = payload.records || []
     total.value = Number(payload.total || 0)
     pages.value = Number(payload.pages || 1)
+    // 数量草稿默认给一个「合理起订量」，用户直接点「加入采购单」即可
+    rows.value.forEach((r) => {
+      if (draft[r.id] === undefined) {
+        draft[r.id] = Math.max(1, Math.min(400, Number(r.quantity) || 1))
+      }
+    })
   } catch (e) {
     /* 错误提示由请求拦截器统一处理 */
   } finally {
@@ -274,13 +321,6 @@ const reset = () => {
   load()
 }
 
-const openOrder = (s) => {
-  current.value = s
-  orderForm.quantity = Math.max(1, Math.min(400, Number(s.quantity) || 1))
-  orderForm.expectedDelivery = defaultDelivery()
-  orderVisible.value = true
-}
-
 const showFarmer = (s) => {
   ElMessage({
     type: 'success',
@@ -292,22 +332,24 @@ const showFarmer = (s) => {
   })
 }
 
-const submitOrder = async () => {
-  if (!current.value) return
-  const qty = Number(orderForm.quantity || 0)
-  if (qty <= 0) return ElMessage.warning('下单数量必须大于 0')
-  if (qty > Number(current.value.quantity)) return ElMessage.warning('下单数量不能超过可供数量')
-  if (!orderForm.expectedDelivery) return ElMessage.warning('请选择期望交付时间')
+const submitPo = async () => {
+  if (!cartList.value.length) return
+  for (const c of cartList.value) {
+    const qty = Number(c.qty || 0)
+    if (qty <= 0) return ElMessage.warning(`「${c.source.productName}」数量必须大于 0`)
+    if (qty > Number(c.source.quantity || 0)) {
+      return ElMessage.warning(`「${c.source.productName}」数量超过可供量，请调整后再提交`)
+    }
+  }
   submitting.value = true
   try {
-    await purchaserApi.createOrder({
-      demandId: null,
-      sourceId: current.value.id,
-      quantity: qty,
-      expectedDelivery: orderForm.expectedDelivery
+    const res = await purchaserApi.createPurchaseOrder({
+      items: cartList.value.map((c) => ({ sourceId: c.source.id, quantity: Number(c.qty) })),
+      expectedDelivery: poForm.expectedDelivery || undefined,
+      remark: ''
     })
-    ElMessage.success('下单成功，已通知农户接单')
-    orderVisible.value = false
+    ElMessage.success(res.message || '采购单已生成，已通知农户接单')
+    clearCart()
     router.push('/purchaser/orders')
   } catch (e) {
     /* 错误提示由请求拦截器统一处理 */
@@ -316,7 +358,11 @@ const submitOrder = async () => {
   }
 }
 
-onMounted(load)
+useAutoRefresh(load)
+onMounted(() => {
+  poForm.expectedDelivery = defaultDelivery()
+  load()
+})
 </script>
 
 <style scoped>
@@ -374,7 +420,7 @@ onMounted(load)
 }
 
 .sc-name {
-  font-size: 15px;
+  font-size: var(--fs-md);
   font-weight: 700;
   color: #14372a;
   line-height: 1.3;
@@ -384,13 +430,13 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   min-width: 0;
 }
 
 .sc-farmer .el-icon {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-primary);
   flex-shrink: 0;
 }
@@ -404,20 +450,20 @@ onMounted(load)
 
 .sc-price {
   font-family: var(--font-num);
-  font-size: 26px;
+  font-size: var(--fs-display);
   font-weight: 700;
-  color: #15803d;
+  color: var(--accent);
   letter-spacing: -0.6px;
   line-height: 1.1;
 }
 
 .sc-price .cur {
-  font-size: 15px;
+  font-size: var(--fs-md);
   margin-right: 1px;
 }
 
 .sc-price .unit {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   font-weight: 500;
   letter-spacing: 0;
@@ -425,7 +471,7 @@ onMounted(load)
 }
 
 .sc-avg {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: -4px;
 }
@@ -440,13 +486,13 @@ onMounted(load)
   gap: 7px;
   padding: 7px 9px;
   border-radius: 8px;
-  background: #f7fbf9;
+  background: var(--surface-2);
 }
 
 .credit-num {
   font-family: var(--font-num);
-  font-size: 13.5px;
-  color: #15803d;
+  font-size: var(--fs-base);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -454,7 +500,7 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
 }
 
@@ -468,22 +514,100 @@ onMounted(load)
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   padding-top: 8px;
   border-top: 1px dashed var(--c-border);
 }
 
-.sc-foot {
+.sc-buy {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: auto;
   padding-top: 4px;
 }
 
-.sc-foot .el-button {
+.sc-qty {
+  width: 86px;
+}
+
+.sc-qty :deep(.el-input__inner) {
+  text-align: right;
+}
+
+.sc-unit {
+  font-size: var(--fs-xs);
+  color: var(--c-muted);
+}
+
+.sc-buy .el-button {
   flex: 1;
+}
+
+.sc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* 采购单购物栏：吸在视口底部，勾选多少品项都看得到合计与提交 */
+.po-bar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--c-border);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.14);
+}
+
+.po-bar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.po-cart {
+  color: var(--accent);
+  font-size: 17px;
+  align-self: center;
+}
+
+.po-count {
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+
+.po-amount {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: var(--fs-md);
+}
+
+.po-names {
+  font-size: var(--fs-xs);
+  color: var(--c-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 420px;
+}
+
+.po-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .pager-card {
@@ -496,13 +620,13 @@ onMounted(load)
   gap: 9px 16px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f7fbf9;
+  background: var(--surface-2);
 }
 
 .ob-item {
   display: flex;
   gap: 8px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   align-items: baseline;
 }
 
@@ -513,7 +637,7 @@ onMounted(load)
 }
 
 .ob-item .v {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 500;
 }
 
@@ -531,12 +655,12 @@ onMounted(load)
   justify-content: space-between;
   padding-top: 12px;
   border-top: 1px dashed var(--c-border);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
 .ob-total .money {
-  font-size: 20px;
-  color: #15803d;
+  font-size: var(--fs-xl);
+  color: var(--accent);
 }
 </style>

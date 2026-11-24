@@ -17,6 +17,8 @@ public class Warning {
     private String warningType;
     private String target;
     private String content;
+    /** 现场照片，分号分隔的相对地址；质检员上报异常时真实上传 */
+    private String photoUrls;
     private String status;
     private LocalDateTime triggerTime;
     private String handler;

@@ -1,5 +1,6 @@
 package com.canteen.service;
 
+import com.canteen.common.LoginUser;
 import com.canteen.common.UserContext;
 import com.canteen.entity.OperationLog;
 import com.canteen.mapper.OperationLogMapper;
@@ -28,12 +29,24 @@ public class LogService {
     }
 
     public void record(String module, String content, String result) {
+        record((LoginUser) null, module, content, result);
+    }
+
+    public void record(LoginUser actor, String module, String content) {
+        record(actor, module, content, "成功");
+    }
+
+    /**
+     * 显式指定操作人。登录 / 登录失败这类场景发生在 token 签发之前，
+     * UserContext 当时为空，若走隐式取上下文会全部落成「未知」。
+     */
+    public void record(LoginUser actor, String module, String content, String result) {
         try {
             OperationLog l = new OperationLog();
-            var lu = UserContext.getOrNull();
+            LoginUser lu = actor != null ? actor : UserContext.getOrNull();
             if (lu != null) {
                 l.setUserId(lu.getUserId());
-                l.setOperator(lu.getRealName());
+                l.setOperator(displayName(lu));
                 l.setRoleName(roleName(lu.getRole()));
             } else {
                 l.setOperator("未知");
@@ -48,6 +61,17 @@ public class LogService {
         } catch (Exception e) {
             log.warn("写入操作日志失败: {}", e.getMessage());
         }
+    }
+
+    /** 操作人展示名：真实姓名 → 账号名 → 未知，任一层有值就不要显示「未知」 */
+    private static String displayName(LoginUser lu) {
+        if (lu.getRealName() != null && !lu.getRealName().isBlank()) {
+            return lu.getRealName().trim();
+        }
+        if (lu.getUsername() != null && !lu.getUsername().isBlank()) {
+            return lu.getUsername().trim();
+        }
+        return "未知";
     }
 
     public static String roleName(String role) {

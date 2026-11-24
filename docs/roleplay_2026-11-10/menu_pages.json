@@ -1,0 +1,134 @@
+[
+  {
+    "label": "数据看板 01",
+    "title": "食安预警管理",
+    "rows": 10,
+    "cards": 3,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "预警规则",
+      "预警订阅"
+    ]
+  },
+  {
+    "label": "农户/合作社管理 01",
+    "title": "农户/合作社管理",
+    "rows": 10,
+    "cards": 1,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "导出名册",
+      "新增农户"
+    ]
+  },
+  {
+    "label": "食堂档案管理 02",
+    "title": "食堂档案管理",
+    "rows": 5,
+    "cards": 1,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "导出名册",
+      "新增食堂"
+    ]
+  },
+  {
+    "label": "农产品档案 03",
+    "title": "农产品档案",
+    "rows": 10,
+    "cards": 1,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "导入模板",
+      "新增产品"
+    ]
+  },
+  {
+    "label": "用户与权限 04",
+    "title": "用户与权限",
+    "rows": 10,
+    "cards": 2,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "角色管理",
+      "新增用户"
+    ]
+  },
+  {
+    "label": "订单监管 01",
+    "title": "订单监管",
+    "rows": 10,
+    "cards": 2,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "导出订单",
+      "打印统计"
+    ]
+  },
+  {
+    "label": "结算审核 02",
+    "title": "结算审核",
+    "rows": 10,
+    "cards": 3,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "导出对账单",
+      "批量审核"
+    ]
+  },
+  {
+    "label": "食安预警 03",
+    "title": "食安预警管理",
+    "rows": 10,
+    "cards": 3,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "预警规则",
+      "预警订阅"
+    ]
+  },
+  {
+    "label": "批次溯源 04",
+    "title": "批次溯源查询",
+    "rows": 0,
+    "cards": 6,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "扫码查询",
+      "溯源报告"
+    ]
+  },
+  {
+    "label": "系统参数配置 01",
+    "title": "系统参数配置",
+    "rows": 0,
+    "cards": 6,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "恢复默认",
+      "保存配置"
+    ]
+  },
+  {
+    "label": "操作日志 02",
+    "title": "操作日志",
+    "rows": 10,
+    "cards": 1,
+    "empty": "",
+    "guide": false,
+    "actions": [
+      "导出日志",
+      "审计策略"
+    ]
+  }
+]

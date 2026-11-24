@@ -1,0 +1,1301 @@
+{
+  "pages": [
+    {
+      "role": "ADMIN",
+      "route": "/admin/dashboard",
+      "h1": "运营总览",
+      "pageHeight": 1603,
+      "screens": 1.8,
+      "btns": 2,
+      "primaries": [
+        {
+          "text": "导出报表",
+          "inFirst": true,
+          "top": 97
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 43,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 80,
+      "hasSearch": false,
+      "bodyChars": 812,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/farmers",
+      "h1": "农户/合作社管理",
+      "pageHeight": 1281,
+      "screens": 1.4,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "新增农户",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 290
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 10,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 10,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": "10条",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 157,
+      "hasSearch": true,
+      "bodyChars": 1039,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/canteens",
+      "h1": "食堂档案管理",
+      "pageHeight": 900,
+      "screens": 1,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "新增食堂",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 290
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 9,
+          "overflowX": false,
+          "rows": 5
+        }
+      ],
+      "maxCols": 9,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": "10条",
+      "rowsOnPage": 5,
+      "firstScreenNodes": 147,
+      "hasSearch": true,
+      "bodyChars": 573,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/products",
+      "h1": "农产品档案",
+      "pageHeight": 1281,
+      "screens": 1.4,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "新增产品",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 290
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 9,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 9,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": "10条",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 169,
+      "hasSearch": true,
+      "bodyChars": 851,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/users",
+      "h1": "用户与权限",
+      "pageHeight": 1147,
+      "screens": 1.3,
+      "btns": 6,
+      "primaries": [
+        {
+          "text": "新增用户",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 209
+        },
+        {
+          "text": "保存权限",
+          "inFirst": false,
+          "top": 1068
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 7,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 7,
+      "overflowX": false,
+      "tiny": 48,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": "10条",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 191,
+      "hasSearch": true,
+      "bodyChars": 1516,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/orders",
+      "h1": "订单监管",
+      "pageHeight": 1267,
+      "screens": 1.4,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "打印统计",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 503
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 9,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 9,
+      "overflowX": false,
+      "tiny": 28,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 168,
+      "hasSearch": true,
+      "bodyChars": 1183,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/settlements",
+      "h1": "结算审核",
+      "pageHeight": 1381,
+      "screens": 1.5,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 643
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 10,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 10,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 144,
+      "hasSearch": true,
+      "bodyChars": 1471,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/warnings",
+      "h1": "食安预警管理",
+      "pageHeight": 1392,
+      "screens": 1.5,
+      "btns": 5,
+      "primaries": [
+        {
+          "text": "预警订阅",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 629
+        },
+        {
+          "text": "一键处置",
+          "inFirst": true,
+          "top": 629
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 7,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 7,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 112,
+      "hasSearch": true,
+      "bodyChars": 1158,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/trace",
+      "h1": "批次溯源查询",
+      "pageHeight": 1362,
+      "screens": 1.5,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "溯源报告",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询溯源",
+          "inFirst": true,
+          "top": 165
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 27,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 106,
+      "hasSearch": true,
+      "bodyChars": 1135,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/config",
+      "h1": "系统参数配置",
+      "pageHeight": 1283,
+      "screens": 1.4,
+      "btns": 2,
+      "primaries": [
+        {
+          "text": "保存配置",
+          "inFirst": true,
+          "top": 99
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 24,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 116,
+      "hasSearch": true,
+      "bodyChars": 867,
+      "consoleErrors": 0
+    },
+    {
+      "role": "ADMIN",
+      "route": "/admin/logs",
+      "h1": "操作日志",
+      "pageHeight": 1250,
+      "screens": 1.4,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "审计策略",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 290
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 6,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 6,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "概览@11",
+        "01@11",
+        "基础档案@11"
+      ],
+      "filterH": 82,
+      "filterRatio": 9.1,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 121,
+      "hasSearch": true,
+      "bodyChars": 846,
+      "consoleErrors": 0
+    },
+    {
+      "role": "FARMER",
+      "route": "/farmer/workbench",
+      "h1": "我的工作台",
+      "pageHeight": 1108,
+      "screens": 1.2,
+      "btns": 2,
+      "primaries": [
+        {
+          "text": "发布货源",
+          "inFirst": true,
+          "top": 99
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 10,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "生产经营@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 86,
+      "hasSearch": false,
+      "bodyChars": 616,
+      "consoleErrors": 0
+    },
+    {
+      "role": "FARMER",
+      "route": "/farmer/sources",
+      "h1": "货源管理",
+      "pageHeight": 1214,
+      "screens": 1.3,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "发布货源",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 337
+        },
+        {
+          "text": "发布货源",
+          "inFirst": false,
+          "top": 875
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 8,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 8,
+      "overflowX": false,
+      "tiny": 20,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "生产经营@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 158,
+      "hasSearch": true,
+      "bodyChars": 743,
+      "consoleErrors": 0
+    },
+    {
+      "role": "FARMER",
+      "route": "/farmer/orders",
+      "h1": "订单管理",
+      "pageHeight": 1070,
+      "screens": 1.2,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "刷新",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 381
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 8,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 8,
+      "overflowX": false,
+      "tiny": 28,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "生产经营@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 148,
+      "hasSearch": true,
+      "bodyChars": 883,
+      "consoleErrors": 0
+    },
+    {
+      "role": "FARMER",
+      "route": "/farmer/settlement",
+      "h1": "结算与收入",
+      "pageHeight": 931,
+      "screens": 1,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "刷新",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 337
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 11,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 11,
+      "overflowX": false,
+      "tiny": 10,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "生产经营@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 201,
+      "hasSearch": false,
+      "bodyChars": 1146,
+      "consoleErrors": 0
+    },
+    {
+      "role": "FARMER",
+      "route": "/farmer/credit",
+      "h1": "信用评价",
+      "pageHeight": 1814,
+      "screens": 2,
+      "btns": 1,
+      "primaries": [],
+      "primaryInFirst": false,
+      "tables": [
+        {
+          "cols": 5,
+          "overflowX": false,
+          "rows": 8
+        }
+      ],
+      "maxCols": 5,
+      "overflowX": false,
+      "tiny": 82,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "生产经营@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 8,
+      "firstScreenNodes": 104,
+      "hasSearch": false,
+      "bodyChars": 1494,
+      "consoleErrors": 0
+    },
+    {
+      "role": "FARMER",
+      "route": "/farmer/messages",
+      "h1": "消息提醒",
+      "pageHeight": 1155,
+      "screens": 1.3,
+      "btns": 1,
+      "primaries": [
+        {
+          "text": "全部已读",
+          "inFirst": true,
+          "top": 99
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 25,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "生产经营@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 88,
+      "hasSearch": false,
+      "bodyChars": 845,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/demands",
+      "h1": "采购需求管理",
+      "pageHeight": 1136,
+      "screens": 1.3,
+      "btns": 3,
+      "primaries": [
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 337
+        },
+        {
+          "text": "发布需求",
+          "inFirst": true,
+          "top": 804
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 9,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 9,
+      "overflowX": false,
+      "tiny": 11,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 143,
+      "hasSearch": true,
+      "bodyChars": 869,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/sources",
+      "h1": "货源大厅",
+      "pageHeight": 934,
+      "screens": 1,
+      "btns": 19,
+      "primaries": [
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 162
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 481
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 481
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 481
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 481
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 795
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 795
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 795
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 795
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 11,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 56,
+      "filterRatio": 6.2,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 0,
+      "firstScreenNodes": 163,
+      "hasSearch": true,
+      "bodyChars": 798,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/match",
+      "h1": "智能匹配",
+      "pageHeight": 900,
+      "screens": 1,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "调整权重",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "开始匹配",
+          "inFirst": true,
+          "top": 320
+        },
+        {
+          "text": "下单",
+          "inFirst": true,
+          "top": 456
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 11,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 70,
+      "hasSearch": false,
+      "bodyChars": 527,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/orders",
+      "h1": "我的订单",
+      "pageHeight": 1136,
+      "screens": 1.3,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "导出",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 337
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 8,
+          "overflowX": false,
+          "rows": 10
+        }
+      ],
+      "maxCols": 8,
+      "overflowX": false,
+      "tiny": 11,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 57,
+      "filterRatio": 6.3,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 10,
+      "firstScreenNodes": 134,
+      "hasSearch": true,
+      "bodyChars": 913,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/inbound",
+      "h1": "入库确认（生鲜损耗）",
+      "pageHeight": 1113,
+      "screens": 1.2,
+      "btns": 5,
+      "primaries": [
+        {
+          "text": "查询",
+          "inFirst": true,
+          "top": 165
+        },
+        {
+          "text": "确认入库",
+          "inFirst": true,
+          "top": 561
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 6,
+          "overflowX": false,
+          "rows": 5
+        }
+      ],
+      "maxCols": 6,
+      "overflowX": false,
+      "tiny": 11,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 5,
+      "firstScreenNodes": 101,
+      "hasSearch": true,
+      "bodyChars": 878,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/evaluation",
+      "h1": "采购评价",
+      "pageHeight": 917,
+      "screens": 1,
+      "btns": 8,
+      "primaries": [
+        {
+          "text": "提交评价",
+          "inFirst": true,
+          "top": 792
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 12,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 103,
+      "hasSearch": false,
+      "bodyChars": 672,
+      "consoleErrors": 0
+    },
+    {
+      "role": "PURCHASER",
+      "route": "/purchaser/trace",
+      "h1": "批次溯源查询",
+      "pageHeight": 1362,
+      "screens": 1.5,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "溯源报告",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询溯源",
+          "inFirst": true,
+          "top": 165
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 19,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "采购协同@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 94,
+      "hasSearch": true,
+      "bodyChars": 1088,
+      "consoleErrors": 0
+    },
+    {
+      "role": "INSPECTOR",
+      "route": "/inspector/tasks",
+      "h1": "",
+      "pageHeight": 900,
+      "screens": 1,
+      "btns": 0,
+      "primaries": [],
+      "primaryInFirst": false,
+      "tables": [
+        {
+          "cols": 7,
+          "overflowX": false,
+          "rows": 4
+        }
+      ],
+      "maxCols": 7,
+      "overflowX": false,
+      "tiny": 9,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "质检配送@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "rowsOnPage": 4,
+      "firstScreenNodes": 90,
+      "hasSearch": false,
+      "bodyChars": 402,
+      "consoleErrors": 0
+    },
+    {
+      "role": "INSPECTOR",
+      "route": "/inspector/quality",
+      "h1": "质检录入",
+      "pageHeight": 1205,
+      "screens": 1.3,
+      "btns": 3,
+      "primaries": [
+        {
+          "text": "提交质检",
+          "inFirst": false,
+          "top": 1127
+        }
+      ],
+      "primaryInFirst": false,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 10,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "质检配送@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 102,
+      "hasSearch": false,
+      "bodyChars": 658,
+      "consoleErrors": 0
+    },
+    {
+      "role": "INSPECTOR",
+      "route": "/inspector/delivery",
+      "h1": "配送任务",
+      "pageHeight": 1818,
+      "screens": 2,
+      "btns": 3,
+      "primaries": [
+        {
+          "text": "扫码交付",
+          "inFirst": true,
+          "top": 393
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [
+        {
+          "cols": 7,
+          "overflowX": false,
+          "rows": 13
+        }
+      ],
+      "maxCols": 7,
+      "overflowX": false,
+      "tiny": 12,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "质检配送@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 13,
+      "firstScreenNodes": 79,
+      "hasSearch": false,
+      "bodyChars": 1357,
+      "consoleErrors": 0
+    },
+    {
+      "role": "INSPECTOR",
+      "route": "/inspector/exception",
+      "h1": "异常上报",
+      "pageHeight": 981,
+      "screens": 1.1,
+      "btns": 3,
+      "primaries": [
+        {
+          "text": "提交上报",
+          "inFirst": true,
+          "top": 758
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 12,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "质检配送@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 74,
+      "hasSearch": true,
+      "bodyChars": 477,
+      "consoleErrors": 0
+    },
+    {
+      "role": "INSPECTOR",
+      "route": "/inspector/trace",
+      "h1": "批次溯源查询",
+      "pageHeight": 1362,
+      "screens": 1.5,
+      "btns": 4,
+      "primaries": [
+        {
+          "text": "溯源报告",
+          "inFirst": true,
+          "top": 99
+        },
+        {
+          "text": "查询溯源",
+          "inFirst": true,
+          "top": 165
+        }
+      ],
+      "primaryInFirst": true,
+      "tables": [],
+      "maxCols": 0,
+      "overflowX": false,
+      "tiny": 17,
+      "tinySamples": [
+        "TRACE & SETTLE@11",
+        "质检配送@11",
+        "01@11",
+        "02@11"
+      ],
+      "filterH": 0,
+      "filterRatio": 0,
+      "enumUniq": [],
+      "hasEmpty": false,
+      "emptyText": "",
+      "pageSize": null,
+      "rowsOnPage": 0,
+      "firstScreenNodes": 90,
+      "hasSearch": true,
+      "bodyChars": 1076,
+      "consoleErrors": 0
+    }
+  ],
+  "summary": {}
+}

@@ -1,0 +1,311 @@
+[
+  {
+    "role": "管理员",
+    "no": 1,
+    "title": "结算审核",
+    "count": "11 笔待审核",
+    "path": "/admin/settlements",
+    "file": "ADMIN-1-审核结算单.png",
+    "sub": "依据生鲜损耗结算规则，审核入库实收数量与扣款，支持批量结算与凭证导出",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "导出对账单",
+      "批量审核"
+    ],
+    "chip": "流程 1/5 审核结算单 11"
+  },
+  {
+    "role": "管理员",
+    "no": 2,
+    "title": "食安预警管理",
+    "count": "13 条待处理",
+    "path": "/admin/warnings",
+    "file": "ADMIN-2-处置食安预警.png",
+    "sub": "集中监测证照、质检、价格、订单逾期四类风险，阈值后台可配置",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "预警规则",
+      "预警订阅"
+    ],
+    "chip": "流程 2/5 处置食安预警 13"
+  },
+  {
+    "role": "管理员",
+    "no": 3,
+    "title": "订单监管",
+    "count": "23 笔在途",
+    "path": "/admin/orders",
+    "file": "ADMIN-3-跟进在途订单.png",
+    "sub": "全流程监管订单状态流转，支持超时预警、催办与追溯",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "导出订单",
+      "打印统计"
+    ],
+    "chip": "流程 3/5 跟进在途订单 23"
+  },
+  {
+    "role": "管理员",
+    "no": 4,
+    "title": "农户/合作社管理",
+    "count": "6 户待审核",
+    "path": "/admin/farmers",
+    "file": "ADMIN-4-审核农户准入.png",
+    "sub": "维护农户、合作社、生产基地档案，审核入驻资质与认证状态",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "导出名册",
+      "新增农户"
+    ],
+    "chip": "流程 4/5 审核农户准入 6"
+  },
+  {
+    "role": "管理员",
+    "no": 5,
+    "title": "运营总览",
+    "count": "6 笔今日新单",
+    "path": "/admin/dashboard",
+    "file": "ADMIN-5-看经营态势.png",
+    "sub": "平台全局态势 · 数据截至 2026-11-11 18:03 · 2026-11-11",
+    "rows": 0,
+    "empty": "",
+    "buttons": [
+      "刷新",
+      "导出报表"
+    ],
+    "chip": "流程 5/5 看经营态势 6"
+  },
+  {
+    "role": "农户",
+    "no": 1,
+    "title": "货源管理",
+    "count": "7 个在售",
+    "path": "/farmer/sources",
+    "file": "FARMER-1-把今天能供的菜挂上去.png",
+    "sub": "维护可供农产品、数量与报价，货源将进入智能匹配候选池",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "导出货源",
+      "发布货源"
+    ],
+    "chip": "流程 1/5 把今天能供的菜挂上去 7"
+  },
+  {
+    "role": "农户",
+    "no": 2,
+    "title": "需求大厅",
+    "count": "7 条待报价",
+    "path": "/farmer/demands",
+    "file": "FARMER-2-去需求大厅报价.png",
+    "sub": "食堂发布的采购需求都在这里，报价后由采购员横向比价定标，中标即生成采购单",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "刷新"
+    ],
+    "chip": "流程 2/5 去需求大厅报价 7"
+  },
+  {
+    "role": "农户",
+    "no": 3,
+    "title": "订单管理",
+    "count": "暂无待办",
+    "path": "/farmer/orders?status=10",
+    "file": "FARMER-3-确认接单.png",
+    "sub": "查看食堂采购订单，完成接单、发货与批次绑定，跟踪订单全流程",
+    "rows": 0,
+    "empty": "暂无符合条件的订单",
+    "buttons": [
+      "导出订单",
+      "刷新"
+    ],
+    "chip": "流程 3–4/5 确认接单"
+  },
+  {
+    "role": "农户",
+    "no": 4,
+    "title": "订单管理",
+    "count": "暂无待办",
+    "path": "/farmer/orders?status=20",
+    "file": "FARMER-4-备货发货.png",
+    "sub": "查看食堂采购订单，完成接单、发货与批次绑定，跟踪订单全流程",
+    "rows": 0,
+    "empty": "暂无符合条件的订单",
+    "buttons": [
+      "导出订单",
+      "刷新"
+    ],
+    "chip": "流程 3–4/5 确认接单"
+  },
+  {
+    "role": "农户",
+    "no": 5,
+    "title": "结算与收入",
+    "count": "1 笔待审核结算",
+    "path": "/farmer/settlement",
+    "file": "FARMER-5-查结算与收入.png",
+    "sub": "查看结算单、损耗扣款明细与收入统计",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "导出对账单",
+      "刷新"
+    ],
+    "chip": "流程 5/5 查结算与收入 1"
+  },
+  {
+    "role": "采购员",
+    "no": 1,
+    "title": "采购需求管理",
+    "count": "10 条处理中",
+    "path": "/purchaser/demands",
+    "file": "PURCHASER-1-提出采购需求.png",
+    "sub": "发布采购需求，系统自动推送农户并启动五因子智能匹配",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "导出需求"
+    ],
+    "chip": "流程 1/5 提出采购需求 10"
+  },
+  {
+    "role": "采购员",
+    "no": 2,
+    "title": "智能匹配",
+    "count": "49 个在售货源",
+    "path": "/purchaser/match",
+    "file": "PURCHASER-2-选货源智能匹配.png",
+    "sub": "需求单 X20261111145 · 基于五因子加权模型自动推荐 Top5 货源",
+    "rows": 0,
+    "empty": "",
+    "buttons": [
+      "重新匹配",
+      "调整权重"
+    ],
+    "chip": "流程 2/5 选货源 / 智能匹配 49"
+  },
+  {
+    "role": "采购员",
+    "no": 3,
+    "title": "我的订单",
+    "count": "29 笔在途",
+    "path": "/purchaser/orders",
+    "file": "PURCHASER-3-跟单到货.png",
+    "sub": "第一食堂采购订单全流程跟踪，支持收货入库、结算与溯源",
+    "rows": 10,
+    "empty": "",
+    "buttons": [
+      "发布需求",
+      "导出"
+    ],
+    "chip": "流程 3/5 跟单到货 29"
+  },
+  {
+    "role": "采购员",
+    "no": 4,
+    "title": "入库确认（生鲜损耗）",
+    "count": "6 笔待验收",
+    "path": "/purchaser/inbound",
+    "file": "PURCHASER-4-实秤验收入库.png",
+    "sub": "扫码核对批次，录入实收数量与质检结果，系统按损耗自动计算结算金额",
+    "rows": 5,
+    "empty": "",
+    "buttons": [
+      "刷新记录"
+    ],
+    "chip": "流程 4/5 实秤验收入库 6"
+  },
+  {
+    "role": "采购员",
+    "no": 5,
+    "title": "采购评价",
+    "count": "8 笔待评价",
+    "path": "/purchaser/evaluation",
+    "file": "PURCHASER-5-评价本次供货.png",
+    "sub": "对已完成订单进行多维评分，评价结果纳入农户信用与智能匹配权重",
+    "rows": 0,
+    "empty": "",
+    "buttons": [
+      "刷新"
+    ],
+    "chip": "流程 5/5 评价本次供货 8"
+  },
+  {
+    "role": "质检配送员",
+    "no": 1,
+    "title": "",
+    "count": "2 批待质检",
+    "path": "/inspector/tasks",
+    "file": "INSPECTOR-1-领质检任务.png",
+    "sub": "",
+    "rows": 2,
+    "empty": "",
+    "buttons": [],
+    "chip": "流程 1/5 领质检任务 2"
+  },
+  {
+    "role": "质检配送员",
+    "no": 2,
+    "title": "质检录入",
+    "count": "4 批不合格待复检",
+    "path": "/inspector/quality",
+    "file": "INSPECTOR-2-录入质检结论.png",
+    "sub": "录入批次抽检结果，合格后自动生成溯源二维码与存证哈希",
+    "rows": 0,
+    "empty": "",
+    "buttons": [
+      "导出报告"
+    ],
+    "chip": "流程 2/5 录入质检结论 4"
+  },
+  {
+    "role": "质检配送员",
+    "no": 3,
+    "title": "配送任务",
+    "count": "3 批待发车",
+    "path": "/inspector/delivery",
+    "file": "INSPECTOR-3-发车配送.png",
+    "sub": "冷链车辆调度、温度监控与 GPS 轨迹，送达后扫码交付",
+    "rows": 18,
+    "empty": "",
+    "buttons": [
+      "配送单"
+    ],
+    "chip": "流程 3–4/5 发车配送 4"
+  },
+  {
+    "role": "质检配送员",
+    "no": 4,
+    "title": "配送任务",
+    "count": "1 批配送中",
+    "path": "/inspector/delivery",
+    "file": "INSPECTOR-4-在途跟踪与交付.png",
+    "sub": "冷链车辆调度、温度监控与 GPS 轨迹，送达后扫码交付",
+    "rows": 18,
+    "empty": "",
+    "buttons": [
+      "配送单"
+    ],
+    "chip": "流程 3–4/5 发车配送 4"
+  },
+  {
+    "role": "质检配送员",
+    "no": 5,
+    "title": "异常上报",
+    "count": "11 条质检预警待处置",
+    "path": "/inspector/exception",
+    "file": "INSPECTOR-5-异常上报.png",
+    "sub": "质检不合格、冷链温度超标、配送异常等情况及时上报，纳入食安预警处置",
+    "rows": 0,
+    "empty": "",
+    "buttons": [
+      "刷新"
+    ],
+    "chip": "流程 5/5 异常上报 11"
+  }
+]

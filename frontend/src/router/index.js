@@ -1,6 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/store/user'
 
+/* 主题不再与路由绑定（2026-11-10 二次收敛）：
+   全站只有一套设计系统，明度模式由用户全局选择并持久化（ct_ui_mode），
+   main.js 首屏设置 html[data-mode]，路由切换不会改变外观。 */
+
 const routes = [
   {
     path: '/login',
@@ -29,6 +33,7 @@ const routes = [
       /* ---------------- 农户/合作社 ---------------- */
       { path: 'farmer/workbench', component: () => import('@/views/farmer/Workbench.vue'), meta: { roles: ['FARMER'], title: '我的工作台', crumb: '生产经营 / 我的工作台' } },
       { path: 'farmer/sources', component: () => import('@/views/farmer/Sources.vue'), meta: { roles: ['FARMER'], title: '货源管理', crumb: '生产经营 / 货源管理' } },
+      { path: 'farmer/demands', component: () => import('@/views/farmer/Demands.vue'), meta: { roles: ['FARMER'], title: '需求大厅', crumb: '生产经营 / 需求大厅' } },
       { path: 'farmer/orders', component: () => import('@/views/farmer/Orders.vue'), meta: { roles: ['FARMER'], title: '订单管理', crumb: '生产经营 / 订单管理' } },
       { path: 'farmer/settlement', component: () => import('@/views/farmer/Settlement.vue'), meta: { roles: ['FARMER'], title: '结算与收入', crumb: '生产经营 / 结算与收入' } },
       { path: 'farmer/credit', component: () => import('@/views/farmer/Credit.vue'), meta: { roles: ['FARMER'], title: '信用评价', crumb: '生产经营 / 信用评价' } },
@@ -40,7 +45,7 @@ const routes = [
       { path: 'purchaser/match', component: () => import('@/views/purchaser/Match.vue'), meta: { roles: ['PURCHASER'], title: '智能匹配', crumb: '采购协同 / 智能匹配' } },
       { path: 'purchaser/orders', component: () => import('@/views/purchaser/Orders.vue'), meta: { roles: ['PURCHASER'], title: '我的订单', crumb: '采购协同 / 我的订单' } },
       { path: 'purchaser/inbound', component: () => import('@/views/purchaser/Inbound.vue'), meta: { roles: ['PURCHASER'], title: '入库确认', crumb: '采购协同 / 入库确认' } },
-      { path: 'purchaser/evaluation', component: () => import('@/views/purchaser/Evaluation.vue'), meta: { roles: ['PURCHASER'], title: '采购评价', crumb: '采购协同 / 采购评价' } },
+      { path: 'purchaser/stock', component: () => import('@/views/purchaser/Stock.vue'), meta: { roles: ['PURCHASER'], title: '库存与建议', crumb: '采购协同 / 库存与建议' } },      { path: 'purchaser/evaluation', component: () => import('@/views/purchaser/Evaluation.vue'), meta: { roles: ['PURCHASER'], title: '采购评价', crumb: '采购协同 / 采购评价' } },
       { path: 'purchaser/trace', component: () => import('@/views/admin/Trace.vue'), meta: { roles: ['PURCHASER'], title: '批次溯源', crumb: '采购协同 / 批次溯源' } },
 
       /* ---------------- 质检配送员 ---------------- */
@@ -62,13 +67,23 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 })
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const store = useUserStore()
   if (to.meta.public) {
     return true
   }
   if (!store.isLogin) {
     return { path: '/login', query: { redirect: to.fullPath } }
+  }
+  // 修复 P1-13：每次会话首次进入受保护路由都向 /auth/me 复核，
+  // 服务端返回的角色覆盖 localStorage，本地篡改 role 不再能进入管理页面。
+  if (!store.verified) {
+    try {
+      await store.refresh()
+    } catch (e) {
+      store.clear()
+      return { path: '/login', query: { redirect: to.fullPath } }
+    }
   }
   if (to.meta.roles && !to.meta.roles.includes(store.role)) {
     return store.home
@@ -81,6 +96,7 @@ router.beforeEach((to) => {
 
 router.afterEach((to) => {
   document.title = (to.meta.title ? to.meta.title + ' · ' : '') + '农校直供 · 溯源与结算管理平台'
+  // 外观是全局状态，与路由无关；此处刻意不改动 html[data-mode]。
 })
 
 export default router

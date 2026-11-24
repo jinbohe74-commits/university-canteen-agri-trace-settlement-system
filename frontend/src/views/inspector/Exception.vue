@@ -50,12 +50,22 @@
 
             <el-form-item label="现场照片">
               <div class="photo-row">
-                <div v-for="i in 3" :key="i" class="photo-ph" @click="uploadTip">
+                <div v-for="(p, i) in photos" :key="p.url || p.name" class="photo-ph has-photo">
+                  <img v-if="p.preview" :src="p.preview" :alt="p.name" class="photo-img" />
+                  <div v-else class="photo-done">
+                    <el-icon><Picture /></el-icon><span class="photo-name">{{ p.name }}</span>
+                  </div>
+                  <span class="photo-del" title="移除这张" @click.stop="removePhoto(i)">×</span>
+                </div>
+                <!-- 真实上传：走 /api/files/upload，失败会明确报错，不再只弹"演示环境" -->
+                <div v-if="photos.length < 3" class="photo-ph" :class="{ busy: uploading }" @click="pickPhoto">
                   <el-icon><Plus /></el-icon>
-                  <span>上传</span>
+                  <span>{{ uploading ? '上传中' : '上传' }}</span>
                 </div>
               </div>
-              <div class="photo-hint">支持 JPG / PNG，单张不超过 5MB</div>
+              <div class="photo-hint">
+                支持 JPG / PNG / WEBP，单张不超过 5MB，最多 3 张；照片随预警一并存档，管理员处置时可查看
+              </div>
             </el-form-item>
           </el-form>
 
@@ -109,9 +119,12 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { inspectorApi } from '@/api'
+import { commonApi, inspectorApi } from '@/api'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const submitting = ref(false)
+const uploading = ref(false)
+const photos = ref([])
 const types = ref(['质检异常', '温度异常', '配送异常', '其他异常'])
 const levels = ref(['高', '中', '低'])
 
@@ -154,9 +167,50 @@ const reset = () => {
   form.level = '中'
   form.target = ''
   form.content = ''
+  photos.value.forEach((p) => p.preview && URL.revokeObjectURL(p.preview))
+  photos.value = []
 }
 
-const uploadTip = () => ElMessage.info('演示环境：照片将随异常记录一并存档')
+/* 现场照片：真实上传到服务端（与质检页同一套接口），提交时带服务端地址留痕。
+   原来这里是三个只弹"演示环境"的假格子——点了没反应是用户最反感的一类。 */
+const pickPhoto = () => {
+  if (uploading.value) return
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.multiple = true
+  input.onchange = async () => {
+    const files = Array.from(input.files || []).slice(0, 3 - photos.value.length)
+    if (!files.length) return
+    uploading.value = true
+    try {
+      for (const f of files) {
+        if (f.size > 5 * 1024 * 1024) {
+          ElMessage.warning(f.name + ' 超过 5MB，已跳过')
+          continue
+        }
+        const res = await commonApi.upload(f, 'exception')
+        photos.value.push({
+          name: res.data?.name || f.name,
+          url: res.data?.url || '',
+          preview: URL.createObjectURL(f)
+        })
+      }
+      if (photos.value.length) ElMessage.success(`已上传 ${photos.value.length} 张现场照片`)
+    } catch (e) {
+      ElMessage.error('照片上传失败：' + (e?.message || '请重试'))
+    } finally {
+      uploading.value = false
+    }
+  }
+  input.click()
+}
+
+const removePhoto = (i) => {
+  const p = photos.value[i]
+  if (p?.preview) URL.revokeObjectURL(p.preview)
+  photos.value.splice(i, 1)
+}
 
 const submit = async () => {
   if (!form.content || form.content.trim().length < 10) {
@@ -169,15 +223,19 @@ const submit = async () => {
       type: form.type,
       content: form.content.trim(),
       target: form.target || '—',
-      level: form.level
+      level: form.level,
+      photos: photos.value.map((p) => p.url).filter(Boolean)
     })
-    ElMessage.success('异常已上报，管理员将在食安预警中跟进处理')
+    ElMessage.success(photos.value.length
+      ? `异常已上报（含 ${photos.value.length} 张现场照片），管理员将在食安预警中跟进处理`
+      : '异常已上报，管理员将在食安预警中跟进处理')
     reset()
   } finally {
     submitting.value = false
   }
 }
 
+useAutoRefresh(load)
 onMounted(load)
 </script>
 
@@ -196,14 +254,14 @@ onMounted(load)
 }
 
 .ex-form :deep(.el-form-item__label) {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: #4b5563;
   padding-bottom: 6px;
 }
 
 .ex-form :deep(.el-radio-button__inner) {
   padding: 7px 14px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 
 .level-group {
@@ -216,39 +274,41 @@ onMounted(load)
   border-radius: 9px;
   border: 1px solid var(--c-border-strong);
   background: #fff;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: #4b5563;
   cursor: pointer;
   transition: all 0.18s;
 }
 
 .level-btn.lv-高.active {
-  border-color: #ef4444;
+  border-color: var(--danger);
   background: #fef2f2;
-  color: #b91c1c;
+  color: var(--danger);
   font-weight: 600;
 }
 
 .level-btn.lv-中.active {
-  border-color: #f59e0b;
-  background: #fffbeb;
-  color: #b45309;
+  border-color: var(--warn);
+  background: var(--warn-soft);
+  color: var(--warn);
   font-weight: 600;
 }
 
 .level-btn.lv-低.active {
-  border-color: #6b7280;
+  border-color: var(--muted);
   background: #f9fafb;
-  color: #374151;
+  color: var(--ink-2);
   font-weight: 600;
 }
 
 .photo-row {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .photo-ph {
+  position: relative;
   width: 84px;
   height: 66px;
   border-radius: 9px;
@@ -257,15 +317,72 @@ onMounted(load)
   align-items: center;
   justify-content: center;
   gap: 3px;
-  font-size: 10.5px;
-  border: 1px dashed #b8e3c8;
-  background: #f4fdf8;
-  color: var(--c-primary);
+  font-size: var(--fs-2xs);
+  border: 1px dashed var(--line-strong);
+  background: var(--accent-soft);
+  color: var(--accent);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.photo-ph:hover {
+  border-color: var(--accent);
+}
+
+.photo-ph.busy {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.photo-ph.has-photo {
+  border-style: solid;
+  border-color: var(--line);
+  background: var(--surface-2);
+  cursor: default;
+}
+
+.photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-2);
+  padding: 4px;
+}
+
+.photo-name {
+  max-width: 74px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-2xs);
+}
+
+.photo-del {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  line-height: 14px;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
   cursor: pointer;
 }
 
 .photo-hint {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 6px;
 }
@@ -295,18 +412,18 @@ onMounted(load)
   border-radius: 9px;
   display: grid;
   place-items: center;
-  font-size: 15px;
+  font-size: var(--fs-md);
   flex-shrink: 0;
 }
 
 .rule-title {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #1b2a24;
+  color: var(--ink);
 }
 
 .rule-desc {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   margin-top: 3px;
   line-height: 1.6;

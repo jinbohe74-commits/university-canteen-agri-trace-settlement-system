@@ -164,9 +164,11 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { purchaserApi } from '@/api'
 import { fmtDate, fmtMoney, fmtNum } from '@/utils/format'
+import { useAutoRefresh } from '@/utils/useAutoRefresh'
 
 const DIMENSIONS = [
   { key: 'qualityScore', label: '产品品质' },
@@ -178,6 +180,7 @@ const DIMENSIONS = [
 
 const RATE_TEXT = { 5: '非常满意', 4: '满意', 3: '一般', 2: '不满意', 1: '很差' }
 
+const route = useRoute()
 const loading = ref(false)
 const submitting = ref(false)
 const pendingRows = ref([])
@@ -273,7 +276,15 @@ const submit = async () => {
   }
 }
 
-onMounted(load)
+useAutoRefresh(load)
+/* 待办「去评价」带 ?focus=<订单号>：直接选中那一单，省得在待评价列表里翻 */
+onMounted(async () => {
+  await load()
+  const no = String(route.query.focus || '')
+  if (!no) return
+  const hit = pendingRows.value.find((r) => r.orderNo && String(r.orderNo).includes(no))
+  if (hit) selectOrder(hit)
+})
 </script>
 
 <style scoped>
@@ -311,13 +322,13 @@ onMounted(load)
 }
 
 .pending-item:hover {
-  border-color: #bbe6cb;
+  border-color: var(--accent-soft);
   background: #f8fdfa;
 }
 
 .pending-item.active {
   border-color: var(--c-primary);
-  background: #f2fbf5;
+  background: var(--surface-2);
   box-shadow: 0 2px 10px rgba(22, 163, 74, 0.1);
 }
 
@@ -335,7 +346,7 @@ onMounted(load)
 
 .pi-sub {
   margin-top: 3px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -349,14 +360,14 @@ onMounted(load)
   gap: 12px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #f0fdf4, #e8f8ee);
-  border: 1px solid #d6f0e0;
+  background: linear-gradient(135deg, var(--surface-2), #e8f8ee);
+  border: 1px solid var(--accent-soft);
 }
 
 .fc-name {
-  font-size: 14.5px;
+  font-size: var(--fs-md);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
 }
 
 .fc-meta {
@@ -364,8 +375,8 @@ onMounted(load)
   align-items: center;
   gap: 7px;
   margin-top: 6px;
-  font-size: 11.5px;
-  color: #4b7a60;
+  font-size: var(--fs-xs);
+  color: var(--muted);
   flex-wrap: wrap;
 }
 
@@ -379,15 +390,15 @@ onMounted(load)
 
 .fs-num {
   font-family: var(--font-num);
-  font-size: 26px;
+  font-size: var(--fs-display);
   font-weight: 700;
-  color: #14532d;
+  color: var(--ink);
   letter-spacing: -0.6px;
 }
 
 .fs-label {
-  font-size: 10.5px;
-  color: #4b7a60;
+  font-size: var(--fs-2xs);
+  color: var(--muted);
   margin-top: 2px;
 }
 
@@ -407,7 +418,7 @@ onMounted(load)
 .fd-name {
   width: 62px;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-muted);
 }
 
@@ -416,16 +427,16 @@ onMounted(load)
   text-align: right;
   flex-shrink: 0;
   font-family: var(--font-num);
-  font-size: 12px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #15803d;
+  color: var(--accent);
 }
 
 .fc-foot {
   margin-top: 13px;
   padding-top: 10px;
   border-top: 1px dashed var(--c-border);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
 }
 
@@ -441,9 +452,9 @@ onMounted(load)
 }
 
 .ev-label {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #27362f;
+  color: var(--ink);
   margin-bottom: 10px;
 }
 
@@ -458,18 +469,18 @@ onMounted(load)
 }
 
 .ev-overall :deep(.el-rate__icon) {
-  font-size: 22px;
+  font-size: var(--fs-xl);
   margin-right: 4px;
 }
 
 .ev-text {
-  font-size: 13px;
+  font-size: var(--fs-base);
   font-weight: 600;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .ev-text.strong {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .dim-list {
@@ -487,13 +498,13 @@ onMounted(load)
 }
 
 .dim-row:nth-child(odd) {
-  background: #f8fbfa;
+  background: var(--surface-2);
 }
 
 .dim-name {
   width: 78px;
   flex-shrink: 0;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   color: var(--c-text-2);
 }
 
@@ -502,15 +513,15 @@ onMounted(load)
 }
 
 .dim-row :deep(.el-rate__icon) {
-  font-size: 17px;
+  font-size: var(--fs-lg);
 }
 
 .dim-val {
   margin-left: auto;
   font-family: var(--font-num);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #b45309;
+  color: var(--warn);
 }
 
 .tag-wrap {
@@ -527,7 +538,7 @@ onMounted(load)
   border-radius: 13px;
   border: 1px solid var(--c-border-strong);
   background: #fff;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--c-text-2);
   cursor: pointer;
   transition: all 0.16s;
@@ -536,13 +547,13 @@ onMounted(load)
 
 .pick-tag:hover {
   border-color: #86d9a6;
-  color: #15803d;
+  color: var(--accent);
 }
 
 .pick-tag.on {
   border-color: var(--c-primary);
-  background: #f0fdf4;
-  color: #15803d;
+  background: var(--surface-2);
+  color: var(--accent);
   font-weight: 600;
   box-shadow: 0 1px 6px rgba(22, 163, 74, 0.15);
 }

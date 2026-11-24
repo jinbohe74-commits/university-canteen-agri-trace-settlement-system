@@ -176,7 +176,7 @@ const verify = () => {
 .info-item {
   display: flex;
   gap: 10px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   align-items: baseline;
 }
 
@@ -184,18 +184,18 @@ const verify = () => {
   color: var(--c-muted);
   flex-shrink: 0;
   width: 66px;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
 }
 
 .info-item .v {
-  color: #1b2a24;
+  color: var(--ink);
   font-weight: 500;
 }
 
 .loss {
-  color: #b45309;
+  color: var(--warn);
   font-style: normal;
-  font-size: 12px;
+  font-size: var(--fs-sm);
 }
 
 .qr-card {
@@ -227,26 +227,26 @@ const verify = () => {
   align-items: center;
   gap: 6px;
   color: var(--c-muted-2);
-  font-size: 12px;
+  font-size: var(--fs-sm);
 }
 
 .qr-ph .el-icon {
-  font-size: 26px;
+  font-size: var(--fs-display);
 }
 
 .batch-no {
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   font-weight: 600;
-  color: #14532d;
-  background: #f2fbf5;
-  border: 1px dashed #bbe6cb;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px dashed var(--accent-soft);
   border-radius: 8px;
   padding: 6px 8px;
   word-break: break-all;
 }
 
 .qr-hint {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 7px;
   line-height: 1.6;
@@ -259,7 +259,7 @@ const verify = () => {
 }
 
 .timeline-op {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted-2);
   margin-top: 4px;
 }
@@ -271,38 +271,38 @@ const verify = () => {
   margin: 12px 0;
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f7faf9;
+  background: var(--surface-2);
 }
 
 .qc-result {
-  font-size: 18px;
+  font-size: var(--fs-lg);
   font-weight: 700;
 }
 
 .qc-result.ok {
-  color: #15803d;
+  color: var(--accent);
 }
 
 .qc-result.no {
-  color: #b91c1c;
+  color: var(--danger);
 }
 
 .qc-sub {
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   margin-top: 3px;
 }
 
 .qc-icon {
-  font-size: 26px;
+  font-size: var(--fs-display);
 }
 
 .qc-icon.ok {
-  color: #22c55e;
+  color: var(--ok);
 }
 
 .qc-icon.no {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .qc-items {
@@ -316,26 +316,26 @@ const verify = () => {
   grid-template-columns: 74px minmax(0, 1fr) 96px 54px;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--fs-sm);
   padding: 5px 0;
   border-bottom: 1px dashed var(--c-border);
 }
 
 .qc-name {
   font-weight: 600;
-  color: #27362f;
+  color: var(--ink);
 }
 
 .qc-std {
   color: var(--c-muted-2);
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .qc-val {
-  color: #374151;
+  color: var(--ink-2);
 }
 
 .hash-box {
@@ -346,14 +346,14 @@ const verify = () => {
 }
 
 .hash-label {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: rgba(255, 255, 255, 0.45);
   margin-bottom: 6px;
 }
 
 .hash {
   color: #86efac;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   line-height: 1.7;
   word-break: break-all;
 }
@@ -362,7 +362,7 @@ const verify = () => {
   display: flex;
   gap: 6px;
   margin-top: 10px;
-  font-size: 11.5px;
+  font-size: var(--fs-xs);
   color: var(--c-muted);
   line-height: 1.7;
 }

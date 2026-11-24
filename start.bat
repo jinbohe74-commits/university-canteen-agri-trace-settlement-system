@@ -32,7 +32,7 @@ if not exist "backend\target\canteen-trace.jar" (
 )
 
 echo       启动后端 ...
-start "canteen-backend-8080" /min /D "%ROOT%backend" cmd /k "chcp 65001 >nul && set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8 && java -jar target\canteen-trace.jar"
+start "canteen-backend-8080" /min /D "%ROOT%backend" cmd /k "chcp 65001 >nul && set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8 && java -jar target\canteen-trace.jar --server.port=8080"
 
 echo [2/3] 等待后端就绪 ...
 set "READY="
@@ -93,8 +93,7 @@ echo ============================================================
 echo   访问地址 : http://127.0.0.1:5173
 echo   后端接口 : http://127.0.0.1:8080/api
 echo.
-echo   演示账号 : admin / farmer24 / purchaser01 / inspector01
-echo   登录密码 : 123456
+echo   演示账号 : 见 README（仅限本地演示）
 echo.
 echo   注意：请勿关闭 canteen-backend-8080 与 canteen-frontend-5173
 echo         这两个黑窗口（可最小化），关闭即等于停止服务。

@@ -11,8 +11,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/canteen_trace?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-    username: root
-    password: "168168"
+    username: ${CANTEEN_DB_USERNAME:root}
+    password: ${CANTEEN_DB_PASSWORD:168168}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -25,9 +25,6 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
 
 mybatis-plus:
   configuration:
@@ -37,22 +34,29 @@ mybatis-plus:
     banner: false
     db-config:
       id-type: auto
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+      # 修复 P2：数据库 25 张表均无 deleted 列，不再配置全局逻辑删除，避免配置与表结构脱节
 
 # 业务参数（可用 sys_config 覆盖）
 canteen:
   jwt:
-    secret: "canteen-trace-direct-supply-trace-settlement-2026-secret-key"
+    # 生产必须注入环境变量 CANTEEN_JWT_SECRET；留空时自动生成随机密钥写入本地文件
+    secret: ${CANTEEN_JWT_SECRET:}
+    secret-file: ./config/jwt.secret
+    revocation-file: ./config/token-revocations.txt
     expire-minutes: 120          # 普通登录有效期
     remember-days: 7             # 记住我有效期
+  cors:
+    # 修复 P2：不再允许任意来源携带凭证跨域
+    allowed-origins: http://127.0.0.1:5173,http://localhost:5173
   upload:
     dir: ./uploads
     allow-ext: jpg,jpeg,png,pdf,webp
     max-size-mb: 5
   batch:
     qr-dir: ./uploads/qrcode
+  security:
+    # 本地演示时可在启动命令中打开：--canteen.security.expose-demo-accounts=true
+    expose-demo-accounts: false
 
 logging:
   level:

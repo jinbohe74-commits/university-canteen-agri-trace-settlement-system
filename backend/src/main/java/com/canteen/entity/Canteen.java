@@ -17,6 +17,12 @@ public class Canteen {
     private Long userId;
     private String name;
     private String campus;
+
+    /** 食堂经度（配送动态地图终点） */
+    private BigDecimal lng;
+
+    /** 食堂纬度 */
+    private BigDecimal lat;
     private String manager;
     private String phone;
     private Integer scale;
